@@ -9,4 +9,8 @@ Rails.application.routes.draw do
   get '/onboarding/dismiss', to: 'bx_block_admin/onboarding#dismiss'
   put '/catalogues/toggle_status', to: 'bx_block_admin/catalogues#toggle_status'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+
+  namespace :bx_block_admin, path: 'admin' do
+    # write routes for the admin panel here and controllers inside controllers/bx_block_admin
+  end
 end
