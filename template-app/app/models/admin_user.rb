@@ -90,6 +90,10 @@ class AdminUser < ApplicationRecord
         self.admin_profile
     end
 
+    def valid_otp?(otp)
+        (self.otp_code == otp && Time.current <= self.otp_valid_until) rescue false
+    end
+
     protected
 
     def password_required?

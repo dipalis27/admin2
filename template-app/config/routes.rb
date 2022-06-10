@@ -11,6 +11,15 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
   namespace :bx_block_admin, path: 'admin' do
-    # write routes for the admin panel here and controllers inside controllers/bx_block_admin
+    namespace :v1 do
+      # write routes for the admin panel here and controllers inside controllers/bx_block_admin/v1
+      resource :login, only: [:create]
+      resource :forgot_password, only: [:create] do
+        collection do
+          post :otp_validate
+          put :reset_password
+        end
+      end
+    end
   end
 end
