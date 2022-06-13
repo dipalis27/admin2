@@ -29,6 +29,12 @@ group :development do
   gem 'dotenv-rails'
 end
 
+group :test do
+  gem 'factory_bot_rails'
+  gem 'rspec-rails', '~> 4.0.1'
+  gem 'database_cleaner'
+end
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'studio_store_ecommerce_payment_razorpay', '0.0.6', require: 'bx_block_payment_razorpay'
