@@ -12,5 +12,6 @@ Rails.application.routes.draw do
 
   namespace :bx_block_admin, path: 'admin' do
     # write routes for the admin panel here and controllers inside controllers/bx_block_admin
+    resources :catalogues, only: [:create, :show]
   end
 end
