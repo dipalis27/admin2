@@ -1,7 +1,7 @@
 module BxBlockAdmin
   module V1
     class CataloguesController < ApplicationController
-      before_action :set_catalogue, only: [:show]
+      before_action :set_catalogue, only: [:show, :destroy]
 
       def toggle_status
         catalogue = BxBlockCatalogue::Catalogue.find_by_id(toggle_params[:id])
@@ -44,6 +44,14 @@ module BxBlockAdmin
 
       def show
         render json: BxBlockAdmin::CatalogueSerializer.new(@catalogue).serializable_hash, status: :ok
+      end
+
+      def destroy
+        if @catalogue.destroy
+          render json: { message: "Product deleted successfully.", success: true}, status: :ok
+        else
+          render json: BxBlockCatalogue::ErrorSerializer.new(@catalogue).serializable_hash, status: :unprocessable_entity
+        end
       end
 
       private

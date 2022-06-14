@@ -21,7 +21,7 @@ Rails.application.routes.draw do
           put :reset_password
         end
       end
-      resources :catalogues, only: [:index, :create, :show]
+      resources :catalogues, only: [:index, :create, :show, :destroy]
     end
   end
 end
