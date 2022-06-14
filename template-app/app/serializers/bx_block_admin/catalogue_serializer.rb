@@ -33,7 +33,26 @@
 
 module BxBlockAdmin
   class CatalogueSerializer < BuilderBase::BaseSerializer
-    attributes :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax, :tags, :brand, :sub_categories, :catalogue_variants
+    attributes :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax,  :catalogue_variants
+    
+    attribute :tags do |object|
+      object.tags.select(:id, :name)
+    end
+
+    attribute :brand do |object|
+      object.brand&.name
+    end
+
+    attribute :category do |object|
+      sub_categories = object.sub_categories.select(:id, :name, :disabled, :category_id)
+      if sub_categories.present?
+        {
+          id: sub_categories.first.category.id,
+          name: sub_categories.first.category.name,
+          sub_categories: sub_categories 
+        }
+      end
+    end
 
     attribute :attachments do |object|
       if object.attachments.present?
