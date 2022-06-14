@@ -54,6 +54,10 @@ module BxBlockAdmin
       end
     end
 
+    attribute :subscriptions do |object|
+      object.catalogue_subscriptions.select(:id, :subscription_package, :subscription_period, :discount, :catalogue_id, :morning_slot, :evening_slot)
+    end
+
     attribute :attachments do |object|
       if object.attachments.present?
         BxBlockAdmin::AttachmentSerializer.new(object.attachments)
