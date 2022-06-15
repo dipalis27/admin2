@@ -21,6 +21,7 @@ Rails.application.routes.draw do
           put :reset_password
         end
       end
+      resources :brand_settings, only: [:create, :update, :show, :index]
     end
   end
 end

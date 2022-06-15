@@ -1,25 +1,39 @@
 module BxBlockStoreProfile
   class BrandSetting < BxBlockStoreProfile::ApplicationRecord
     self.table_name = :brand_settings
+    
+    attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
+    
+    # Associations
     has_one_attached :logo
     has_one_attached :promotion_banner
-
-    attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
-
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
+    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
 
+    # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
 
-    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
-
+    # Validations
     validates_presence_of :address_state_id, if: :country_india?
     validates :heading, :logo, :country, presence: true
     validates_length_of :heading, maximum: 18
     validate :validate_phone_number
 
+    # Enum Values
     enum country: ['india', 'uk']
+    enum template_selection: ['Minimal', 'Prime', 'Bold', 'Ultra', 'Essence']
+    enum color_palet: [
+      "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
+      "{themeName: 'Navy',primaryColor:'#011638',secondaryColor:'#FE5F55'}",       
+      "{themeName: 'Bonsai',primaryColor:'#4A6C6F',secondaryColor:'#7FB069'}",
+      "{themeName: 'Forest',primaryColor:'#0B3C49',secondaryColor:'#BE7C4D'}",
+      "{themeName: 'Wood',primaryColor:'#6F1A07',secondaryColor:'#AF9164'}",
+      "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
+      "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
+    ]
+
 
     def cropped_image=(val)
       @cropped_image = val
