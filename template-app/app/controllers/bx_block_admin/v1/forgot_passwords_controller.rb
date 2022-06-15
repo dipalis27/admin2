@@ -10,6 +10,8 @@ module BxBlockAdmin
         if @admin_user.update(otp_code: rand(1_000..9_999), otp_valid_until: Time.current + 5.minutes)
           EmailOtpMailer.with(admin_user: @admin_user).otp_email.deliver_now
           render json: { 'messages': ['Otp sent successfully'] }, status: :ok
+        else
+          render json: {'errors' => ['Unable to send OTP']}, status: :unprocessable_entity
         end
       end
 
