@@ -1,10 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe BxBlockAdmin::V1::OnboardingController,
-               type: :controller do
-                
+RSpec.describe BxBlockAdmin::V1::OnboardingController, type: :controller do
   before :context do
-    @admin_user = FactoryBot.create(:admin_user, email: 'admin2@example.com', role: 'super_admin')
+    @admin_user = FactoryBot.create(:admin_user)
     @token = BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id)
     @request_params = { token: @token, format: :json }
     @success_response_code = 200
@@ -12,7 +10,7 @@ RSpec.describe BxBlockAdmin::V1::OnboardingController,
 
   describe 'onboarding status' do
     describe 'onboarding' do
-      describe 'get onboarding current status' do
+      context 'get onboarding current status' do
         it 'returns correct result' do
           get :index, params: @request_params
           result = JSON.parse(response.body)
