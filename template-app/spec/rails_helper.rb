@@ -15,7 +15,7 @@ RSpec.configure do |config|
 
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
@@ -36,14 +36,10 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
-
-  config.after(:each) do
-    DatabaseCleaner.clean
-  end
   
-  config.before :all do
-    Rails.application.load_seed
-  end
+  # config.before :all do
+  #   Rails.application.load_seed
+  # end
 
   config.infer_spec_type_from_file_location!
 
