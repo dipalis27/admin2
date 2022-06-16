@@ -29,7 +29,7 @@ module BxBlockAdmin
           @brand_setting = BxBlockStoreProfile::BrandSetting.find(params[:id])
           render(json: BrandSettingSerializer.new(@brand_setting).serializable_hash,status: :ok)
         rescue 
-          render(json: { error: "No brand settings found" }, status:401)
+          render(json: { error: "No brand settings found" }, status:404)
       end
       end
 
@@ -37,7 +37,7 @@ module BxBlockAdmin
         @brand_setting = BxBlockStoreProfile::BrandSetting.find(params[:id])
 
         if @brand_setting.update(brand_settings_params)
-          render(json: @brand_setting,status: :ok, message: "Brand Settings updated successfully")
+          render json: { data: @brand_setting,  message: "Brand Settings updated successfully" }, status: :ok
         else
           render(json:{ error: "No brand settings found"}, status:404)
         end
