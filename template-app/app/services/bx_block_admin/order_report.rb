@@ -23,7 +23,7 @@ module BxBlockAdmin
 
     def monthly_report(dates)
       data = []
-      dates.compact.map{|a|a.to_date}.uniq.sort.reverse.each do |date|
+      dates.compact.map{|a|a.to_date}.uniq.sort_by{|d| d.to_date }.reverse!.each do |date|
         one_day_orders = @report_orders.one_day_orders(date)
         invoiced_orders = one_day_orders.select{|order| order.total if order.status == 'delivered'}
         refunded_orders = one_day_orders.select{|order| order.total if order.status == 'refunded'}
