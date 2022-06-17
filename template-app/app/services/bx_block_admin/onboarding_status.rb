@@ -53,8 +53,8 @@ module BxBlockAdmin
     end
 
     def percent_completion
-      total_steps, steps_completed = @onboarding.task_info
       begin
+        total_steps, steps_completed = @onboarding&.task_info
         (steps_completed.to_f/total_steps.to_f)*100
       rescue
         100

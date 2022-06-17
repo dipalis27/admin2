@@ -90,7 +90,8 @@ module BxBlockOrderManagement
     scope :not_in_cart, -> { where.not(status: ['in_cart','created']) }
     scope :total_sale_amount, -> { where(status: 'placed').map(&:total).compact.sum }
     scope :one_day_sale, -> { where(status: 'placed', placed_at: (Time.now - 24.hours)..Time.now).map(&:total).compact.sum }
-
+    scope :one_day_orders, -> (date) {where(order_date:date.in_time_zone('UTC').beginning_of_day..date.in_time_zone('UTC').end_of_day)}
+    
     enum deliver_by: %i[fedex]
     before_update :set_status
     before_create :add_order_number

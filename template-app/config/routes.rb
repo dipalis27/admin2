@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       # write routes for the admin panel here and controllers inside controllers/bx_block_admin/v1
       resource :login, only: [:create]
       resources :onboarding, only: [:index]
+      resources :order_reports, only: [:index]
       resource :forgot_password, only: [:create] do
         collection do
           post :otp_validate
