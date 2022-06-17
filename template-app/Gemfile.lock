@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/faker-ruby/faker.git
+  revision: 425581295d59839e1c4c19a0f4482886d1e9f373
+  branch: master
+  specs:
+    faker (2.21.0)
+      i18n (>= 1.8.11, < 2)
+
 GEM
   remote: https://rubygems.org/
   remote: https://gem.fury.io/engineerai/
@@ -614,6 +622,7 @@ DEPENDENCIES
   database_cleaner
   dotenv-rails
   factory_bot_rails
+  faker!
   haml
   humanize
   json-jwt
@@ -674,4 +683,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.3.6
+   2.3.12
