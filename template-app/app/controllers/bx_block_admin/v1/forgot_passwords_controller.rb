@@ -7,10 +7,9 @@ module BxBlockAdmin
       before_action :validate_password, :validate_token, only: :reset_password
 
       def create
-        if @admin_user.update(otp_code: rand(1_000..9_999), otp_valid_until: Time.current + 5.minutes)
-          EmailOtpMailer.with(admin_user: @admin_user).otp_email.deliver_now
-          render json: { 'messages': ['Otp sent successfully'] }, status: :ok
-        end
+        @admin_user.update(otp_code: rand(1_000..9_999), otp_valid_until: Time.current + 5.minutes)
+        EmailOtpMailer.with(admin_user: @admin_user).otp_email.deliver_now
+        render json: { 'messages': ['Otp sent successfully'] }, status: :ok
       end
 
       def otp_validate
