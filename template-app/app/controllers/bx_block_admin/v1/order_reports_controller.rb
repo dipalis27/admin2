@@ -6,7 +6,7 @@ module BxBlockAdmin
         if order_reports
           render json: order_reports, status: :ok
         else
-          render json: {errors: [{order_reports: "Order Report Found"},
+          render json: {errors: [{order_reports: "Order Report Not Found"},
           ]}, status: :unprocessable_entity
         end
       end
