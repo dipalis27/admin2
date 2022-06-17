@@ -406,6 +406,11 @@ unless Products::Load.is_loaded_from_gem
       redirect_to edit_thingy_path(resource, thingy_filter: params["thingy"]["thingy_filter"])
     end
 
+    member_action :toggle_status, method: :patch do
+      resource.update_attributes(status: params[:catalogue][:status]) 
+      render json: {active: resource.reload.active?, success: !resource.errors.any?, id: resource.id} 
+    end
+
     collection_action :catalogue_sub_category_dropdown do
       cate = BxBlockCategoriesSubCategories::Category.find_by(id: params[:product_category_id])
       array = cate.sub_categories&.map { |u| {name: u.name, id: u.id} }.compact
