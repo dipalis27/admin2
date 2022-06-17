@@ -3,19 +3,6 @@ module BxBlockAdmin
     class CataloguesController < ApplicationController
       before_action :set_catalogue, only: [:show, :update, :destroy]
 
-      def toggle_status
-        catalogue = BxBlockCatalogue::Catalogue.find_by_id(toggle_params[:id])
-        return if catalogue.nil?
-
-        if toggle_params[:active] == 'true'
-          catalogue.update(status: 'active')
-        elsif toggle_params[:active] == 'false'
-          catalogue.update(status: 'draft')
-        end
-
-        render json: { active: catalogue.reload.active?, success: !catalogue.errors.any?, id: catalogue.id }
-      end
-
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1

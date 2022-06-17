@@ -685,10 +685,14 @@ $(document).ready(function (){
 $(document).on("click", ".catalogue-active-span", function (event) {
   var id = this.getAttribute('data-id');
   var switchElem = document.getElementById('catalogue-active-switch-' + id)
+  var handleStatus = !switchElem.checked ? 'active' : 'draft';
   $.ajax({
-    type: "PUT",
-    url: '/catalogues/toggle_status',
-    data : { 'id': id, 'active': !switchElem.checked },
+    type: "PATCH",
+    url: '/admin/products/'+id+'/toggle_status',
+    data : { 'catalogue': { 'status': handleStatus } },
+    headers: {
+      'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+    },
     success: function(response){
       var elemId = 'catalogue-active-switch-' + response.id
       document.getElementById(elemId).checked = response.active
