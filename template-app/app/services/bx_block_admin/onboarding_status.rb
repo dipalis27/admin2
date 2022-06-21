@@ -6,11 +6,14 @@ module BxBlockAdmin
       @variant = BxBlockCatalogue::Variant.first
       @category = BxBlockCategoriesSubCategories::Category.first
       @onboarding = BxBlockAdmin::Onboarding.first
+      @api_configuration_payment = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['stripe', 'razorpay']).first
+      @api_configuration_shipping = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).first
+      @tax = BxBlockOrderManagement::Tax.first 
     end
 
     def call
-      data = {onboarding_steps: [{title: 'Branding',steps: branding},{title: 'Products',steps: products},
-          {title: 'Business settings',steps: business_settings}],
+      data = {onboarding_steps: [{title: 'Branding', steps_completed: branding.select{|key, hash| hash if hash[:completion_status] }.size, total_steps: branding.size, steps: branding },{title: 'Products',steps_completed: products.select{|key, hash| hash if hash[:completion_status] }.size, total_steps: products.size, steps: products},
+          {title: 'Business settings', steps_completed: business_settings.select{|key, hash| hash if hash[:completion_status] }.size, total_steps: business_settings.size, steps: business_settings}],
         percent_completion: percent_completion
       }
       data
@@ -38,16 +41,25 @@ module BxBlockAdmin
 
     def business_settings
       {
-        lorem1: {
-          title: 'Lorem1',
-          description: 'Lorem 1',
-          completion_status: false
+        store_details: {
+          title: 'Store details',
+          description: 'Define the main details of your store (e.g. phone, address)',
+          completion_status: @brand_setting.phone_number.present? && @brand_setting.address.present?
         },
-        lorem2: {
-          title: 'Lorem2',
-          description: 'Lorem 2',
-          completion_status: false
-
+        taxes: {
+          title: 'Taxes',
+          description: 'Define the different taxes that will apply to your products',
+          completion_status: @tax.present?
+      },
+        shipping: {
+          title: 'Shipping',
+          description: 'Customise the shipping charges of your products',
+          completion_status: @api_configuration_shipping.present?
+        },
+        payment: {
+          title: 'Payment',
+          description: 'Define the payment mechanisim for your sales',
+          completion_status: @api_configuration_payment.present?
         }
       }
     end
