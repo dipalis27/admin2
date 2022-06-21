@@ -1,5 +1,4 @@
 module BxBlockAdmin
-
   class BrandSettingSerializer < BuilderBase::BaseSerializer
     attributes :buttons_color, :main_texts_color, :logo_url, :common_borders_color, :highlight_primary_color, :highlight_secondary_color, :common_texts_content, :footer_content, :common_logo_src, :product_filter_slider_color, :extra_fields, :notification_keys, :template_selection, :payment_keys
 
