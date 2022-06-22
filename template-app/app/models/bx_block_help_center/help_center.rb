@@ -5,6 +5,7 @@ module BxBlockHelpCenter
     validates_presence_of :title, :description, :help_center_type
     ALL_STATES = %w[ other about_us terms_of_service privacy_policy how_it_works delivery_and_returns ].freeze
     enum help_center_type: ALL_STATES.zip(ALL_STATES).to_h
+    enum status:["not_published", "published"]
 
     before_create :track_event
 

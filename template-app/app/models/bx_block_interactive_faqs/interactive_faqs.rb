@@ -14,9 +14,13 @@ module BxBlockInteractiveFaqs
 
     SERIALIZE_ATTRIBUTES = %w[id title content created_at updated_at].freeze
 
+    enum status:["not_published", "published"]
+
+    # Validations
     validates :title, presence: true, uniqueness: true
     validates :content, presence: true
 
+    # Callbacks
     before_save :set_content
     after_create :track_event
 
