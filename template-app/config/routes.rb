@@ -25,6 +25,7 @@ Rails.application.routes.draw do
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
+      resources :customers, except: [:edit, :new]
     end
   end
 end
