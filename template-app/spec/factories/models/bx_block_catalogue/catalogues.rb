@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :catalogue, class: "BxBlockCatalogue::Catalogue" do
     brand_id {  }
     name { Faker::Commerce.product_name }
-    sku { Faker::Code.asin }                        # uniq
+    sequence(:sku) { |num| "PRODUCT_#{num}" }       # uniq.
     description { Faker::Commerce.department }
     manufacture_date {}                             # should be < today's date
     length {}
