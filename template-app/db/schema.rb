@@ -293,8 +293,8 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.string "gst_number"
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
-    t.string "template_selection", default: "Minimal"
-    t.string "color_palet", default: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}"
+    t.integer "template_selection", default: 0
+    t.integer "color_palet", default: 0
     t.integer "address_state_id"
   end
 
