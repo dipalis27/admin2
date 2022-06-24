@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       end
       resources :brand_settings, only: [:create, :update, :show, :index]
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
+      resources :categories, only: [:index, :create, :show, :update, :destroy]
     end
   end
 end
