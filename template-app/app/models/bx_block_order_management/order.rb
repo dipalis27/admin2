@@ -462,7 +462,7 @@ module BxBlockOrderManagement
                   right:  "0.5in" },
         disposition: "attachment"
       )
-      pdf_path = Rails.root.join("tmp", "temp_pdf_file_#{self.id}_#{Date.today.iso8601}.pdf")
+      pdf_path = Rails.root.join("tmp", "temp_pdf_file_#{self.id}_#{Time.now}.pdf")
       File.open(pdf_path, "wb") do |file|
         file << doc_pdf
       end
