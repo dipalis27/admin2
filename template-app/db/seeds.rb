@@ -175,3 +175,16 @@ BxBlockCatalogue::Catalogue.active.each do |catalogue|
     end
   end
 end
+
+customer_facing_email = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Customer facing emails")
+admin_emails = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Admin emails")
+
+user_account_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "User account emails", email_setting_tab_id: customer_facing_email.id)
+order_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Order emails", email_setting_tab_id: customer_facing_email.id)
+notification_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Notification emails", email_setting_tab_id: customer_facing_email.id)
+admin_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Admin emails", email_setting_tab_id: admin_emails.id)
+
+BxBlockSettings::EmailSetting.where(title: ['welcome email', 'new account otp verification', 'password changed']).update_all(email_setting_category_id: user_account_email.id)
+BxBlockSettings::EmailSetting.where(title: ['new order', 'order confirmed', 'order status']).update_all(email_setting_category_id: order_email.id)
+BxBlockSettings::EmailSetting.where(title: ['product stock notification']).update_all(email_setting_category_id: notification_email.id)
+BxBlockSettings::EmailSetting.where(title: ['contact us','admin new order']).update_all(email_setting_category_id: admin_email.id)
