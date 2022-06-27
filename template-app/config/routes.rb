@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
       resources :customers, except: [:edit, :new]
+      resources :email_settings, only: [:index, :create, :edit, :update, :show, :destroy]
     end
   end
 end
