@@ -22,6 +22,9 @@ Rails.application.routes.draw do
         end
       end
       resources :brand_settings, only: [:create, :update, :show, :index]
+      post '/add_banner', to: "brand_settings#add_banner"
+      put '/update_banner', to: "brand_settings#update_banner"
+      delete '/destroy_banner', to: "brand_settings#destroy_banner"
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
