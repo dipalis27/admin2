@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :catalogue, class: "BxBlockCatalogue::Catalogue" do
     brand_id {  }
     name { Faker::Commerce.product_name }
-    sequence(:sku) { |num| "PRODUCT_#{num}" }       # uniq.
+    sequence(:sku) { |num| "PRODUCT_#{num}_#{Time.now.to_i}" }       # uniq.
     description { Faker::Commerce.department }
     manufacture_date {}                             # should be < today's date
     length {}
@@ -22,6 +22,13 @@ FactoryBot.define do
     status { 0 }
     tax_amount {}
     price_including_tax {}
-    tax                                             # tax is manditory, if status is active.
+    tax     
+    after(:build) do |catalogue|
+      catalogue.attachments.new(
+        image: Rack::Test::UploadedFile.new(Rails.root.join('app/assets/images/Bold.jpg'), 'image/jpg'),
+        image_file_name: "Bold.jpg",
+        image_content_type: "image/jpg"
+      )
+    end
   end
 end
