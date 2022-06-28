@@ -7,7 +7,6 @@ Rails.application.routes.draw do
   get '422', to: 'application#server_error'
   get '404', to: 'application#page_not_found'
   get '/onboarding/dismiss', to: 'bx_block_admin/onboarding#dismiss'
-  put '/catalogues/toggle_status', to: 'bx_block_admin/catalogues#toggle_status'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
   namespace :bx_block_admin, path: 'admin' do
@@ -15,6 +14,7 @@ Rails.application.routes.draw do
       # write routes for the admin panel here and controllers inside controllers/bx_block_admin/v1
       resource :login, only: [:create]
       resources :onboarding, only: [:index]
+      resources :order_reports, only: [:index]
       resource :forgot_password, only: [:create] do
         collection do
           post :otp_validate
@@ -26,7 +26,6 @@ Rails.application.routes.draw do
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
       resources :customers, except: [:edit, :new]
-      resources :customer_feedbacks, only: [:create, :update, :show, :index, :destroy]
     end
   end
 end

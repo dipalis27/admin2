@@ -45,7 +45,8 @@ module AccountBlock
     # has_many :attachments, -> {where record_type: 'AccountBlock::Account'}, class_name: "ActiveStorage::Attachment", dependent: :destroy, foreign_key: :record_id
     # -> { where a
     validates :full_name, presence: true
-    validates :email, uniqueness: true
+    validates :email, uniqueness: true, presence: true
+    validates_presence_of :password, on: :create
     # validates :user_name, presence: true, uniqueness: true
     # validates :password_digest, presence: true, uniqueness: true
 
@@ -88,7 +89,7 @@ module AccountBlock
       self.full_phone_number = phone.sanitized
       self.country_code      = phone.country_code
       self.phone_number      = phone.raw_national
-      errors.add(:full_phone_number, "Invalid Phone Number for UK or India") unless  self.country_code == 91 || self.country_code == 44
+      errors.add(:full_phone_number, "Invalid Phone Number for UK or India") unless self.country_code == 91 || self.country_code == 44
       valid_phone_number
     end
 
