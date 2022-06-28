@@ -10,7 +10,40 @@ class AdminUser < ApplicationRecord
 
     before_create :track_event
 
-    PERMISSION_KEYWORDS = [['product','BxBlockCatalogue::Catalogue'], ['category','BxBlockCategoriesSubCategories::Category'], ['order', 'BxBlockOrderManagement::Order'], ['brand', 'BxBlockCatalogue::Brand'], ['coupon', 'BxBlockCouponCodeGenerator::CouponCode'], ['tag', 'BxBlockCatalogue::Tag'], ['user', 'AccountBlock::Account']]
+    PERMISSION_KEYWORDS = [
+        ['product','BxBlockCatalogue::Catalogue'],
+        ['category','BxBlockCategoriesSubCategories::Category'],
+        ['order', 'BxBlockOrderManagement::Order'],
+        ['brand', 'BxBlockCatalogue::Brand'],
+        ['coupon', 'BxBlockCouponCodeGenerator::CouponCode'],
+        ['tag', 'BxBlockCatalogue::Tag'],
+        ['user', 'AccountBlock::Account']
+    ]
+    # Add routes inside this as per permissions to give access to sub admin
+    PERMISSION_ROUTES = HashWithIndifferentAccess.new({
+        'bx_block_admin/v1/catalogues': 'BxBlockCatalogue::Catalogue',
+        'bx_block_admin/v1/categories': 'BxBlockCategoriesSubCategories::Category', #valid route needed
+        'bx_block_admin/v1/order_reports': 'BxBlockOrderManagement::Order',
+        'bx_block_admin/v1/brand': 'BxBlockCatalogue::Brand', #valid route needed
+        'bx_block_admin/v1/coupon': 'BxBlockCouponCodeGenerator::CouponCode', #valid route needed
+        'bx_block_admin/v1/tag': 'BxBlockCatalogue::Tag', #valid route needed
+        'bx_block_admin/v1/customers': 'AccountBlock::Account'
+    })
+    PERMISSION_CONVERSIONS = HashWithIndifferentAccess.new({
+        'BxBlockCatalogue::Catalogue': 'catalogue',
+        'BxBlockCategoriesSubCategories::Category': 'category',
+        'BxBlockOrderManagement::Order': 'order',
+        'BxBlockCatalogue::Brand': 'brand',
+        'BxBlockCouponCodeGenerator::CouponCode': 'coupon',
+        'BxBlockCatalogue::Tag': 'tag',
+        'AccountBlock::Account': 'user'
+    })
+    PERMISSIONS = [
+        'BxBlockCatalogue::Catalogue', 'BxBlockCategoriesSubCategories::Category',
+        'BxBlockOrderManagement::Order', 'BxBlockCatalogue::Brand',
+        'BxBlockCouponCodeGenerator::CouponCode', 'BxBlockCatalogue::Tag',
+        'AccountBlock::Account'
+    ]
 
     #################
     ## Association
@@ -22,6 +55,7 @@ class AdminUser < ApplicationRecord
     validates :name, :email, :phone_number, presence: true, if: -> { role == 'sub_admin' }
     validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, if: -> { role == 'sub_admin' }
     validates :email, presence: true, format: /\w+@\w+\.{1}[a-zA-Z]{2,}/
+    validate :validate_permissions 
 
     #################
     ## Callbacks
@@ -92,6 +126,17 @@ class AdminUser < ApplicationRecord
 
     def valid_otp?(otp)
         (self.otp_code == otp && Time.current <= self.otp_valid_until) rescue false
+    end
+
+    def admin_permissions
+        return ['all'] if super_admin?
+        permissions.map{|p| PERMISSION_CONVERSIONS[p]}
+    end
+
+    def validate_permissions
+        if permissions.any?{|p| !(PERMISSIONS).include?(p)}
+            errors.add(:permissions, "are invalid")
+        end
     end
 
     protected
