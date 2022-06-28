@@ -145,7 +145,7 @@ RSpec.describe BxBlockAdmin::V1::CataloguesController, type: :controller do
           it 'should have attributes key in data hash' do
             expect(data).to have_key(:attributes)
           end
-          
+
           it { is_expected.to have_key(:name) }
           it { is_expected.to have_key(:sku) }
           it { is_expected.to have_key(:description) }
@@ -186,23 +186,22 @@ RSpec.describe BxBlockAdmin::V1::CataloguesController, type: :controller do
 
     context "DELETE /destroy" do     
       context 'with a valid authorization token' do
-        before(:context) do
-          @catalogue = FactoryBot.create(:catalogue)
+        subject(:response) do
+          catalogue = FactoryBot.create(:catalogue)
+          delete :destroy, params: @request_params.merge(id: catalogue.id)
         end
-        let(:response) { delete :destroy, params: @request_params.merge(id: @catalogue.id) }
-        
+        let(:response_body) { JSON.parse response.body }
+
         it 'returns http success' do
           expect(response).to have_http_status(:success)
         end
 
         it 'expects message and success key' do
-          response_body = JSON.parse response.body
           expect(response_body).to have_key("message")
           expect(response_body).to have_key("success")
         end
 
         it 'expects success to be true' do
-          response_body = JSON.parse response.body
           expect(response_body["success"]).to eq(true) 
         end
       end
