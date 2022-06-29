@@ -5,10 +5,11 @@ module BxBlockAdmin
     class HelpCentersController < ApplicationController
 
       def index
-        @static_page = BxBlockHelpCenter::HelpCenter.all
+        @static_pages = BxBlockHelpCenter::HelpCenter.all
+        @static_pages = @static_pages.order(created_at: "desc").page(params[:page]).per(10)
 
-        if @static_page.present?
-          render json: @static_page, status: :ok
+        if @static_pages.present?
+          render json: @static_pages, status: :ok
         else
           render json: { message: "No static pages found"}, status: 404
         end

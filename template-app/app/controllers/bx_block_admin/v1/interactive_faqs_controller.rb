@@ -5,10 +5,11 @@ module BxBlockAdmin
     class InteractiveFaqsController < ApplicationController
       
       def index
-        @faq = BxBlockInteractiveFaqs::InteractiveFaqs.all
+        @faqs = BxBlockInteractiveFaqs::InteractiveFaqs.all
+        @faqs = @faqs.order(created_at: "desc").page(params[:page]).per(10)
 
-        if @faq.present?
-          render json: @faq, status: :ok
+        if @faqs.present?
+          render json: @faqs, status: :ok
         else
           render json: { message: "No FAQ found"}, status: 404
         end
