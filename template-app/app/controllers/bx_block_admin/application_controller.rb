@@ -9,7 +9,8 @@ module BxBlockAdmin
     rescue_from ActiveRecord::RecordNotFound, :with => :not_found
 
     EXCEPTION_ROUTES = [
-      'bx_block_admin/v1/admin_users#show', 'bx_block_admin/v1/admin_users#update'
+      'bx_block_admin/v1/admin_users#show', 'bx_block_admin/v1/admin_users#update',
+      'bx_block_admin/v1/onboarding#index'
     ]
 
     private

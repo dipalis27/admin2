@@ -17,7 +17,8 @@ class AdminUser < ApplicationRecord
         ['brand', 'BxBlockCatalogue::Brand'],
         ['coupon', 'BxBlockCouponCodeGenerator::CouponCode'],
         ['tag', 'BxBlockCatalogue::Tag'],
-        ['user', 'AccountBlock::Account']
+        ['user', 'AccountBlock::Account'],
+        ['brand setting', 'BxBlockStoreProfile::BrandSetting']
     ]
     # Add routes inside this as per permissions to give access to sub admin
     PERMISSION_ROUTES = HashWithIndifferentAccess.new({
@@ -27,7 +28,8 @@ class AdminUser < ApplicationRecord
         'bx_block_admin/v1/brand': 'BxBlockCatalogue::Brand', #valid route needed
         'bx_block_admin/v1/coupon': 'BxBlockCouponCodeGenerator::CouponCode', #valid route needed
         'bx_block_admin/v1/tag': 'BxBlockCatalogue::Tag', #valid route needed
-        'bx_block_admin/v1/customers': 'AccountBlock::Account'
+        'bx_block_admin/v1/customers': 'AccountBlock::Account',
+        'bx_block_admin/v1/brand_settings': 'BxBlockStoreProfile::BrandSetting'
     })
     PERMISSION_CONVERSIONS = HashWithIndifferentAccess.new({
         'BxBlockCatalogue::Catalogue': 'catalogue',
@@ -36,13 +38,14 @@ class AdminUser < ApplicationRecord
         'BxBlockCatalogue::Brand': 'brand',
         'BxBlockCouponCodeGenerator::CouponCode': 'coupon',
         'BxBlockCatalogue::Tag': 'tag',
-        'AccountBlock::Account': 'user'
+        'AccountBlock::Account': 'user',
+        'BxBlockStoreProfile::BrandSetting': 'brand setting'
     })
     PERMISSIONS = [
         'BxBlockCatalogue::Catalogue', 'BxBlockCategoriesSubCategories::Category',
         'BxBlockOrderManagement::Order', 'BxBlockCatalogue::Brand',
         'BxBlockCouponCodeGenerator::CouponCode', 'BxBlockCatalogue::Tag',
-        'AccountBlock::Account'
+        'AccountBlock::Account', 'BxBlockStoreProfile::BrandSetting'
     ]
 
     #################
