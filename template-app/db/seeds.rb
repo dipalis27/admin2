@@ -184,7 +184,21 @@ order_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Ord
 notification_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Notification emails", email_setting_tab_id: customer_facing_email.id)
 admin_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Admin emails", email_setting_tab_id: admin_emails.id)
 
-BxBlockSettings::EmailSetting.where(title: ['welcome email', 'new account otp verification', 'password changed']).update_all(email_setting_category_id: user_account_email.id)
-BxBlockSettings::EmailSetting.where(title: ['new order', 'order confirmed', 'order status']).update_all(email_setting_category_id: order_email.id)
-BxBlockSettings::EmailSetting.where(title: ['product stock notification']).update_all(email_setting_category_id: notification_email.id)
-BxBlockSettings::EmailSetting.where(title: ['contact us','admin new order']).update_all(email_setting_category_id: admin_email.id)
+content = YAML.load_file("#{Rails.root}/config/templates.yaml")
+BxBlockSettings::EmailSetting.event_names.keys.each do |event_name|
+  content_key = event_name.downcase.gsub(" ", "_")
+  email_setting = BxBlockSettings::EmailSetting.find_or_initialize_by(title: event_name)
+  email_setting.content = content[content_key] if email_setting.new_record?
+  if ['welcome email', 'new account otp verification', 'password changed'].include?(event_name)
+    email_setting.email_setting_category_id = user_account_email.id
+  elsif ['new order', 'order confirmed', 'order status'].include?(event_name)
+    email_setting.email_setting_category_id = order_email.id
+  elsif ['product stock notification'].include?(event_name)
+    email_setting.email_setting_category_id = notification_email.id
+  elsif ['contact us','admin new order'].include?(event_name)
+    email_setting.email_setting_category_id = admin_email.id
+  end
+  email_setting.event_name = event_name
+  email_setting.save
+end
+
