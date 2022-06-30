@@ -27,6 +27,17 @@ Rails.application.routes.draw do
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
       resources :customers, except: [:edit, :new]
       resources :email_settings, only: [:index, :create, :edit, :update, :show, :destroy]
+      resource :admin_user, only: [:show, :update] do
+        collection do
+          get :sub_admin_users
+          get :permissions
+        end
+        member do
+          post :create_sub_admin
+          get :show_sub_admin
+          put :update_sub_admin
+        end
+      end
     end
   end
 end

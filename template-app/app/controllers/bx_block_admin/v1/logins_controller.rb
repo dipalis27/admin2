@@ -3,11 +3,15 @@ module BxBlockAdmin
     class LoginsController < ApplicationController
       skip_before_action :validate_json_web_token
       skip_before_action :get_admin_user
+      skip_before_action :validate_admin
       before_action :set_admin_user
 
       def create
         if @admin_user.valid_password?(admin_user_params[:password])
-          render json: { token: BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id) }, status: :ok
+          render json: {
+            token: BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id),
+            admin_user: AdminUserSerializer.new(@admin_user).serializable_hash
+          }, status: :ok
         else
           render json: {'errors' => ['Invalid password']}, status: :unprocessable_entity
         end
