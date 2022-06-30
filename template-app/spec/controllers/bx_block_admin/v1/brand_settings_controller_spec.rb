@@ -39,7 +39,7 @@ RSpec.describe BxBlockAdmin::V1::BrandSettingsController, type: :controller do
         request.headers['token'] = @token
         post :create, params: {"heading": Faker::Lorem.word, "country": "uk", "phone_number": "98765432101"}
         expect(JSON.parse(response.body)["errors"].count).to be >0
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe BxBlockAdmin::V1::BrandSettingsController, type: :controller do
 
       it 'when brand setting is not present ' do
         request.headers['token'] = @token
-        get :show, params: {"id":12}
+        get :show, params: {"id": 0}
         expectation = HashWithIndifferentAccess.new({"error" => "No brand settings found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
@@ -71,10 +71,10 @@ RSpec.describe BxBlockAdmin::V1::BrandSettingsController, type: :controller do
         expect(response.status).to eq(200)
       end
       
-      it 'when admin_user does not provide all the fields' do
+      it 'when admin_user does not valid id' do
         request.headers['token'] = @token
-        put :update, params: {"id": 45,"heading": Faker::Lorem.word, "country": "uk", "phone_number": "98765432101"}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        put :update, params: {"id": 0,"heading": Faker::Lorem.word, "country": "uk", "phone_number": "98765432101"}
+        expectation = HashWithIndifferentAccess.new({"errors" => ["Brand setting not found."]})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end

@@ -1,6 +1,6 @@
 FactoryBot.define do
   sequence :email do |n|
-    "admin#{Time.now.to_i}@example.com"
+    "admin#{Time.now.to_i}_#{rand(10**4..10**5)}@example.com"
   end
 
   factory :admin_user, class: 'AdminUser' do

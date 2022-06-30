@@ -48,7 +48,7 @@ module BxBlockAdmin
             return render json: { errors: [@brand_setting.errors.full_messages.to_sentence] }, status: :unprocessable_entity
           end
         else
-          render json: { errors: ["Brand setting not found."] }, status: :unprocessable_entity
+          render json: { errors: ["Brand setting not found."] }, status: :not_found
         end
       end
 

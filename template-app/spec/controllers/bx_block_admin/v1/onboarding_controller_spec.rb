@@ -7,6 +7,7 @@ RSpec.describe BxBlockAdmin::V1::OnboardingController, type: :controller do
     @token = BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id)
     @request_params = { token: @token, format: :json }
     @success_response_code = 200
+    @brand_setting = FactoryBot.create(:brand_settings)
   end
 
   describe 'onboarding status' do
