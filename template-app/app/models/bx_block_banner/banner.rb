@@ -49,6 +49,37 @@ module BxBlockBanner
       end
     end
 
+    def self.validate_and_save(banners)
+      response = {}
+      BxBlockBanner::Banner.transaction do
+        banners.each do |banner_data|
+          banner =  self.find_by_id(banner_data[:id])
+          banner = banner || self.new(banner_position: banner_data[:banner_position], web_banner: true)
+          banner.attachments.destroy_all unless banner.new_record?
+          banner_data[:sub_banners].each do |sub_banner|
+            attachment = banner.attachments.new(position: sub_banner[:position])
+            if sub_banner[:image].present?
+              image_extension = sub_banner[:image].split(',').first.split(';').first.split('/').last rescue 'png'
+              decoded_data = sub_banner[:image].gsub!("data:image/#{image_extension};base64,", "")
+              image_path="tmp/banner_image.#{image_extension}"
+              File.open(image_path, 'wb') do |f|
+                f.write(Base64.decode64(decoded_data))
+              end
+              attachment.image.attach(io: File.open(image_path),filename: "cropped_image.#{image_extension}")
+              File.delete(image_path) if File.exist?(image_path)
+            end
+          end
+          banner.save!
+        end
+        response[:success] = true
+      rescue StandardError => e
+        response[:success] = false
+        response[:message] = e.message
+        raise ActiveRecord::Rollback
+      end
+      response
+    end
+
     private
 
     def update_onboarding_step

@@ -101,3 +101,4 @@ gem "yabeda-http_requests" #External request monitoring
 gem "yabeda-puma-plugin"
 gem 'yabeda-sidekiq'
 gem 'bx_block_cors'
+gem 'active_storage_base64'
