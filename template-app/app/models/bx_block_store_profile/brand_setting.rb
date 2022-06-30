@@ -5,7 +5,7 @@ module BxBlockStoreProfile
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
     
     # Associations
-    has_one_attached :logo
+    has_one_base64_attached :logo
     has_one_attached :promotion_banner
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
@@ -33,7 +33,6 @@ module BxBlockStoreProfile
       "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
       "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
     ]
-
 
     def cropped_image=(val)
       @cropped_image = val
