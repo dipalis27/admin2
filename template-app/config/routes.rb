@@ -41,6 +41,7 @@ Rails.application.routes.draw do
           post :create_sub_admin
           get :show_sub_admin
           put :update_sub_admin
+          delete :destroy_sub_admin
         end
       end
       resources :variants, only: [:index, :create, :update, :show, :destroy]

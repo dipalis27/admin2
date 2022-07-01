@@ -55,9 +55,8 @@ class AdminUser < ApplicationRecord
     #################
     ## Validations
     #################
-    validates :name, :email, :phone_number, presence: true, if: -> { role == 'sub_admin' }
-    validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, if: -> { role == 'sub_admin' }
-    validates :email, presence: true, format: /\w+@\w+\.{1}[a-zA-Z]{2,}/
+    validates_presence_of :name, if: -> { role == 'sub_admin' }
+    validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, presence: true, if: -> { role == 'sub_admin' }
     validate :validate_permissions 
 
     #################
