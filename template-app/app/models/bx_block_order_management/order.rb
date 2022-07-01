@@ -307,12 +307,20 @@ module BxBlockOrderManagement
     def send_email_to_customer
       return unless self.account&.is_notification_enabled
       return unless self.account&.is_email_valid?
-      OrderMailer.with(host: $hostname).order_status_notification(self).deliver_now if self.saved_change_to_order_status_id? && !['in_cart', 'created', 'confirmed', 'placed'].include?(self.status)
+      if BxBlockSettings::EmailSetting.find_by(event_name: "order status").try(:active)
+        OrderMailer.with(host: $hostname).order_status_notification(self).deliver_now if self.saved_change_to_order_status_id? && !['in_cart', 'created', 'confirmed', 'placed'].include?(self.status)  
+      end
       if self.placed?
-        OrderMailer.with(host: $hostname).order_placed(self).deliver_later(wait: 10.seconds)
-        OrderMailer.with(host: $hostname).admin_order_placed(self).deliver_later(wait: 10.seconds)
+        if BxBlockSettings::EmailSetting.find_by(event_name: "new order").try(:active)
+          OrderMailer.with(host: $hostname).order_placed(self).deliver_later(wait: 10.seconds)
+          if BxBlockSettings::EmailSetting.find_by(event_name: "admin new order").try(:active)
+            OrderMailer.with(host: $hostname).admin_order_placed(self).deliver_later(wait: 10.seconds)
+          end
+        end
       elsif self.confirmed?
-        OrderMailer.with(host: $hostname).order_confirmed(self).deliver_now
+        if BxBlockSettings::EmailSetting.find_by(event_name: "order confirmed").try(:active)
+          OrderMailer.with(host: $hostname).order_confirmed(self).deliver_now
+        end
       end
     end
 
