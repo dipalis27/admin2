@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_27_121943) do
+ActiveRecord::Schema.define(version: 2022_07_01_065732) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -294,7 +294,7 @@ ActiveRecord::Schema.define(version: 2022_06_27_121943) do
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
     t.integer "template_selection", default: 0
-    t.integer "color_palet", default: 0
+    t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
   end
 
