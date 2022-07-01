@@ -19,6 +19,7 @@ module BxBlockStoreProfile
     has_one_attached :promotion_banner
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
+    has_one_base64_attached :favicon_logo
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
 
     # Callbacks
