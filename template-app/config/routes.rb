@@ -41,6 +41,7 @@ Rails.application.routes.draw do
           put :update_sub_admin
         end
       end
+      resources :taxes, only: [:index, :create, :show]
     end
   end
 end
