@@ -25,12 +25,11 @@ module BxBlockAdmin
       end
 
       def show
-        @tax = BxBlockOrderManagement::Tax.find(params[:id])
-
-        if @tax.present?
+        begin
+          @tax = BxBlockOrderManagement::Tax.find(params[:id])
           render json: @tax, status: :ok
-        else
-          render json: { message: "No taxes found"}, status: 404
+        rescue 
+          render(json: { error: "No taxes found" }, status:404)
         end
       end
 
