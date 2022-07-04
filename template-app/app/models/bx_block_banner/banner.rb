@@ -55,8 +55,12 @@ module BxBlockBanner
         banners.each do |banner_data|
           banner =  self.find_by_id(banner_data[:id])
           banner = banner || self.new(banner_position: banner_data[:banner_position], web_banner: true)
-          banner.attachments.destroy_all unless banner.new_record?
           banner_data[:sub_banners].each do |sub_banner|
+            attachment = banner.attachments.find_by_id(sub_banner[:id])
+            if attachment.present? && sub_banner[:is_delete]
+              attachment.destroy
+              next
+            end
             attachment = banner.attachments.new(position: sub_banner[:position])
             if sub_banner[:image].present?
               image_extension = sub_banner[:image].split(',').first.split(';').first.split('/').last rescue 'png'
