@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_01_065732) do
+ActiveRecord::Schema.define(version: 2022_07_01_065819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -296,6 +296,9 @@ ActiveRecord::Schema.define(version: 2022_07_01_065732) do
     t.integer "template_selection", default: 0
     t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
+    t.string "navigation_item1"
+    t.string "navigation_item2"
+    t.boolean "is_whatsapp_integration", default: false
   end
 
   create_table "brands", force: :cascade do |t|

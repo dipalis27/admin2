@@ -42,6 +42,7 @@ Rails.application.routes.draw do
           put :update_sub_admin
         end
       end
+      resources :variants, only: [:index, :create, :update, :show, :destroy]
     end
   end
 end
