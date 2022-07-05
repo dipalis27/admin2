@@ -294,8 +294,11 @@ ActiveRecord::Schema.define(version: 2022_07_01_073913) do
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
     t.integer "template_selection", default: 0
-    t.integer "color_palet", default: 0
+    t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
+    t.string "navigation_item1"
+    t.string "navigation_item2"
+    t.boolean "is_whatsapp_integration", default: false
   end
 
   create_table "brands", force: :cascade do |t|
