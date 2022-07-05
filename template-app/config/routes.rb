@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
+      resources :categories, only: [:index, :create, :show, :update, :destroy]
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
       resources :customers, except: [:edit, :new]
