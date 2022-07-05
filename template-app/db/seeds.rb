@@ -175,3 +175,30 @@ BxBlockCatalogue::Catalogue.active.each do |catalogue|
     end
   end
 end
+
+customer_facing_email = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Customer facing emails")
+admin_emails = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Admin emails")
+
+user_account_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "User account emails", email_setting_tab_id: customer_facing_email.id)
+order_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Order emails", email_setting_tab_id: customer_facing_email.id)
+notification_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Notification emails", email_setting_tab_id: customer_facing_email.id)
+admin_email = BxBlockSettings::EmailSettingCategory.find_or_create_by(name: "Admin emails", email_setting_tab_id: admin_emails.id)
+
+content = YAML.load_file("#{Rails.root}/config/templates.yaml")
+BxBlockSettings::EmailSetting.event_names.keys.each do |event_name|
+  content_key = event_name.downcase.gsub(" ", "_")
+  email_setting = BxBlockSettings::EmailSetting.find_or_initialize_by(title: event_name)
+  email_setting.content = content[content_key] if email_setting.new_record?
+  if ['welcome email', 'new account otp verification', 'password changed'].include?(event_name)
+    email_setting.email_setting_category_id = user_account_email.id
+  elsif ['new order', 'order confirmed', 'order status'].include?(event_name)
+    email_setting.email_setting_category_id = order_email.id
+  elsif ['product stock notification'].include?(event_name)
+    email_setting.email_setting_category_id = notification_email.id
+  elsif ['contact us','admin new order'].include?(event_name)
+    email_setting.email_setting_category_id = admin_email.id
+  end
+  email_setting.event_name = event_name
+  email_setting.save
+end
+
