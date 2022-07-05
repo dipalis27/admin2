@@ -79,7 +79,6 @@ module BxBlockBanner
       rescue StandardError => e
         response[:success] = false
         response[:message] = e.message
-        raise ActiveRecord::Rollback
       end
       response
     end
