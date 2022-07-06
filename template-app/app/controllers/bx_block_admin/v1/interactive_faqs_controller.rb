@@ -15,12 +15,21 @@ module BxBlockAdmin
       end
 
       def create
-        @faq = BxBlockInteractiveFaqs::InteractiveFaqs.create(faq_params)
-
-        if @faq.save
-          render json: @faq, status: :ok
+        res = {}
+        ary = []
+        params["_json"].each do |attrs|
+          ActiveRecord::Base.transaction do
+            obj = BxBlockInteractiveFaqs::InteractiveFaqs.new(title: attrs[:title], content: attrs[:content])
+            obj.save!
+            ary.push(obj)
+          end
+        rescue ActiveRecord::RecordInvalid => e
+          res = { errors: e.message }
+        end
+        if res[:errors].present?
+          render json: res.to_json, status: :ok
         else
-          render json: { errors: @faq.errors.full_messages }, status: 400
+          render json:InteractiveFaqsSerializer.new(ary) , status: :ok
         end
       end
 
