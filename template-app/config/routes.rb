@@ -43,7 +43,11 @@ Rails.application.routes.draw do
           put :update_sub_admin
         end
       end
-      resources :variants, only: [:index, :create, :update, :show, :destroy]
+      resources :variants, only: [:index, :create, :update, :show, :destroy] do
+        collection do
+          post :bulk_data  
+        end
+      end
     end
   end
 end
