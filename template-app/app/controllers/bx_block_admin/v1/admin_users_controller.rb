@@ -2,8 +2,8 @@ module BxBlockAdmin
   module V1
     class AdminUsersController < ApplicationController
       before_action :validate_password, only: [:update]
-      before_action :validate_super_admin, only: [:sub_admin_users, :create_sub_admin, :update_sub_admin, :show_sub_admin]
-      before_action :set_sub_admin, only: [:update_sub_admin, :show_sub_admin]
+      before_action :validate_super_admin, only: %i(sub_admin_users create_sub_admin update_sub_admin show_sub_admin destroy_sub_admin)
+      before_action :set_sub_admin, only: %i(update_sub_admin show_sub_admin destroy_sub_admin)
 
       def show
         render json: AdminUserSerializer.new(@current_admin_user).serializable_hash, status: :ok
@@ -45,7 +45,16 @@ module BxBlockAdmin
         permissions << sub_admin_params[:permissions]
         @admin_user.permissions = permissions.flatten.compact.uniq
         if @admin_user.save
+          @admin_user.admin_profile.present? ? @admin_user.admin_profile.update(name: @admin_user.name, phone: @admin_user.phone_number, email: @admin_user.email) : BxBlockRoleAndPermission::AdminProfile.create(name: @admin_user.name, phone: @admin_user.phone_number, email: @admin_user.email, admin_user_id: @admin_user.id)
           render json: AdminUserSerializer.new(@admin_user).serializable_hash, status: :ok
+        else
+          render json: {'errors' => @admin_user.errors.full_messages}, status: :unprocessable_entity
+        end
+      end
+
+      def destroy_sub_admin
+        if @admin_user.destroy
+          render json: {'messages': ['Sub admin has been removed']}, status: :ok
         else
           render json: {'errors' => @admin_user.errors.full_messages}, status: :unprocessable_entity
         end
