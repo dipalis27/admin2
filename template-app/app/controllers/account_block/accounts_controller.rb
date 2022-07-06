@@ -41,7 +41,9 @@ module AccountBlock
           @account = EmailAccount.new(jsonapi_deserialize(params))
           @account.activated = true
           if @account.save
-            BxBlockEmailNotifications::UserMailer.with(host: $hostname).welcome_email(@account).deliver_now
+            if BxBlockSettings::EmailSetting.find_by(event_name: "welcome email").try(:active)
+              BxBlockEmailNotifications::UserMailer.with(host: $hostname).welcome_email(@account).deliver_now  
+            end
             render json: EmailAccountSerializer.new(@account, meta: {
               token: encode(@account.id)
             }).serializable_hash, status: :created

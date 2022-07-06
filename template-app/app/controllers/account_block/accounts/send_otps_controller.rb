@@ -112,9 +112,13 @@ module AccountBlock
           ]}, status: :unprocessable_entity
         elsif @email_otp.save
           if params[:data].present? && params[:data][:process] == "reset_password"
-            BxBlockEmailNotifications::UserMailer.with(host: $hostname).password_changed(@email_otp).deliver_now
+            if BxBlockSettings::EmailSetting.find_by(event_name: "password changed").try(:active)
+              BxBlockEmailNotifications::UserMailer.with(host: $hostname).password_changed(@email_otp).deliver_now
+            end
           else
-            BxBlockEmailNotifications::UserMailer.with(host: $hostname).new_account_otp_verification(@email_otp).deliver_now
+            if BxBlockSettings::EmailSetting.find_by(event_name: "new account otp verification").try(:active)
+              BxBlockEmailNotifications::UserMailer.with(host: $hostname).new_account_otp_verification(@email_otp).deliver_now
+            end
           end
           render json: EmailOtpSerializer.new(@email_otp, meta: {
             token: BuilderJsonWebToken.encode(@email_otp.id),

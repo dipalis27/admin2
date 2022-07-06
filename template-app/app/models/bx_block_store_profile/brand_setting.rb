@@ -3,12 +3,23 @@ module BxBlockStoreProfile
     self.table_name = :brand_settings
     
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
+
+    COLOR_PALET = [
+      "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
+      "{themeName: 'Navy',primaryColor:'#011638',secondaryColor:'#FE5F55'}",
+      "{themeName: 'Bonsai',primaryColor:'#4A6C6F',secondaryColor:'#7FB069'}",
+      "{themeName: 'Forest',primaryColor:'#0B3C49',secondaryColor:'#BE7C4D'}",
+      "{themeName: 'Wood',primaryColor:'#6F1A07',secondaryColor:'#AF9164'}",
+      "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
+      "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
+    ]
     
     # Associations
-    has_one_attached :logo
+    has_one_base64_attached :logo
     has_one_attached :promotion_banner
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
+    has_one_base64_attached :favicon_logo
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
 
     # Callbacks
@@ -24,16 +35,6 @@ module BxBlockStoreProfile
     # Enum Values
     enum country: ['india', 'uk']
     enum template_selection: ['Minimal', 'Prime', 'Bold', 'Ultra', 'Essence']
-    enum color_palet: [
-      "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
-      "{themeName: 'Navy',primaryColor:'#011638',secondaryColor:'#FE5F55'}",       
-      "{themeName: 'Bonsai',primaryColor:'#4A6C6F',secondaryColor:'#7FB069'}",
-      "{themeName: 'Forest',primaryColor:'#0B3C49',secondaryColor:'#BE7C4D'}",
-      "{themeName: 'Wood',primaryColor:'#6F1A07',secondaryColor:'#AF9164'}",
-      "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
-      "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
-    ]
-
 
     def cropped_image=(val)
       @cropped_image = val
@@ -211,10 +212,18 @@ module BxBlockStoreProfile
           },
           TemplateSelections: {
             template_selection: self.template_selection,
-            color_palet: self.color_palet
+            color_palet: self.get_color_palet
           }
       }
       return response
+    end
+
+    def get_color_palet
+      begin
+        JSON.parse(self.color_palet.to_s)
+      rescue
+        self.color_palet
+      end
     end
 
     def get_configurations
