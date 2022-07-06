@@ -47,4 +47,8 @@ Rails.application.routes.draw do
       resources :variants, only: [:index, :create, :update, :show, :destroy]
     end
   end
+
+  namespace :bx_block_course do
+    resources :courses
+  end
 end
