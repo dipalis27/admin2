@@ -18,6 +18,12 @@ module BxBlockAdmin
       end
     end
 
+    attribute :delivery_addresses do |object, params|
+      if params[:delivery_addresses].present? && object.delivery_addresses.present?
+        BxBlockAdmin::DeliveryAddressSerializer.new(object.delivery_addresses)
+      end
+    end
+
     attribute :account do |object|
       BxBlockAdmin::AccountSerializer.new(object.account)
     end
