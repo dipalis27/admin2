@@ -28,7 +28,12 @@ Rails.application.routes.draw do
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
       resources :categories, only: [:index, :create, :show, :update, :destroy]
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
-      resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
+      resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy] do
+        collection do
+          put :bulk_update
+          post :bulk_create
+        end
+      end
       resources :customers, except: [:edit, :new]
       resources :orders, only: [:index, :show, :update] do
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
