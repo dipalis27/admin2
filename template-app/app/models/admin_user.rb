@@ -57,7 +57,7 @@ class AdminUser < ApplicationRecord
     #################
     validates_presence_of :name, if: -> { role == 'sub_admin' }
     validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, presence: true, if: -> { role == 'sub_admin' }
-    validate :validate_permissions 
+    validate :validate_permissions
 
     #################
     ## Callbacks

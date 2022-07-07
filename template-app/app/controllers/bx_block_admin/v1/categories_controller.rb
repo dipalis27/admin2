@@ -21,20 +21,8 @@ module BxBlockAdmin
       end
 
       def create
-        category = BxBlockCategoriesSubCategories::Category.new(category_params)
-        if category.save
-          render json: BxBlockAdmin::CategorySerializer.new(category).serializable_hash, status: :ok
-        else
-          render json: {'errors' => [category.errors.full_messages.to_sentence]}, status: :unprocessable_entity
-        end
-      end
-
-      def update
-        if @category.update(category_params)
-          render json: BxBlockAdmin::CategorySerializer.new(@category).serializable_hash, status: :ok
-        else
-          render json: {'errors' => [@category.errors.full_messages.to_sentence]}, status: :unprocessable_entity
-        end
+        categories = ChangeCategoriesSubCategories.new(category_params['categories']).call
+        render json: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash, status: :ok
       end
 
       def show
@@ -56,19 +44,22 @@ module BxBlockAdmin
 
       private 
 
-        def category_params
-          params.permit(:name, :image)
-        end
+      def category_params
+        params.permit(categories: [
+          :id, :name, :disabled, :_destroy, :image, sub_categories_attributes: [
+            :id, :name, :image, :disabled, :_destroy
+          ]
+        ])
+      end
 
-        def set_category
-          @category = BxBlockCategoriesSubCategories::Category.find_by_id(params[:id])
-        end
+      def set_category
+        @category = BxBlockCategoriesSubCategories::Category.find_by_id(params[:id])
+      end
 
-        def serialization_options
-          request_hash = { params: {sub_categories: true } }
-          request_hash
-        end
-
+      def serialization_options
+        request_hash = { params: {sub_categories: true } }
+        request_hash
+      end
     end
   end
 end
