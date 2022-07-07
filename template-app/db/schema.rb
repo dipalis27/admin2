@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_01_073913) do
+ActiveRecord::Schema.define(version: 2022_07_05_103141) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -450,6 +450,12 @@ ActiveRecord::Schema.define(version: 2022_07_01_073913) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "courses", force: :cascade do |t|
+    t.string "course_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "customer_feedbacks", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -762,6 +768,7 @@ ActiveRecord::Schema.define(version: 2022_07_01_073913) do
     t.boolean "is_blocked"
     t.boolean "is_subscribed"
     t.string "stripe_payment_method_id"
+    t.string "pdf_invoice_url"
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["coupon_code_id"], name: "index_orders_on_coupon_code_id"
   end
