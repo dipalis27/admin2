@@ -5,7 +5,7 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        orders =  BxBlockOrderManagement::Order.includes(:account).not_in_cart.order(order_date: :desc).page(current_page).per(per_page)
+        orders =  BxBlockOrderManagement::Order.includes(:account, :order_items).not_in_cart.order(order_date: :desc).page(current_page).per(per_page)
         
         placed_orders = orders.where(status: 'placed')
         deliverd_orders = orders.where(status: 'delivered')
@@ -57,6 +57,15 @@ module BxBlockAdmin
           end
         else
           render json: { errors: ["Delivery Address Not Found"]}, status: :unprocessable_entity
+        end
+      end
+
+      def download_csv_report
+        reponse = BxBlockOrderManagement::Order.generate_csv_report
+        if reponse[:success]
+          render json: {csv_data: reponse[:data]}, status: :ok
+        else
+          render json: {errors: [reponse[:message]]}, status: :unprocessable_entity
         end
       end
 

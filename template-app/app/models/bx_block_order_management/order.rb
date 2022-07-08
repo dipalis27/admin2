@@ -487,5 +487,86 @@ module BxBlockOrderManagement
         end
       end
     end
+
+    def self.generate_csv_report
+      headers = ["id", "order_number", "order_date", "account", "applied_discount", "sub_total", "total", "total_tax", "status", "coupon_code", "delivery_addresses", "cancellation_reason", "is_gift", "placed_at", "confirmed_at", "in_transit_at", "delivered_at", "cancelled_at", "refunded_at", "source", "shipment_id", "delivery_charges", "tracking_url", "schedule_time", "payment_failed_at", "returned_at", "tax_charges", "deliver_by", "tracking_number", "is_error", "delivery_error_message", "payment_pending_at", "is_group", "is_availability_checked", "shipping_charge", "shipping_discount", "shipping_net_amt", "shipping_total", "razorpay_order_id", "length", "breadth", "height", "weight", "ship_rocket_order_id", "ship_rocket_shipment_id", "ship_rocket_status", "ship_rocket_status_code", "ship_rocket_onboarding_completed_now", "ship_rocket_awb_code", "ship_rocket_courier_company_id", "ship_rocket_courier_name", "logistics_ship_rocket_enabled", "availability_checked_at", "is_blocked", "is_subscribed", "stripe_payment_method_id"]
+      orders =  BxBlockOrderManagement::Order.includes(:account, :order_items).not_in_cart.order(order_date: :desc)
+      csv_data = []
+      csv_data << headers
+      response = {}
+      begin
+        orders.each do |order|
+          order_data = order.order_row
+          csv_data << order_data
+        end
+        response[:success] = true
+        response[:data] = csv_data
+      rescue Exception => e
+        response[:success] = false
+        response[:message] = "There is problem in downloading csv report please try after some time. Error: #{e.message}"
+      end
+      response
+    end
+
+    def order_row
+      [
+       self.id,
+       self.order_number,
+       (self.order_date.strftime("%b %d %Y, %I:%M %p") rescue ''),
+       self.account&.full_name, 
+       self.applied_discount,
+       self.sub_total,
+       self.total,
+       self.total_tax,
+       self.status,
+       self.coupon_code&.code, 
+       self.delivery_addresses.first&.full_address,
+       self.cancellation_reason,
+       self.is_gift,
+       (self.placed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.confirmed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.in_transit_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.delivered_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.cancelled_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.refunded_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       self.source, 
+       self.shipment_id, 
+       self.delivery_charges, 
+       self.tracking_url, 
+       self.schedule_time, 
+       (self.payment_failed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       (self.returned_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
+       self.tax_charges, 
+       self.deliver_by,
+       self.tracking_number, 
+       self.is_error, 
+       self.delivery_error_message, 
+       (self.payment_pending_at.strftime("%b %d %Y, %I:%M %p") rescue ''),
+       self.is_group,
+       self.is_availability_checked,
+       self.shipping_charge,
+       self.shipping_discount, 
+       self.shipping_net_amt, 
+       self.shipping_total,
+       self.razorpay_order_id,
+       self.length,
+       self.breadth,
+       self.height, 
+       self.weight,
+       self.ship_rocket_order_id,
+       self.ship_rocket_shipment_id, 
+       self.ship_rocket_status,
+       self.ship_rocket_status_code,
+       self.ship_rocket_onboarding_completed_now,
+       self.ship_rocket_awb_code,
+       self.ship_rocket_courier_company_id,
+       self.ship_rocket_courier_name,
+       self.logistics_ship_rocket_enabled,
+       (self.availability_checked_at.strftime("%b %d %Y, %I:%M %p") rescue ''),
+       self.is_blocked,
+       self.is_subscribed,
+       self.stripe_payment_method_id
+       ]
+    end
   end
 end
