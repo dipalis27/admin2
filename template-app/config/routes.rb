@@ -36,6 +36,7 @@ Rails.application.routes.draw do
       end
       resources :customers, except: [:edit, :new]
       resources :orders, only: [:index, :show, :update] do
+        get :download_csv_report, on: :collection
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
       end
       resources :customer_feedbacks, only: [:index, :create, :update, :show]
