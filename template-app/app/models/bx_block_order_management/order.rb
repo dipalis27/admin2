@@ -91,7 +91,9 @@ module BxBlockOrderManagement
     scope :total_sale_amount, -> { where(status: 'placed').map(&:total).compact.sum }
     scope :one_day_sale, -> { where(status: 'placed', placed_at: (Time.now - 24.hours)..Time.now).map(&:total).compact.sum }
     scope :one_day_orders, -> (date) {where(order_date: date.in_time_zone('UTC').beginning_of_day..date.in_time_zone('UTC').end_of_day)}
-    
+    scope :search_by_order_number_or_customer_name, -> (term) { joins(:account).where("lower(order_number) like (?) OR lower(accounts.full_name) like (?)", "%#{term.to_s.downcase}%", "%#{term.to_s.downcase}%")}
+    scope :filter_by_date_and_statuses, -> (from, to, statuses) { where(order_date: from.in_time_zone('UTC').beginning_of_day..to.in_time_zone('UTC').end_of_day).where(status: statuses)}
+
     enum deliver_by: %i[fedex]
     before_update :set_status
     before_create :add_order_number
@@ -101,6 +103,7 @@ module BxBlockOrderManagement
     after_save :update_product_stock, if: :saved_change_to_status?
     before_save :update_ship_rocket_order_status, if: :order_status_id_changed?
     after_save :upload_invoice_to_s3, if: :saved_change_to_status?
+    
     NOTIFICATION_KEYS = {
       PLACED: 'PLACED',
       CANCELLED: 'CANCELLED',
@@ -567,6 +570,10 @@ module BxBlockOrderManagement
        self.is_subscribed,
        self.stripe_payment_method_id
        ]
+    end
+
+    def search(term)
+
     end
   end
 end
