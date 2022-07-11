@@ -3,6 +3,7 @@ module BxBlockAdmin
     class ForgotPasswordsController < ApplicationController
       skip_before_action :validate_json_web_token, except: :reset_password
       skip_before_action :get_admin_user, except: :reset_password
+      skip_before_action :validate_admin, except: :reset_password
       before_action :set_admin_user, except: :reset_password
       before_action :validate_password, :validate_token, only: :reset_password
 

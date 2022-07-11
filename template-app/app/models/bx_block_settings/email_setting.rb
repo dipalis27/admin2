@@ -4,6 +4,8 @@ module BxBlockSettings
     #extend FriendlyId
     #friendly_id :title, use: %i[slugged finders]
 
+    belongs_to :email_setting_category, class_name: "BxBlockSettings::EmailSettingCategory", optional: true
+
     validates :title, presence: true, uniqueness: true
     validates :content, presence: true
 
@@ -46,6 +48,11 @@ module BxBlockSettings
         template.content = content
         template.save
       end
+    end
+
+    # Merge without duplicating values.
+    def self.keywords
+      ORDER_EMAIL_KEYWORDS | CUSTOMER_EMAIL_KEYWORDS | EMAIL_KEYWORDS
     end
 
     private

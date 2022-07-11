@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_10_052408) do
+ActiveRecord::Schema.define(version: 2022_07_01_073913) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -293,9 +293,12 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.string "gst_number"
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
-    t.string "template_selection", default: "Minimal"
-    t.string "color_palet", default: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}"
+    t.integer "template_selection", default: 0
+    t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
+    t.string "navigation_item1"
+    t.string "navigation_item2"
+    t.boolean "is_whatsapp_integration", default: false
   end
 
   create_table "brands", force: :cascade do |t|
@@ -527,6 +530,20 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.string "phone_number"
   end
 
+  create_table "email_setting_categories", force: :cascade do |t|
+    t.string "name"
+    t.bigint "email_setting_tab_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["email_setting_tab_id"], name: "index_email_setting_categories_on_email_setting_tab_id"
+  end
+
+  create_table "email_setting_tabs", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "email_settings", force: :cascade do |t|
     t.string "title"
     t.text "content"
@@ -534,6 +551,8 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "slug"
+    t.integer "email_setting_category_id"
+    t.boolean "active", default: true
     t.index ["slug"], name: "index_email_settings_on_slug", unique: true
   end
 
@@ -543,6 +562,7 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.text "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "status", default: 1
   end
 
   create_table "interactive_faqs", force: :cascade do |t|
@@ -550,6 +570,7 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "status", default: 1
   end
 
   create_table "notification_groups", force: :cascade do |t|
@@ -932,6 +953,7 @@ ActiveRecord::Schema.define(version: 2022_06_10_052408) do
   add_foreign_key "delivery_address_orders", "delivery_addresses"
   add_foreign_key "delivery_address_orders", "orders"
   add_foreign_key "delivery_addresses", "accounts"
+  add_foreign_key "email_setting_categories", "email_setting_tabs"
   add_foreign_key "notification_groups", "notification_settings"
   add_foreign_key "notification_subgroups", "notification_groups"
   add_foreign_key "notifications", "accounts"

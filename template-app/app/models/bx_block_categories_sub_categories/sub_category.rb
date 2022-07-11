@@ -20,8 +20,8 @@ module BxBlockCategoriesSubCategories
 
     has_one_attached :image
 
-    validates :image, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg'], if: -> { Rails.env != 'test' && self.from_csv != true }
-    validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validates :image, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg'], if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
 
     has_and_belongs_to_many :catalogues, class_name: 'BxBlockCatalogue::Catalogue', join_table: 'catalogues_sub_categories', foreign_key: 'sub_category_id'
 
