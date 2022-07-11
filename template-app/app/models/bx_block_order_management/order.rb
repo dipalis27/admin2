@@ -443,7 +443,7 @@ module BxBlockOrderManagement
       pdf         = File.open(pdf_path)
 
       Aws.config.update(
-        region: ENV['STORAGE_REGION'],
+        region: ENV['STORAGE_REGION'] || 'ap-south-1',
         credentials: Aws::Credentials.new(ENV['STORAGE_ACCESS_KEY'], ENV['STORAGE_SECRET_ACCESS_KEY'])
       )
       s3          = Aws::S3::Client.new
