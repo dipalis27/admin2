@@ -3,6 +3,7 @@ module BxBlockAdmin
   module V1
 
     class CustomerFeedbacksController < ApplicationController
+      before_action :process_image, only: [:create, :update]
       
       def index
         @feedbacks = BxBlockCatalogue::CustomerFeedback.all 
@@ -16,12 +17,22 @@ module BxBlockAdmin
       end
 
       def create
-       @feedback = BxBlockCatalogue::CustomerFeedback.create(feedback_params)
+        @feedback = BxBlockCatalogue::CustomerFeedback.new(feedback_params)
+        @feedback = attach_image(@feedback, image_param[:image], 'feedback pic')if image_param.present?
 
         if @feedback.save
-          render json:@feedback, status: :ok
+          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash, status: :ok
         else
-          render json: { errors:@feedback.errors.full_messages }, status: 400
+          render json: { errors:@feedback.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      def process_image
+        image_extension = params[:image].split(',').first.split(';').first.split('/').last
+        if image_extension.in? (["png", "jpg", "jpeg"])
+          params[:image].gsub!("data:image/#{image_extension};base64,", "")
+        else
+          render json: { errors: ["invalid image format"] }, status: :unprocessable_entity
         end
       end
 
@@ -36,9 +47,10 @@ module BxBlockAdmin
 
       def update
        @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
+       @feedback = attach_image(@feedback, image_param[:image], 'feedback pic')if image_param.present?
 
         if @feedback.update(feedback_params)
-          render json: { data:@feedback,  message: "Feedback updated successfully" }, status: :ok
+          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully", status: :ok
         else
           render(json:{ error: "No feedback found"}, status:404)
         end
@@ -59,6 +71,11 @@ module BxBlockAdmin
       def feedback_params
         params.permit(:title, :description, :position, :customer_name, :catalogue_id, :is_active)
       end
+
+      def image_param
+        params.permit(:image)
+      end
+
     end
   end
 end

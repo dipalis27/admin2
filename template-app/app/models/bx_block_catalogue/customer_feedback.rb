@@ -10,7 +10,7 @@ module BxBlockCatalogue
 
     has_one_attached :image
 
-    validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg']
+    # validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg']
 
     after_create :track_event
 
