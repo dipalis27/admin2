@@ -1,6 +1,7 @@
 module BxBlockAdmin
   class ApplicationController < BuilderBase::ApplicationController
     include BuilderJsonWebToken::AdminJsonWebTokenValidation
+    include BxBlockAdmin::ModelUtilities
 
     before_action :validate_json_web_token
     before_action :get_admin_user

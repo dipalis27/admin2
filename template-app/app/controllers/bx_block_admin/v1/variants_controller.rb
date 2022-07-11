@@ -66,7 +66,7 @@ module BxBlockAdmin
                     existing_variant_property = { id: variant_property.id, name: variant_property.name }
                     variant_properties << existing_variant_property
                   else
-                    new_variant_property_hash = { name: variant_property.name }
+                    new_variant_property_hash = { name: variant_property_hash[:name] }
                     variant_properties << new_variant_property_hash
                   end
                 end
