@@ -21,8 +21,11 @@ module BxBlockAdmin
       end
 
       def create
-        categories = ChangeCategoriesSubCategories.new(category_params['categories']).call
-        render json: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash, status: :ok
+        categories, errors = ChangeCategoriesSubCategories.new(category_params['categories']).call
+        render json: {
+          categories: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash,
+          errors: errors
+        }, status: :ok
       end
 
       def show

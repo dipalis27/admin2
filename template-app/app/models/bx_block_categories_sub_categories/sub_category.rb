@@ -16,7 +16,7 @@ module BxBlockCategoriesSubCategories
     # validates :name, uniqueness: { scope: :category_id,
     # message: "Sub Category name should not be same" }
 
-    validates_uniqueness_of :name, scope: :category_id
+    validates_uniqueness_of :name, scope: :category_id, :message => '%{value} has already been taken'
 
     has_one_attached :image
 
