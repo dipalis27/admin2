@@ -13,7 +13,7 @@ module BxBlockAdmin
         if brand.save
           render json: serialized_hash(brand), status: :ok
         else
-          render json: serialized_hash(brand, {}, true), status: :unprocessable_entity
+          render json: serialized_hash(brand, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -21,7 +21,7 @@ module BxBlockAdmin
         if @brand.update(brand_params)
           render json: serialized_hash(@brand), status: :ok
         else
-          render json: serialized_hash(@brand, {}, true), status: :unprocessable_entity
+          render json: serialized_hash(@brand, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -33,7 +33,7 @@ module BxBlockAdmin
         if @brand.destroy
           render json: { message: "Brand deleted successfully." }, status: :ok
         else
-          render json: serialized_hash(@brand, {}, true), status: :unprocessable_entity          
+          render json: serialized_hash(@brand, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity          
         end
       end
 
@@ -52,9 +52,8 @@ module BxBlockAdmin
         end
 
         # Calls base class method serialized_hash in application_controller
-        def serialized_hash(obj, options = {}, error = false)
-          serializer_class = error ? BxBlockCatalogue::ErrorSerializer : BrandSerializer
-          super(serializer_class, obj, options = {})
+        def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::BrandSerializer)
+          super(serializer_class, obj, options)
         end
 
     end
