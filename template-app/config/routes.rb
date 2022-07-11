@@ -26,7 +26,12 @@ Rails.application.routes.draw do
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
-      resources :categories, only: [:index, :create, :show, :destroy]
+      resources :categories, only: [:index, :create, :show, :destroy] do
+        collection do
+          get :validate_category
+          get :validate_sub_category
+        end
+      end
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
       resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy] do
         collection do
@@ -36,6 +41,7 @@ Rails.application.routes.draw do
       end
       resources :customers, except: [:edit, :new]
       resources :orders, only: [:index, :show, :update] do
+        get :download_csv_report, on: :collection
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
       end
       resources :customer_feedbacks, only: [:index, :create, :update, :show]

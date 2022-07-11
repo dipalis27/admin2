@@ -4,6 +4,7 @@ module BxBlockAdmin
 
     def initialize(category_params)
       @categories = []
+      @errors = []
       @category_params = category_params
     end
 
@@ -15,7 +16,7 @@ module BxBlockAdmin
           create_category_sub_categories(cat_par)
         end
       end
-      @categories.map(&:reload)
+      [@categories.map(&:reload), @errors.flatten]
     end
 
     def create_category_sub_categories(cat_par)
@@ -25,7 +26,11 @@ module BxBlockAdmin
         category = add_sub_category(category, sub_cat_par)
       end
 
-      @categories << category if category.save
+      if category.save
+        @categories << category
+      else
+        @errors.push(category.errors.full_messages)
+      end
     end
 
     def update_category_sub_categories(cat_par)
@@ -43,7 +48,11 @@ module BxBlockAdmin
         end
       end
 
-      @categories << category if category.save
+      if category.save
+        @categories << category
+      else
+        @errors.push(category.errors.full_messages)
+      end
     end
 
     def add_sub_category(category, sub_cat_par)
@@ -56,7 +65,7 @@ module BxBlockAdmin
       return if category.sub_categories.exists?(name: sub_cat_par['name'])
       sub_category = category.sub_categories.new(name: sub_cat_par['name'])
       sub_category = change_object_attributes(sub_category, sub_cat_par['disabled'], sub_cat_par['image'])
-      sub_category.save
+      @errors.push(sub_category.errors.full_messages) unless sub_category.save
     end
 
     def update_sub_category(category, sub_cat_par)
@@ -66,7 +75,7 @@ module BxBlockAdmin
 
       sub_category.name = sub_cat_par['name'] if sub_cat_par['name'].present?
       sub_category = change_object_attributes(sub_category, sub_cat_par['disabled'], sub_cat_par['image'])
-      sub_category.save
+      @errors.push(sub_category.errors.full_messages) unless sub_category.save
     end
 
     def change_object_attributes(object, disabled, base64)
