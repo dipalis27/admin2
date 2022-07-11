@@ -1,7 +1,7 @@
 module BxBlockAdmin
   module V1
     class CategoriesController < ApplicationController
-      before_action :set_category, only: [:show, :update, :destroy]
+      before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category]
 
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
@@ -21,8 +21,11 @@ module BxBlockAdmin
       end
 
       def create
-        categories = ChangeCategoriesSubCategories.new(category_params['categories']).call
-        render json: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash, status: :ok
+        categories, errors = ChangeCategoriesSubCategories.new(category_params['categories']).call
+        render json: {
+          categories: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash,
+          errors: errors
+        }, status: :ok
       end
 
       def show
@@ -42,6 +45,20 @@ module BxBlockAdmin
         end
       end
 
+      def validate_category
+        render json: { 'errors' => ['Please pass a name'] }, status: :unprocessable_entity if validate_params[:name].blank?
+        render json: { valid: !BxBlockCategoriesSubCategories::Category.exists?(name: validate_params[:name]) }, status: :ok
+      end
+
+      def validate_sub_category
+        if @category
+          render json: { 'errors' => ['Please pass a name'] }, status: :unprocessable_entity if validate_params[:name].blank?
+          render json: { valid: !@category.sub_categories.exists?(name: validate_params[:name]) }, status: :ok
+        else
+          render json: {'errors' => ['Category not found']}, status: :not_found
+        end
+      end
+
       private 
 
       def category_params
@@ -50,6 +67,10 @@ module BxBlockAdmin
             :id, :name, :image, :disabled, :_destroy
           ]
         ])
+      end
+
+      def validate_params
+        params.permit(:id, :name)
       end
 
       def set_category
