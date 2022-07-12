@@ -74,6 +74,8 @@ module BxBlockOrderManagement
     has_many :delivery_address_orders
     has_many :delivery_addresses, through: :delivery_address_orders
 
+    has_one_attached :pdf_invoice
+
     validates :status, presence: true, inclusion: { in: BxBlockOrderManagement::OrderStatus.pluck(:status) }
     # validates :shipping_charge, :shipping_discount, :shipping_total, :shipping_net_amt, presence: true
 
@@ -435,34 +437,12 @@ module BxBlockOrderManagement
     end
 
     def upload_invoice_to_s3
-      return nil if self.pdf_invoice_url.present?
+      return nil if self.pdf_invoice.present?
       return nil if ['in_cart', 'created'].include?(self.status)
-
-      filename    = "#{self.id}-#{Time.now.strftime('%Y%m%d%H%M%S')}.pdf"
-      pdf_path    = create_pdf_path
-      pdf         = File.open(pdf_path)
-
-      Aws.config.update(
-        region: ENV['STORAGE_REGION'] || 'ap-south-1',
-        credentials: Aws::Credentials.new(ENV['STORAGE_ACCESS_KEY'], ENV['STORAGE_SECRET_ACCESS_KEY'])
-      )
-      s3          = Aws::S3::Client.new
-      response    = s3.put_object(
-        bucket: ENV['STORAGE_BUCKET'], 
-        key:    ENV['STORAGE_SECRET_ACCESS_KEY'], 
-        body:   pdf,
-        acl:    "public-read"
-      )
-      update_inovice_url(response)
-      File.delete(pdf_path) if File.exist?(pdf_path)
-    end
-
-    def create_pdf_path
-      @order = self
       doc_pdf = WickedPdf.new.pdf_from_string(
         ActionController::Base.new().render_to_string(
           template: "admin/csv/invoice.html.erb",           
-          locals:   { params: {order: @order} }       
+          locals:   { params: {order: self} }       
         ),
         pdf:         "Tax Invoice",
         page_size:   "Letter",
@@ -473,22 +453,7 @@ module BxBlockOrderManagement
                   right:  "0.5in" },
         disposition: "attachment"
       )
-      pdf_path = Rails.root.join("tmp", "temp_pdf_file_#{self.id}_#{Time.now}.pdf")
-      File.open(pdf_path, "wb") do |file|
-        file << doc_pdf
-      end
-      return pdf_path
-    end
-
-    def update_inovice_url(response)
-      s3 = Aws::S3::Resource.new
-      bucket = s3.bucket(ENV['STORAGE_BUCKET'])
-      bucket.objects.each do |obj|
-        if JSON.parse(obj.etag) == JSON.parse(response.etag)
-          url = "https://#{ENV['STORAGE_BUCKET']}.s3.#{ENV['STORAGE_REGION']}.amazonaws.com/#{obj.key}"
-          self.update_column('pdf_invoice_url', url)
-        end
-      end
+      self.pdf_invoice.attach(io: StringIO.new(doc_pdf), filename: "invoice.pdf", content_type: "application/pdf")
     end
 
     def self.generate_csv_report
@@ -570,10 +535,6 @@ module BxBlockOrderManagement
        self.is_subscribed,
        self.stripe_payment_method_id
        ]
-    end
-
-    def search(term)
-
     end
   end
 end
