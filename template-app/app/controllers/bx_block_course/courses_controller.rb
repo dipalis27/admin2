@@ -8,8 +8,7 @@ module BxBlockCourse
 			end
 		end
 		def course_params
-			params.require(:course).permit \
-			:course_name
+			params.require(:data).permit(:course_name, :discription)
 		end
 
 	end
