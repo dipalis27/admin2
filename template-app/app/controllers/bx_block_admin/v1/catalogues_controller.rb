@@ -17,29 +17,29 @@ module BxBlockAdmin
             total_count: catalogues.total_count
           }
         }
-        render json: BxBlockAdmin::CatalogueSerializer.new(catalogues, options).serializable_hash, status: :ok
+        render json: serialized_hash(catalogues, options: options), status: :ok
       end
 
       def create
         catalogue = BxBlockCatalogue::Catalogue.new(catalogue_params) 
         if catalogue.save
           assign_sub_categories(catalogue)
-          render json: BxBlockAdmin::CatalogueSerializer.new(catalogue).serializable_hash, status: :ok
+          render json: serialized_hash(catalogue), status: :ok
         else 
-          render json: BxBlockCatalogue::ErrorSerializer.new(catalogue).serializable_hash, status: :unprocessable_entity
+          render json: serialized_hash(catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
       def show
-        render json: BxBlockAdmin::CatalogueSerializer.new(@catalogue).serializable_hash, status: :ok
+        render json: serialized_hash(@catalogue), status: :ok
       end
 
       def update
         if @catalogue.update_attributes(catalogue_params)
           assign_sub_categories(@catalogue)
-          render json: BxBlockAdmin::CatalogueSerializer.new(@catalogue).serializable_hash, status: :ok
+          render json: serialized_hash(@catalogue), status: :ok
         else
-          render json: BxBlockCatalogue::ErrorSerializer.new(@catalogue).serializable_hash, status: :unprocessable_entity
+          render json: serialized_hash(@catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -47,7 +47,7 @@ module BxBlockAdmin
         if @catalogue.destroy
           render json: { message: "Product deleted successfully.", success: true}, status: :ok
         else
-          render json: BxBlockCatalogue::ErrorSerializer.new(@catalogue).serializable_hash, status: :unprocessable_entity
+          render json: serialized_hash(@catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -62,7 +62,11 @@ module BxBlockAdmin
         end
 
         def set_catalogue
-          @catalogue = BxBlockCatalogue::Catalogue.find(params[:id])
+          begin
+            @catalogue = BxBlockCatalogue::Catalogue.find(params[:id])
+          rescue => exception
+            render json: { message: "Product not found." }, status: :not_found
+          end
         end
 
         def assign_sub_categories(catalogue)
@@ -70,6 +74,11 @@ module BxBlockAdmin
             catalogue.sub_categories = BxBlockCategoriesSubCategories::SubCategory.where(id: params[:sub_category_ids])
             catalogue.save
           end
+        end
+
+        # Calls base class method serialized_hash in application_controller
+        def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::CatalogueSerializer)
+          super(serializer_class, obj, options)
         end
 
     end

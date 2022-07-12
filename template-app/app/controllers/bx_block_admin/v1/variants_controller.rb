@@ -13,7 +13,7 @@ module BxBlockAdmin
         if variant.save
           render json: serialized_hash(variant), status: :ok          
         else
-          render json: error_serialized_hash(variant), status: :unprocessable_entity
+          render json: serialized_hash(variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -21,7 +21,7 @@ module BxBlockAdmin
         if @variant.update_attributes(variant_params)
           render json: serialized_hash(@variant), status: :ok
         else
-          render json: error_serialized_hash(@variant), status: :unprocessable_entity
+          render json: serialized_hash(@variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -31,9 +31,9 @@ module BxBlockAdmin
 
       def destroy
         if @variant.destroy
-          render json: { message: "Variant deleted successfully.", success: true}, status: :ok
+          render json: { message: "Variant deleted successfully.", success: true }, status: :ok
         else
-          render json: error_serialized_hash(@variant), status: :unprocessable_entity
+          render json: serialized_hash(@variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
         end
       end
 
@@ -107,14 +107,9 @@ module BxBlockAdmin
           params.require(:data)
         end
 
-        # Used to serialize the variant object.
-        def serialized_hash(obj, options = {})
-          BxBlockAdmin::VariantSerializer.new(obj, options).serializable_hash
-        end
-
-        # Used to serialize the error object.
-        def error_serialized_hash(obj)
-          BxBlockCatalogue::ErrorSerializer.new(obj).serializable_hash
+        # Calls base class method serialized_hash in application_controller
+        def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::VariantSerializer)
+          super(serializer_class, obj, options)
         end
 
     end
