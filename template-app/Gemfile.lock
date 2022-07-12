@@ -1519,6 +1519,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.13.6-x86_64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.6-x86_64-linux)
+      racc (~> 1.4)
     oauth2 (2.0.5)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
@@ -1848,6 +1850,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-19
+  x86_64-linux
 
 DEPENDENCIES
   active_admin_datetimepicker
@@ -1930,4 +1933,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.3.6
+   2.3.15
