@@ -17,6 +17,7 @@ module BxBlockAdmin
             total_count: categories.total_count
           }
         }
+        options[:params] = { sub_categories: true }
         render json: BxBlockAdmin::CategorySerializer.new(categories, options).serializable_hash, status: :ok
       end
 
