@@ -35,7 +35,7 @@ module BxBlockAdmin
       end
 
       def update
-        @email_setting.update_attributes(email_setting_params)
+        @email_setting.update(email_setting_params)
         if @email_setting.save
           render json: serialized_hash(@email_setting), status: :ok
         else

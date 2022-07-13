@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_05_103141) do
+ActiveRecord::Schema.define(version: 2022_07_12_084128) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -454,6 +454,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.string "course_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "discription"
   end
 
   create_table "customer_feedbacks", force: :cascade do |t|
@@ -577,6 +578,14 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "status", default: 1
+  end
+
+  create_table "modulees", force: :cascade do |t|
+    t.string "module_title"
+    t.bigint "course_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["course_id"], name: "index_modulees_on_course_id"
   end
 
   create_table "notification_groups", force: :cascade do |t|
@@ -961,6 +970,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
   add_foreign_key "delivery_address_orders", "orders"
   add_foreign_key "delivery_addresses", "accounts"
   add_foreign_key "email_setting_categories", "email_setting_tabs"
+  add_foreign_key "modulees", "courses"
   add_foreign_key "notification_groups", "notification_settings"
   add_foreign_key "notification_subgroups", "notification_groups"
   add_foreign_key "notifications", "accounts"
