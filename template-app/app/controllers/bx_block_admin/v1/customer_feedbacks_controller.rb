@@ -27,15 +27,6 @@ module BxBlockAdmin
         end
       end
 
-      def process_image
-        image_extension = params[:image].split(',').first.split(';').first.split('/').last
-        if image_extension.in? (["png", "jpg", "jpeg"])
-          params[:image].gsub!("data:image/#{image_extension};base64,", "")
-        else
-          render json: { errors: ["invalid image format"] }, status: :unprocessable_entity
-        end
-      end
-
       def show
         begin
          @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
@@ -67,6 +58,18 @@ module BxBlockAdmin
       end
 
       private
+      
+      def process_image
+        return if params[:image].blank?
+ 
+        if !image_extension.in?(BxBlockCatalogue::CustomerFeedback::VALID_IMAGE_FORMATS)
+          render json: { errors: ["invalid image format"] }, status: :unprocessable_entity
+        end
+      end
+
+      def image_extension
+        params[:image].split(',').first.split(';').first.split('/').last
+      end
 
       def feedback_params
         params.permit(:title, :description, :position, :customer_name, :catalogue_id, :is_active)

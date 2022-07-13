@@ -2,6 +2,8 @@ module BxBlockCatalogue
   class CustomerFeedback < BxBlockCatalogue::ApplicationRecord
     self.table_name = :customer_feedbacks
 
+    VALID_IMAGE_FORMATS = %w(png jpg jpeg)
+
     belongs_to :catalogue, optional: true
     default_scope {order('position ASC')}
 
