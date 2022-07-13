@@ -67,11 +67,15 @@ Rails.application.routes.draw do
   end
 
   namespace :bx_block_course do
-    resources :courses
+    resources :courses, only: [:index, :new, :create, :update, :show, :destroy]
   end
   namespace :bx_block_course do
     resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
-   post 'duplicate', to: 'modulees#duplicate'
-    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
+    post 'duplicate', to: 'modulees#duplicate'
+    # resources :duplicate,to: 'modulees#duplicate', only: [:create]
   end
+  namespace :bx_block_course do
+    resources :lessons, only: [:index, :new, :create, :update, :show, :destroy]
+  end
+
 end

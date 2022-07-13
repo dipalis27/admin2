@@ -31,7 +31,6 @@ module BxBlockCourse
 		end
 		
 		private
-
 		def modulee_params
 			params.require(:data).permit(:module_title, :course_id )
 		end
