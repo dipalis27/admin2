@@ -17,21 +17,20 @@ module BxBlockAdmin
             total_count: categories.total_count
           }
         }
-        options[:params] = { sub_categories: true }
         render json: BxBlockAdmin::CategorySerializer.new(categories, options).serializable_hash, status: :ok
       end
 
       def create
         categories, errors = ChangeCategoriesSubCategories.new(category_params['categories']).call
         render json: {
-          categories: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash,
+          categories: BxBlockAdmin::CategorySerializer.new(categories).serializable_hash,
           errors: errors
         }, status: :ok
       end
 
       def show
         if @category
-          render json: BxBlockAdmin::CategorySerializer.new(@category, serialization_options).serializable_hash, status: :ok
+          render json: BxBlockAdmin::CategorySerializer.new(@category).serializable_hash, status: :ok
         else
           render json: {'errors' => ['Category not found']}, status: :not_found
         end
@@ -76,11 +75,6 @@ module BxBlockAdmin
 
       def set_category
         @category = BxBlockCategoriesSubCategories::Category.find_by_id(params[:id])
-      end
-
-      def serialization_options
-        request_hash = { params: {sub_categories: true } }
-        request_hash
       end
     end
   end

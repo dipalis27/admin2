@@ -7,11 +7,7 @@ module BxBlockAdmin
     end
 
     attribute :sub_categories do |object, params|
-      if params[:sub_categories].present? && object.sub_categories.present?
-        BxBlockAdmin::SubCategorySerializer.new(object.sub_categories)
-      else
-        []
-      end
+      BxBlockAdmin::SubCategorySerializer.new(object.sub_categories)
     end
   end
 end
