@@ -11,7 +11,7 @@ module BxBlockAdmin
           tab_hash = {
             tab_name: tab.name,
             count: categories.map{ |category| category.email_settings.count }.sum,
-            categories: categories.map { |category| { category_name: category.name, email_settings: category.email_settings.select(:id, :title, :content).order(:id) } }
+            categories: categories.map { |category| { category_name: category.name, email_settings: category.email_settings.select(:id, :title, :content, :active).order(:id) } }
           }
           result << tab_hash
         end
@@ -50,7 +50,7 @@ module BxBlockAdmin
       private
 
         def email_setting_params
-          params.permit(:title, :content, :event_name, :email_setting_category_id)
+          params.permit(:title, :content, :event_name, :email_setting_category_id, :active)
         end
 
         def set_email_setting

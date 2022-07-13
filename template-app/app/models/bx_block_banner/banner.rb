@@ -61,8 +61,8 @@ module BxBlockBanner
               attachment.destroy
               next
             end
-            attachment = banner.attachments.new(position: sub_banner[:position])
             if sub_banner[:image].present?
+              attachment = banner.attachments.new(position: sub_banner[:position]) if sub_banner[:id].blank?
               image_extension = sub_banner[:image].split(',').first.split(';').first.split('/').last rescue 'png'
               decoded_data = sub_banner[:image].gsub!("data:image/#{image_extension};base64,", "")
               image_path="tmp/banner_image.#{image_extension}"
@@ -79,7 +79,6 @@ module BxBlockBanner
       rescue StandardError => e
         response[:success] = false
         response[:message] = e.message
-        raise ActiveRecord::Rollback
       end
       response
     end

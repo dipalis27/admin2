@@ -21,14 +21,32 @@ Rails.application.routes.draw do
           put :reset_password
         end
       end
-      resources :brand_settings, only: [:create, :update, :show, :index]
+      resources :brand_settings, only: [:create, :update, :show, :index] do 
+        put '/update_store_detail', to: "brand_settings#update_store_detail"
+      end
+      get '/get_country_by_currency', to:  "brand_settings#get_country_by_currency"
       post '/add_banner', to: "brand_settings#add_banner"
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
       resources :catalogues, only: [:index, :create, :show, :update, :destroy]
+      resources :categories, only: [:index, :create, :show, :destroy] do
+        collection do
+          get :validate_category
+          get :validate_sub_category
+        end
+      end
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
-      resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy]
+      resources :interactive_faqs, only: [:create, :update, :show, :index, :destroy] do
+        collection do
+          put :bulk_update
+          post :bulk_create
+        end
+      end
       resources :customers, except: [:edit, :new]
+      resources :orders, only: [:index, :show, :update] do
+        get :download_csv_report, on: :collection
+        put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
+      end
       resources :customer_feedbacks, only: [:index, :create, :update, :show]
       resources :email_settings, only: [:index, :create, :edit, :update, :show, :destroy]
       resource :admin_user, only: [:show, :update] do
@@ -40,9 +58,24 @@ Rails.application.routes.draw do
           post :create_sub_admin
           get :show_sub_admin
           put :update_sub_admin
+          delete :destroy_sub_admin
         end
       end
-      resources :taxes, only: [:index, :create, :show]
+      resources :variants, only: [:index, :create, :update, :show, :destroy] do
+        collection do
+          post :bulk_data  
+        end
+      end
+      resources :brands, only: [:index, :create, :update, :show, :destroy]
     end
+  end
+
+  namespace :bx_block_course do
+    resources :courses
+  end
+  namespace :bx_block_course do
+    resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
+   post 'duplicate', to: 'modulees#duplicate'
+    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
   end
 end

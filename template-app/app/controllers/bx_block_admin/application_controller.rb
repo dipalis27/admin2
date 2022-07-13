@@ -1,6 +1,7 @@
 module BxBlockAdmin
   class ApplicationController < BuilderBase::ApplicationController
     include BuilderJsonWebToken::AdminJsonWebTokenValidation
+    include BxBlockAdmin::ModelUtilities
 
     before_action :validate_json_web_token
     before_action :get_admin_user
@@ -34,5 +35,16 @@ module BxBlockAdmin
         render :json => {'errors' => ['Permission denied!']}, status: :forbidden
       end
     end
+
+    # Used to serialized the object
+    # Example :- serializer_class => BxBlockAdmin::CatalogueSerializer, Obj => object of catalogue class, options => Are used to additional information like meta tag.
+    def serialized_hash(serializer_class, obj, options = {})
+      if serializer_class.is_a?(Class)
+        serializer_class.new(obj, options).serializable_hash
+      else
+        raise "Pass a proper serializer class to this method."
+      end
+    end
+
   end
 end

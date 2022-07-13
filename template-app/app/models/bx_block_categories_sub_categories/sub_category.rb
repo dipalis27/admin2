@@ -16,12 +16,12 @@ module BxBlockCategoriesSubCategories
     # validates :name, uniqueness: { scope: :category_id,
     # message: "Sub Category name should not be same" }
 
-    validates_uniqueness_of :name, scope: :category_id
+    validates_uniqueness_of :name, scope: :category_id, :message => '%{value} has already been taken'
 
     has_one_attached :image
 
-    validates :image, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg'], if: -> { Rails.env != 'test' && self.from_csv != true }
-    validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validates :image, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg'], if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
 
     has_and_belongs_to_many :catalogues, class_name: 'BxBlockCatalogue::Catalogue', join_table: 'catalogues_sub_categories', foreign_key: 'sub_category_id'
 
