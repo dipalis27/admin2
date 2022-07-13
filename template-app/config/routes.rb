@@ -21,7 +21,10 @@ Rails.application.routes.draw do
           put :reset_password
         end
       end
-      resources :brand_settings, only: [:create, :update, :show, :index]
+      resources :brand_settings, only: [:create, :update, :show, :index] do 
+        put '/update_store_detail', to: "brand_settings#update_store_detail"
+      end
+      get '/get_country_by_currency', to:  "brand_settings#get_country_by_currency"
       post '/add_banner', to: "brand_settings#add_banner"
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
@@ -69,5 +72,10 @@ Rails.application.routes.draw do
 
   namespace :bx_block_course do
     resources :courses
+  end
+  namespace :bx_block_course do
+    resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
+   post 'duplicate', to: 'modulees#duplicate'
+    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
   end
 end

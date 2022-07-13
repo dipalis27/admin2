@@ -1,7 +1,8 @@
 module BxBlockCourse
   class CourseSerializer < BuilderBase::BaseSerializer
      attributes *[
-      :course_name
+      :course_name,
+      :discription
     ]
   end
 end
