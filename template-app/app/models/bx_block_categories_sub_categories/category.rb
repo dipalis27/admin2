@@ -15,8 +15,8 @@ module BxBlockCategoriesSubCategories
 
     has_one_attached :image
 
-    validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true, if: -> { Rails.env != 'test' && self.from_csv != true }
-    validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
 
     # has_one :catalogue, class_name: 'BxBlockCatalogue::Catalogue'
 
@@ -25,7 +25,8 @@ module BxBlockCategoriesSubCategories
 
     accepts_nested_attributes_for :sub_categories, allow_destroy:  true
 
-    validates :name, presence: true, uniqueness: true
+    validates_presence_of :name
+    validates_uniqueness_of :name, :message => '%{value} has already been taken'
 
     scope :latest, -> { order(created_at: :desc) }
 

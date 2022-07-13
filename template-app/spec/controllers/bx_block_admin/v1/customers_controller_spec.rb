@@ -6,7 +6,7 @@ RSpec.describe BxBlockAdmin::V1::CustomersController, type: :controller do
     @token = BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id)
   end
 
-  describe 'create customer specs' do
+  describe 'customer specs' do
     context 'creates a customer' do
       let (:params) {{
         "full_name": "Test User 1",
@@ -307,7 +307,7 @@ RSpec.describe BxBlockAdmin::V1::CustomersController, type: :controller do
         @customer = FactoryBot.create(:customer, email: 'deleteuser@yopmail.com')
       end
 
-      it 'gets customer successfully with status 200' do
+      it 'destroys customer successfully with status 200' do
         request.headers['token'] = @token
         delete :destroy, params: { id: @customer.id }
         response_body = JSON.parse(response.body).with_indifferent_access
