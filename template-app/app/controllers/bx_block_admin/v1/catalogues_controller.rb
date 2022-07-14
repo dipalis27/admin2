@@ -26,7 +26,7 @@ module BxBlockAdmin
           assign_sub_categories(catalogue)
           render json: serialized_hash(catalogue), status: :ok
         else 
-          render json: serialized_hash(catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: catalogue.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -39,7 +39,7 @@ module BxBlockAdmin
           assign_sub_categories(@catalogue)
           render json: serialized_hash(@catalogue), status: :ok
         else
-          render json: serialized_hash(@catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: @catalogue.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -47,7 +47,7 @@ module BxBlockAdmin
         if @catalogue.destroy
           render json: { message: "Product deleted successfully.", success: true}, status: :ok
         else
-          render json: serialized_hash(@catalogue, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: @catalogue.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -65,7 +65,7 @@ module BxBlockAdmin
           begin
             @catalogue = BxBlockCatalogue::Catalogue.find(params[:id])
           rescue => exception
-            render json: { message: "Product not found." }, status: :not_found
+            render json: { errors: ["Product not found."] }, status: :not_found
           end
         end
 
