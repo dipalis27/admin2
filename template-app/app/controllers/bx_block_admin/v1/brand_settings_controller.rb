@@ -6,7 +6,7 @@ module BxBlockAdmin
 
       def index
         @brand_setting = BxBlockStoreProfile::BrandSetting.last
-
+        
         if @brand_setting.present?
           render json: BrandSettingSerializer.new(@brand_setting), status: :ok
         else
@@ -48,7 +48,7 @@ module BxBlockAdmin
             return render json: { errors: [@brand_setting.errors.full_messages.to_sentence] }, status: :unprocessable_entity
           end
         else
-          render json: { errors: ["Brand setting not found."] }, status: :unprocessable_entity
+          render json: { errors: ["Brand setting not found."] }, status: :not_found
         end
       end
 
@@ -90,6 +90,29 @@ module BxBlockAdmin
         end
       end
 
+      def  get_country_by_currency
+        if params[:currency_type] == "INR"
+          brand_setting_inr = BxBlockStoreProfile::BrandSetting.find_by(currency_type: "INR")
+          (brand_setting_inr.present?) ? (render json: {country: brand_setting_inr.country } , status: :ok)  : (return render json: {status: :not_found})
+        elsif params[:currency_type] == "uk"
+          brand_setting_uk = BxBlockStoreProfile::BrandSetting.find_by(currency_type: "uk")
+          (brand_setting_uk.present?) ? (render json: {country: brand_setting_uk.country } , status: :ok)  : (return render json: {status: :not_found})
+        end
+      end
+
+      def update_store_detail
+       @brand_setting = BxBlockStoreProfile::BrandSetting.find(params[:brand_setting_id])
+        if @brand_setting
+          if @brand_setting.update(update_store_detail_params)
+            render json: BxBlockAdmin::StoreDetailSerializer.new(@brand_setting).serializable_hash, status: :ok
+          else
+            return render json: { errors: [@brand_setting.errors.full_messages.to_sentence] }, status: :unprocessable_entity
+          end
+        else
+          render json: { errors: ["Brand setting not found."] }, status: :not_found
+        end
+      end
+
       private
 
       def brand_settings_params
@@ -98,6 +121,9 @@ module BxBlockAdmin
 
       def banner_params
         params.permit(:banner_position, :web_banner, attachments_attributes:[:id, :image,:position, :url])
+      end
+      def update_store_detail_params
+        params.permit(:heading, :currency_type, :phone_number, :country, :address_state_id, :address, :zipcode)
       end
     end
     

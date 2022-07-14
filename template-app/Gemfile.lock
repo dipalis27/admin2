@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/faker-ruby/faker.git
-  revision: 425581295d59839e1c4c19a0f4482886d1e9f373
+  revision: 2333f9ee4a4e1d8329e19f9e4b07e927648add7c
   branch: master
   specs:
     faker (2.21.0)
@@ -121,8 +121,8 @@ GEM
       font-awesome-sass (~> 5.0)
       jquery-rails
     aws-eventstream (1.2.0)
-    aws-partitions (1.596.0)
-    aws-sdk-core (3.131.1)
+    aws-partitions (1.603.0)
+    aws-sdk-core (3.131.2)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.525.0)
       aws-sigv4 (~> 1.1)
@@ -146,7 +146,7 @@ GEM
     bx_block_cors (0.0.1)
       builder_base
     byebug (11.1.3)
-    cancancan (3.3.0)
+    cancancan (3.4.0)
     chunky_png (1.4.0)
     ckeditor (4.2.4)
       cocaine
@@ -203,7 +203,7 @@ GEM
       activerecord (>= 4.0.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
-    googleauth (1.1.3)
+    googleauth (1.2.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -216,6 +216,7 @@ GEM
     has_scope (0.8.0)
       actionpack (>= 5.2)
       activesupport (>= 5.2)
+    hashie (5.0.0)
     httparty (0.20.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
@@ -248,7 +249,7 @@ GEM
     jsonapi.rb (2.0.0)
       jsonapi-serializer
       rack
-    jwt (2.4.0)
+    jwt (2.4.1)
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.2)
@@ -274,32 +275,35 @@ GEM
     mime-types-data (3.2022.0105)
     mini_magick (4.11.0)
     mini_mime (1.1.2)
-    minitest (5.15.0)
+    minitest (5.16.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     nio4r (2.5.8)
+    nokogiri (1.13.6-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.13.6-x86_64-linux)
       racc (~> 1.4)
-    oauth2 (1.4.9)
+    oauth2 (2.0.5)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
-      multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
+      rash_alt (>= 0.4, < 1)
+      version_gem (~> 1.1)
     orm_adapter (0.5.0)
     os (1.1.4)
-    pg (1.3.5)
-    phonelib (0.6.58)
+    pg (1.4.1)
+    phonelib (0.7.0)
     prometheus-client (2.1.0)
     public_suffix (4.0.7)
     puma (4.3.12)
       nio4r (~> 2.0)
     racc (1.6.0)
-    rack (2.2.3.1)
+    rack (2.2.4)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
-    rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+    rack-test (2.0.2)
+      rack (>= 1.3)
     rails (6.0.3.6)
       actioncable (= 6.0.3.6)
       actionmailbox (= 6.0.3.6)
@@ -318,7 +322,7 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.4.2)
+    rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
     railties (6.0.3.6)
       actionpack (= 6.0.3.6)
@@ -331,9 +335,11 @@ GEM
       activerecord (>= 5.2.4)
       activesupport (>= 5.2.4)
       i18n
+    rash_alt (0.4.12)
+      hashie (>= 3.4)
     razorpay (3.0.0)
       httparty (~> 0.14)
-    redis (4.6.0)
+    redis (4.7.1)
     require_all (3.0.0)
     responders (3.0.1)
       actionpack (>= 5.0)
@@ -372,6 +378,8 @@ GEM
       sprockets-rails
       tilt
     select2-rails (4.0.13)
+    shoulda-matchers (5.1.0)
+      activesupport (>= 5.2.0)
     sidekiq (6.1.3)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -379,9 +387,9 @@ GEM
     sidekiq_alive (2.1.5)
       sidekiq
       webrick
-    signet (0.16.1)
+    signet (0.17.0)
       addressable (~> 2.8)
-      faraday (>= 0.17.5, < 3.0)
+      faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
     simple_po_parser (1.1.6)
@@ -389,14 +397,14 @@ GEM
     sniffer (0.5.0)
       anyway_config (>= 1.0)
       dry-initializer (~> 3)
-    sprockets (4.0.3)
+    sprockets (4.1.1)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.4.2)
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stripe (6.2.0)
+    stripe (6.5.0)
     studio_store_ecommerce_account (0.0.18)
       bcrypt
       builder_base
@@ -565,6 +573,7 @@ GEM
     tilt (2.0.10)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
+    version_gem (1.1.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     webrick (1.7.0)
@@ -601,9 +610,10 @@ GEM
       anyway_config (>= 1.3, < 3)
       sidekiq
       yabeda (~> 0.6)
-    zeitwerk (2.5.4)
+    zeitwerk (2.6.0)
 
 PLATFORMS
+  x86_64-darwin-19
   x86_64-linux
 
 DEPENDENCIES
@@ -635,6 +645,7 @@ DEPENDENCIES
   rails (~> 6.0.3, >= 6.0.3.6)
   rspec-rails (~> 4.0.1)
   sassc-rails
+  shoulda-matchers
   sidekiq (~> 6.1.0)
   sidekiq_alive
   studio_store_ecommerce_account (= 0.0.18)
@@ -686,4 +697,4 @@ RUBY VERSION
    ruby 2.6.5p114
 
 BUNDLED WITH
-   2.3.12
+   2.3.6
