@@ -22,7 +22,7 @@ module BxBlockAdmin
     def create_category_sub_categories(cat_par)
       category = BxBlockCategoriesSubCategories::Category.new(name: cat_par['name'])
       category = change_object_attributes(category, cat_par['disabled'], cat_par['image'])
-      cat_par['sub_categories_attributes'].each do |sub_cat_par|
+      cat_par['sub_categories_attributes']&.each do |sub_cat_par|
         category = add_sub_category(category, sub_cat_par)
       end
 
@@ -40,7 +40,7 @@ module BxBlockAdmin
 
       category.name = cat_par['name'] if cat_par['name'].present?
       category = change_object_attributes(category, cat_par['disabled'], cat_par['image'])
-      cat_par['sub_categories_attributes'].each do |sub_cat_par|
+      cat_par['sub_categories_attributes']&.each do |sub_cat_par|
         if sub_cat_par['id'].present?
           update_sub_category(category, sub_cat_par)
         else
