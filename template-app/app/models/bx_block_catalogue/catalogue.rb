@@ -236,7 +236,8 @@ module BxBlockCatalogue
     def inventory_low_stock_mailings
       if self.stock_qty.to_i <= 10
         AdminUser.all.each do |admin|
-          CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
+          # CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
+          LowStockJob.perform_later($hostname, admin, self)
         end
       end
     end
