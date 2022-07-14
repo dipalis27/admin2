@@ -176,6 +176,9 @@ BxBlockCatalogue::Catalogue.active.each do |catalogue|
   end
 end
 
+# Third party API configurations
+BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+
 customer_facing_email = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Customer facing emails")
 admin_emails = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Admin emails")
 

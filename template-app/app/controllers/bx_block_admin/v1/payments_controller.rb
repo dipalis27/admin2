@@ -8,9 +8,9 @@ module BxBlockAdmin
         @apis = BxBlockApiConfiguration::ApiConfiguration.all
         
         if @apis.present?
-          render json: @apis, success: :ok
+          render json: PaymentSerializer.new(@apis).serializable_hash, success: :ok
         else
-          render(json:{error:"No promo code found"}, status: 404)
+          render(json:{error:"No API configurations found"}, status: 404)
         end
       end
 
@@ -18,46 +18,35 @@ module BxBlockAdmin
         @api = BxBlockApiConfiguration::ApiConfiguration.create(api_params)
 
         if @api.save
-          render json: @api, success: :ok
+          render json: PaymentSerializer.new(@api).serializable_hash, success: :ok
         else
           render(json:{error:@api.errors}, status: :unprocessable_entity)
         end
       end
       
       def show
-        @api = BxBlockApiConfiguration::ApiConfiguration.find(params[:id])
-
-        if @api.present?
-          render json: @api, success: :ok
-        else
-          render(json:{error: "No promo code found"}, status: 404)
+        begin
+          @api = BxBlockApiConfiguration::ApiConfiguration.find(params[:id])
+          render json: PaymentSerializer.new(@api).serializable_hash, success: :ok
+        rescue 
+          render(json: { error: "No API configuration found" }, status:404)
         end
       end
 
       def update
-        @api = BxBlockApiConfiguration::ApiConfiguration.update(api_params)
-
-        if @api.present?
-          render(json: @api, success: :ok, message: "Promo code updated successfully")
-        else
-          render(json:{error: "No promo code found"}, status: 404)
-        end
-      end
-
-      def destroy
         @api = BxBlockApiConfiguration::ApiConfiguration.find(params[:id])
 
-        if @api.destroy
-          render json: {messages: "Promo code destroyed successfully"}, status: :ok
+        if @api.update(api_params)
+          render json: { data: PaymentSerializer.new(@api).serializable_hash, message: "API Configuration updated successfully"}, status: 200
         else
-          render(json:{ error: "No promo code found"}, status:404)
+          render json: {errors: "API configuration not found"}, status: :not_found
         end
       end
 
       private
 
       def api_params
-        params.permit()
+        params.permit(:configuration_type, :api_key, :api_secret_key)
       end
     end
   end

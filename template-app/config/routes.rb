@@ -67,6 +67,7 @@ Rails.application.routes.draw do
         end
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :payments, only: [:index, :create, :update, :show]
     end
   end
 
