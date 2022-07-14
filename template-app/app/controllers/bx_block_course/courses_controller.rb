@@ -1,6 +1,6 @@
 module BxBlockCourse
 	class CoursesController < ApplicationController
-		before_action :set_course, only: [:update, :destroy]
+		before_action :set_course, only: [:update, :destroy, :show]
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
@@ -14,6 +14,12 @@ module BxBlockCourse
 				render json: BxBlockCourse::CourseSerializer.new(course, meta: {message: 'Course created successfully.'
 				}).serializable_hash, status: :ok
 			end
+		end
+
+		def show
+			if @course.present?
+				render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
+			end	
 		end
 
 		def update

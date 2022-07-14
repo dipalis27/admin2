@@ -1,7 +1,6 @@
 module BxBlockCourse
 	class ModuleesController < ApplicationController
-        before_action :set_modulee, only: [:update, :destroy]
-
+        before_action :set_modulee, only: [:update, :destroy, :show]
         def index
         	modulee = BxBlockCourse::Modulee.all 
         	if modulee.present?
@@ -17,6 +16,12 @@ module BxBlockCourse
 			else
 				render json:{message: "Module not created"}, status: :ok
 			end
+		end
+
+		def show
+			if @modulee.present?
+				render json: BxBlockCourse::ModuleeSerializer.new(@modulee).serializable_hash, status: :ok
+			end	
 		end
 
 		def duplicate
@@ -37,7 +42,7 @@ module BxBlockCourse
 				}).serializable_hash, status: :ok	
 			else
 				errors = @modulee.errors.full_messages
-				render :json => {:errors => [{:modulee => errors.first}]},
+				render :json => {:errors => [{:@modulee => errors.first}]},
 				:status => :unprocessable_entity
 			end
 		end
