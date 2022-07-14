@@ -67,6 +67,7 @@ Rails.application.routes.draw do
           post :bulk_data  
         end
       end
+      resources :taxes, only: [:index, :create, :show]
       resources :brands, only: [:index, :create, :update, :show, :destroy]
     end
   end
@@ -75,8 +76,10 @@ Rails.application.routes.draw do
     resources :courses
   end
   namespace :bx_block_course do
-    resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
-   post 'duplicate', to: 'modulees#duplicate'
-    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
+    resources :modulees 
+    post 'duplicate', to: 'modulees#duplicate'
+  end
+  namespace :bx_block_course do
+    resources :lessons
   end
 end
