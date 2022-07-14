@@ -7,10 +7,12 @@ module BxBlockCourse
 				}).serializable_hash, status: :ok
 			end
 		end
+
+
+		private
+
+		def lesson_params
+			params.require(:data).permit(:lesson_title, :discription ,:modulee_id)
+		end
 	end
-	private
-	def lesson_params
-		params.require(:data).permit(:lesson_title, :discription , :vedio , :pdf)
-	end
-end
 end

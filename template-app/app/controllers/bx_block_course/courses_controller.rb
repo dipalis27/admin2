@@ -1,10 +1,10 @@
 module BxBlockCourse
 	class CoursesController < ApplicationController
+		before_action :set_course, only: [:update, :destroy]
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
-				render json: BxBlockCourse::CourseSerializer.new(courses, meta: {message: 'Course created successfully.'
-				}).serializable_hash, status: :ok
+				render json: BxBlockCourse::CourseSerializer.new(courses).serializable_hash, status: :ok
 			end
 		end 
 
@@ -17,8 +17,8 @@ module BxBlockCourse
 		end
 
 		def update
-			@course =  BxBlockCourse::Course.find(params[:id])
-			if @course.update(course_params)
+			if @course.present? 
+				@course.update(course_params)
 				render json: BxBlockCourse::CourseSerializer.new(@course, meta: {message: 'Course update successfully.'
 				}).serializable_hash, status: :ok	
 			else
@@ -29,8 +29,8 @@ module BxBlockCourse
 		end
 
 		def destroy
-			course = BxBlockCourse::Course.find_by(id: params[:id])
-			if course.destroy
+			if @course.present? 
+				@course.destroy
 				render json: { success: true }, status: :ok
 			else
 				render json: {message: "not deleted"}, status: :ok	
@@ -40,6 +40,10 @@ module BxBlockCourse
 		private
 		def course_params
 			params.require(:data).permit(:course_name, :discription)
+		end
+
+		def set_course
+			@course =  BxBlockCourse::Course.find(params[:id])
 		end
 
 	end
