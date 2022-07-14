@@ -47,7 +47,7 @@ module BxBlockCourse
 			 @modulee.destroy
 				render json: { success: true }, status: :ok
 			else
-				render json: {message: "not deleted"}, status: :ok	
+				render json: { 'errors': @modulee.errors.full_messages }, status: :unprocessable_entity	
 			end
 		end
 		
