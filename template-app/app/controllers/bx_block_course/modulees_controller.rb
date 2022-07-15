@@ -21,6 +21,8 @@ module BxBlockCourse
 		def show
 			if @modulee.present?
 				render json: BxBlockCourse::ModuleeSerializer.new(@modulee).serializable_hash, status: :ok
+				else
+				render json: { error: "Module not found." }, status: 404
 			end	
 		end
 

@@ -19,7 +19,9 @@ module BxBlockCourse
 		def show
 			if @course.present?
 				render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
-			end	
+			else
+				render json: { error: "Course not found." }, status: 404
+			end
 		end
 
 		def update
