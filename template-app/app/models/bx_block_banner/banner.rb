@@ -63,13 +63,8 @@ module BxBlockBanner
             end
             if sub_banner[:image].present?
               attachment = banner.attachments.new(position: sub_banner[:position]) if sub_banner[:id].blank?
-              image_extension = sub_banner[:image].split(',').first.split(';').first.split('/').last rescue 'png'
-              decoded_data = sub_banner[:image].gsub!("data:image/#{image_extension};base64,", "")
-              image_path="tmp/banner_image.#{image_extension}"
-              File.open(image_path, 'wb') do |f|
-                f.write(Base64.decode64(decoded_data))
-              end
-              attachment.image.attach(io: File.open(image_path),filename: "cropped_image.#{image_extension}")
+              image_path, image_extension = store_base64_image(sub_banner[:image])
+              attachment.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
               File.delete(image_path) if File.exist?(image_path)
             end
           end
