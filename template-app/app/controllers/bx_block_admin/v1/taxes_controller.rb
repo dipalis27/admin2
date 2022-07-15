@@ -4,8 +4,20 @@ module BxBlockAdmin
       before_action :set_tax, only: %i(edit update show destroy)
 
       def index
-        taxes = BxBlockOrderManagement::Tax.order(:id).all
-        render json: serialized_hash(taxes), status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        taxes = BxBlockOrderManagement::Tax.order(:id).page(current_page).per(per_page)
+        options = {}
+        options[:meta] = {
+          pagination: {
+            current_page: taxes.current_page,
+            next_page: taxes.next_page,
+            prev_page: taxes.prev_page,
+            total_pages: taxes.total_pages,
+            total_count: taxes.total_count
+          }
+        }
+        render json: serialized_hash(taxes, options: options), status: :ok
       end
 
       def create

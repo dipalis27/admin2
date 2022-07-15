@@ -33,7 +33,7 @@
 
 module BxBlockAdmin
   class CatalogueSerializer < BuilderBase::BaseSerializer
-    attributes :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax,  :catalogue_variants
+    attributes :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax
     
     attribute :tags do |object|
       object.tags.select(:id, :name)
@@ -54,15 +54,41 @@ module BxBlockAdmin
       end
     end
 
-    attribute :subscriptions do |object|
-      object.catalogue_subscriptions.select(:id, :subscription_package, :subscription_period, :discount, :catalogue_id, :morning_slot, :evening_slot)
-    end
+    # attribute :subscriptions do |object|
+    #   object.catalogue_subscriptions.select(:id, :subscription_package, :subscription_period, :discount, :catalogue_id, :morning_slot, :evening_slot)
+    # end
 
-    attribute :attachments do |object|
-      if object.attachments.present?
-        BxBlockAdmin::AttachmentSerializer.new(object.attachments)
+    attribute :catalogue_attachments do |object|
+      object.attachments.select{ |attachment| attachment.image.attached? }.map do |attachment|
+        {
+          image_url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(attachment.image, only_path: true),
+          is_default: attachment.is_default 
+        }
       end
     end
     
+    attribute :catalogue_variant_attributes do |object|
+      if object.catalogue_variants.exists?  
+        object.catalogue_variants.map do |catalogue_variant|
+          {
+            id: catalogue_variant.id,
+            price: catalogue_variant.price,
+            stock_qty: catalogue_variant.stock_qty,
+            on_sale: catalogue_variant.on_sale,
+            sale_price: catalogue_variant.sale_price,
+            discount_price: catalogue_variant.discount_price,
+            tax_id: catalogue_variant.tax_id,
+            length: catalogue_variant.length,
+            breadth: catalogue_variant.breadth,
+            height: catalogue_variant.height,
+            block_qty: catalogue_variant.block_qty,
+            is_default: catalogue_variant.is_default,
+            catalogue_variant_properties_attributes: catalogue_variant.catalogue_variant_properties.map { |variant_property| { variant_id: variant_property.variant_id, variant_property_id: variant_property.id } }, 
+            catalogue_variant_attachments: catalogue_variant.attachments.select{ |attachment| attachment.image.attached? }.map { |attachment| {   image_url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(attachment.image, only_path: true), is_default: attachment.is_default } }
+          }
+        end
+      end
+    end
+
   end
 end

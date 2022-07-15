@@ -76,7 +76,7 @@ module BxBlockOrderManagement
 
     has_one_attached :pdf_invoice
 
-    validates :status, presence: true, inclusion: { in: BxBlockOrderManagement::OrderStatus.pluck(:status) }
+    validates :status, presence: true, inclusion: { in: (Rails.env.development? || Rails.env.production?) ? BxBlockOrderManagement::OrderStatus.pluck(:status) : ORDER_STATUS }
     # validates :shipping_charge, :shipping_discount, :shipping_total, :shipping_net_amt, presence: true
 
     accepts_nested_attributes_for :order_items, allow_destroy: true
@@ -437,6 +437,7 @@ module BxBlockOrderManagement
     end
 
     def upload_invoice_to_s3
+      return nil if Rails.env.test?
       return nil if self.pdf_invoice.present?
       return nil if ['in_cart', 'created'].include?(self.status)
       doc_pdf = WickedPdf.new.pdf_from_string(
