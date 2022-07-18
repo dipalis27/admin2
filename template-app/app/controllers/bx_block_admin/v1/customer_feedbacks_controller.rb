@@ -3,6 +3,7 @@ module BxBlockAdmin
   module V1
 
     class CustomerFeedbacksController < ApplicationController
+      before_action :process_image, only: [:create, :update]
       
       def index
         @feedbacks = BxBlockCatalogue::CustomerFeedback.all 
@@ -16,12 +17,17 @@ module BxBlockAdmin
       end
 
       def create
-       @feedback = BxBlockCatalogue::CustomerFeedback.create(feedback_params)
+        @feedback = BxBlockCatalogue::CustomerFeedback.new(feedback_params)
+        if image_param.present?
+          image_path, image_extension = store_base64_image(sub_banner[:image])
+          @feedback.image.attach(io: File.open(image_path), filename: "feedback pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
 
         if @feedback.save
-          render json:@feedback, status: :ok
+          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash, status: :ok
         else
-          render json: { errors:@feedback.errors.full_messages }, status: 400
+          render json: { errors:@feedback.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -35,10 +41,15 @@ module BxBlockAdmin
       end
 
       def update
-       @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
+        @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
+        if image_param.present?
+          image_path, image_extension = store_base64_image(sub_banner[:image])
+          @feedback.image.attach(io: File.open(image_path), filename: "feedback pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
 
         if @feedback.update(feedback_params)
-          render json: { data:@feedback,  message: "Feedback updated successfully" }, status: :ok
+          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully", status: :ok
         else
           render(json:{ error: "No feedback found"}, status:404)
         end
@@ -55,10 +66,23 @@ module BxBlockAdmin
       end
 
       private
+      
+      def process_image
+        return if params[:image].blank?
+
+        if !(BxBlockCatalogue::CustomerFeedback::VALID_IMAGE_FORMATS).any?{|valid_ext|params[:image].include?(valid_ext)}
+          render json: { errors: ["invalid image format"] }, status: :unprocessable_entity
+        end
+      end
 
       def feedback_params
         params.permit(:title, :description, :position, :customer_name, :catalogue_id, :is_active)
       end
+
+      def image_param
+        params.permit(:image)
+      end
+
     end
   end
 end

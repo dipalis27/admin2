@@ -43,6 +43,7 @@ Rails.application.routes.draw do
         end
       end
       resources :customers, except: [:edit, :new]
+      resources :bulk_uploads, only: [:index, :create, :destroy, :show]
       resources :orders, only: [:index, :show, :update] do
         get :download_csv_report, on: :collection
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
@@ -67,6 +68,10 @@ Rails.application.routes.draw do
         end
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :payments, only: [:index, :create, :update, :show]
+      resources :taxes, only: [:index, :create, :show]
+      resources :variants, only: [:index, :create, :update, :show, :destroy]
+      resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
     end
   end
 
@@ -74,8 +79,10 @@ Rails.application.routes.draw do
     resources :courses
   end
   namespace :bx_block_course do
-    resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
-   post 'duplicate', to: 'modulees#duplicate'
-    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
+    resources :modulees 
+    post 'duplicate', to: 'modulees#duplicate'
+  end
+  namespace :bx_block_course do
+    resources :lessons
   end
 end

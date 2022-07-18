@@ -16,7 +16,12 @@ module BxBlockAdmin
       def create
         customer = AccountBlock::Account.new(customer_params)
         customer.type = 'EmailAccount'
-        customer = attach_image(customer, image_params[:image], 'profile pic') if image_params.present?
+        if image_params.present?
+          image_path, image_extension = store_base64_image(image_params[:image])
+          customer.image.attach(io: File.open(image_path), filename: "profile pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
+
         if customer.save
           render json: CustomerSerializer.new(customer).serializable_hash, status: :ok
         else
@@ -29,7 +34,11 @@ module BxBlockAdmin
       end
 
       def update
-        @customer = attach_image(@customer, image_params[:image], 'profile pic') if image_params.present?
+        if image_params.present?
+          image_path, image_extension = store_base64_image(image_params[:image])
+          @customer.image.attach(io: File.open(image_path), filename: "profile pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
         @customer.assign_attributes(customer_params)
         if @customer.save
           render json: CustomerSerializer.new(@customer).serializable_hash, status: :ok
