@@ -119,6 +119,7 @@ module BxBlockOrderManagement
       @coupon =  BxBlockCouponCodeGenerator::CouponCode.find_by(code: params[:code])
       render(json: { message: "Invalid coupon" }, status: 400) && return if @coupon.nil?
       render(json: { message: "Can't find order" }, status: 400) && return if @order.nil?
+      return render json: { message: "Coupon limit reached!" }, status: :unprocessable_entity if coupon_code_limit_reached?
       @response = ApplyCoupon.new(@order, @coupon, params).call
       if @response.success?
         render json: {
@@ -205,6 +206,11 @@ module BxBlockOrderManagement
 
     def serializable_options
       { params: { host: request.protocol + request.host_with_port } }
+    end
+
+    def coupon_code_limit_reached?
+      count = @current_user.orders.not_in_cart.joins(:coupon_code).where('coupon_codes.code = ?', @coupon.code)
+      count >= @coupon.limit rescue false
     end
   end
 end
