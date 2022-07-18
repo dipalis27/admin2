@@ -1,12 +1,12 @@
 module BxBlockAdmin
   module V1
     class CategoriesController < ApplicationController
-      before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category]
+      before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category, :validate_category]
 
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        categories = BxBlockCategoriesSubCategories::Category.order(name: :asc).page(current_page).per(per_page)
+        categories = BxBlockCategoriesSubCategories::Category.order(updated_at: :desc).page(current_page).per(per_page)
         options = {}
         options[:meta] = {
           pagination: {
@@ -47,7 +47,7 @@ module BxBlockAdmin
 
       def validate_category
         render json: { 'errors' => ['Please pass a name'] }, status: :unprocessable_entity if validate_params[:name].blank?
-        render json: { valid: !BxBlockCategoriesSubCategories::Category.exists?(name: validate_params[:name]) }, status: :ok
+        render json: { valid: !BxBlockCategoriesSubCategories::Category.where.not(id: @category&.id).exists?(name: validate_params[:name]) }, status: :ok
       end
 
       def validate_sub_category
