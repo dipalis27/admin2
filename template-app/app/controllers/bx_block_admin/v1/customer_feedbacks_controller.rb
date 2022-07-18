@@ -49,7 +49,7 @@ module BxBlockAdmin
         end
 
         if @feedback.update(feedback_params)
-          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully", status: :ok
+          render json: {data: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully"}, status: :ok
         else
           render(json:{ error: "No feedback found"}, status:404)
         end

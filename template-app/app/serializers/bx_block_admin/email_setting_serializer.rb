@@ -13,7 +13,7 @@
 
 module BxBlockAdmin
   class EmailSettingSerializer < BuilderBase::BaseSerializer
-    attributes :title, :content, :event_name, :active
+    attributes :id, :title, :content, :event_name, :active
 
     attribute :email_category do |obj|
       obj.email_setting_category.try(:name)
