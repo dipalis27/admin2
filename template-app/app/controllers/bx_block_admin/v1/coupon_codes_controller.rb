@@ -4,8 +4,6 @@ module BxBlockAdmin
       before_action :set_coupon, only: %i(show update destroy)
 
       def index
-        render(json: { message: "Can't find order" }, status: 400) && return if @order.nil?
-        return render json: { message: "Coupon limit reached!" }, status: :unprocessable_entity if true
         coupons = BxBlockCouponCodeGenerator::CouponCode.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
         options = {}
         options[:meta] = {
