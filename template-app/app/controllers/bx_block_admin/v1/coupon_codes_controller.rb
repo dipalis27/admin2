@@ -32,8 +32,7 @@ module BxBlockAdmin
       end
 
       def update
-        @coupon.assign_attributes(coupon_params)
-        if @coupon.save
+        if @coupon.update(coupon_params)
           render json: CouponCodeSerializer.new(@coupon).serializable_hash, status: :ok
         else
           render json: { 'errors': @coupon.errors.full_messages }, status: :unprocessable_entity
