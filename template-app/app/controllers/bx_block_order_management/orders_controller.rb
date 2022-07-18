@@ -209,7 +209,7 @@ module BxBlockOrderManagement
     end
 
     def coupon_code_limit_reached?
-      count = @current_user.orders.not_in_cart.joins(:coupon_code).where('coupon_codes.code = ?', @coupon.code)
+      count = @current_user.orders.not_in_cart.joins(:coupon_code).where('coupon_codes.code = ?', @coupon.code).count
       count >= @coupon.limit rescue false
     end
   end
