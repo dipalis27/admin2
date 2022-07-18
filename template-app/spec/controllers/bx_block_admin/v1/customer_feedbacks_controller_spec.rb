@@ -33,9 +33,9 @@ RSpec.describe BxBlockAdmin::V1::CustomerFeedbacksController, type: :controller 
       
       it 'when admin_user does not provide all the fields ' do
         request.headers['token'] = @token
-        post :create, params: {"description": Faker::Lorem.sentence, 'customer_name': Faker::Lorem.word, "position": nil}
+        post :create, params: {"description": nil, 'customer_name': Faker::Lorem.word, "position": 3}
         expect(JSON.parse(response.body)["errors"].count).to be >0
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

@@ -18,7 +18,11 @@ module BxBlockAdmin
 
       def create
         @feedback = BxBlockCatalogue::CustomerFeedback.new(feedback_params)
-        @feedback = attach_image(@feedback, image_param[:image], 'feedback pic')if image_param.present?
+        if image_param.present?
+          image_path, image_extension = store_base64_image(sub_banner[:image])
+          @feedback.image.attach(io: File.open(image_path), filename: "feedback pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
 
         if @feedback.save
           render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash, status: :ok
@@ -37,11 +41,15 @@ module BxBlockAdmin
       end
 
       def update
-       @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
-       @feedback = attach_image(@feedback, image_param[:image], 'feedback pic')if image_param.present?
+        @feedback = BxBlockCatalogue::CustomerFeedback.find(params[:id])
+        if image_param.present?
+          image_path, image_extension = store_base64_image(sub_banner[:image])
+          @feedback.image.attach(io: File.open(image_path), filename: "feedback pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
 
         if @feedback.update(feedback_params)
-          render json: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully", status: :ok
+          render json: {data: CustomerFeedbackSerializer.new(@feedback).serializable_hash,  message: "Feedback updated successfully"}, status: :ok
         else
           render(json:{ error: "No feedback found"}, status:404)
         end

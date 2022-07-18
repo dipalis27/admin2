@@ -17,11 +17,10 @@ RSpec.describe BxBlockAdmin::V1::TaxesController do
         expect(response.status).to eq(200)
       end
 
-      it 'tax is not present' do
+      it 'response body should have data key' do
         get :index, params: @request_params
-        expectation = HashWithIndifferentAccess.new({"message" => "No tax found"})
-        expect(JSON.parse(response.body)).to eq(expectation)
-        expect(response).to have_http_status(:not_found)
+        response_body = JSON.parse response.body
+        expect(response_body).to have_key("data")
       end
     end
 
@@ -51,10 +50,57 @@ RSpec.describe BxBlockAdmin::V1::TaxesController do
       it 'when static page is not present ' do
         request.headers['token'] = @token
         get :show, params: {"id":12}
-        expectation = HashWithIndifferentAccess.new({"error" => "No taxes found"})
-        expect(JSON.parse(response.body)).to eq(expectation)
+        # expectation = HashWithIndifferentAccess.new({"errors" => ["No taxes found"]})
+        # expect(JSON.parse(response.body)).to eq(expectation)
+        # expect(response.status).to eq(404)
+        response_body = JSON.parse response.body
+        expect(response_body).to have_key("errors")
         expect(response.status).to eq(404)
       end
     end
+
+    context 'PATCH /update' do
+      context 'with a valid authorization token' do
+        subject do
+          tax = FactoryBot.create(:tax).attributes.except("created_at", "updated_at")
+          patch :update, params: tax.merge({token: @token})
+        end
+
+        it { is_expected.to have_http_status(:success) }
+      end
+      
+      context "with a invalid authorization token" do
+        it 'returns a bad request' do
+          patch :update, params: { id: 1000 }
+          expect(response).to have_http_status(:bad_request)
+        end  
+      end
+    end
+
+    context "DELETE /destroy" do     
+      context 'with a valid authorization token' do
+        subject(:response) do
+          tax = FactoryBot.create(:tax)
+          delete :destroy, params: @request_params.merge(id: tax.id)
+        end
+        let(:response_body) { JSON.parse response.body }
+
+        it 'returns http success' do
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'expects message and success key' do
+          expect(response_body).to have_key("message")
+        end
+      end
+
+      context "with a invalid authorization token" do
+        it 'returns a bad request' do
+          delete :destroy, params: {id: 1}
+          expect(response).to have_http_status(:bad_request)
+        end  
+      end
+    end
+
   end
 end

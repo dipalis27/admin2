@@ -43,12 +43,8 @@ module BxBlockCategoriesSubCategories
       @cropped_image = val
       return if val.blank?
 
-      decoded_data = val.gsub!("data:image/png;base64,", "")
-      image_path="tmp/cropped_image.png"
-      File.open(image_path, 'wb') do |f|
-        f.write(Base64.decode64(decoded_data))
-      end
-      self.image.attach(io: File.open(image_path),filename: "cropped_image.png")
+      image_path, image_extension = store_base64_image(val)
+      self.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
     end
 

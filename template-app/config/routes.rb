@@ -67,8 +67,12 @@ Rails.application.routes.draw do
           post :bulk_data  
         end
       end
-      resources :taxes, only: [:index, :create, :show]
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :payments, only: [:index, :create, :update, :show]
+      resources :taxes, only: [:index, :create, :show]
+      resources :variants, only: [:index, :create, :update, :show, :destroy]
+      resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
+      resources :coupon_codes, except: [:edit, :new]
     end
   end
 

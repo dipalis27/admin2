@@ -5,5 +5,9 @@ module BxBlockStudentsData
       :student_email,
       :level
     ]
+
+    attribute :courses do |object, params|
+      BxBlockCourse::CourseSerializer.new(object.courses, { params: params })
+    end
   end
 end

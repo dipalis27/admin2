@@ -87,9 +87,9 @@ module BxBlockCatalogue
 
     # Callbacks
     before_save :set_stock_qty, :check_product_quantity, :set_current_availablity, :calculate_tax_amount
-    after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
+    after_save :add_system_sku, :update_default_variant
     after_save :remove_draft_products_from_cart, if: -> { self.draft? }
-    before_save :update_available_price
+    before_save :update_available_price, :inventory_low_stock_mailings
     # before_save :accept_cropped_images_only
     before_create :track_event
 
@@ -234,10 +234,13 @@ module BxBlockCatalogue
     end
 
     def inventory_low_stock_mailings
-      if self.stock_qty.to_i <= 10
-        AdminUser.all.each do |admin|
-          CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
-        end
+      unless self.new_record?
+        if self.stock_qty.to_i <= 10 && self.stock_qty_changed?
+          AdminUser.all.each do |admin|
+            # CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
+            LowStockJob.perform_later($hostname, admin, self)
+          end
+        end  
       end
     end
 
