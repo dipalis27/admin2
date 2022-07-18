@@ -69,7 +69,7 @@ Rails.application.routes.draw do
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
       resources :payments, only: [:index, :create, :update, :show]
-      resources :taxes, only: [:index, :create, :edit, :update, :show, :destroy]
+      resources :taxes, only: [:index, :create, :show]
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
     end

@@ -1,7 +1,7 @@
 module BxBlockAdmin
   module V1
     class TaxesController < ApplicationController
-      before_action :set_tax, only: %i(edit update show destroy)
+      before_action :set_tax, only: %i(show)
 
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
@@ -29,28 +29,8 @@ module BxBlockAdmin
         end
       end
 
-      def edit
-        render json: serialized_hash(@tax), status: :ok
-      end
-
-      def update
-        if @tax.update(tax_params)
-          render json: serialized_hash(@tax), status: :ok
-        else
-          render json: { errors: @tax.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
-
       def show
         render json: serialized_hash(@tax), status: :ok
-      end
-
-      def destroy
-        if @tax.destroy
-          render json: { message: "Tax deleted successfully." }, status: :ok
-        else
-          render json: { errors: @tax.errors.full_messages }, status: :unprocessable_entity
-        end
       end
 
       private
