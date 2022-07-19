@@ -30,9 +30,7 @@ module BxBlockAdmin
       end
 
       def update
-        @api.assign_attributes(api_params)
-
-        if @api.save
+        if @api.update(api_params)
           render json: PaymentSerializer.new(@api).serializable_hash, status: :ok
         else
           render json: {"errors": @api.errors.full_messages}, status: :unprocessable_entity
@@ -49,7 +47,7 @@ module BxBlockAdmin
         begin
           @api = BxBlockApiConfiguration::ApiConfiguration.find(api_params[:id])
         rescue 
-          render json: ["errors": "API configuration not found"]
+          render json: {"errors": "API configuration not found"}, status: 404
         end
       end
     end

@@ -30,9 +30,7 @@ module BxBlockAdmin
       end
 
       def update
-        @static_page.assign_attributes(help_center_params)
-
-        if @static_page.save
+        if @static_page.update(help_center_params)
           render json: { data: @static_page,  message: "Static Page updated successfully" }, status: :ok
         else
           render json: {"errors": @static_page.errors.full_messages}, status: :unprocessable_entity
@@ -57,7 +55,7 @@ module BxBlockAdmin
         begin
           @static_page = BxBlockHelpCenter::HelpCenter.find(help_center_params[:id])
         rescue 
-          render json: ["errors": "No static page found"], status: :not_found
+          render json: {"error": "No static pages found"}, status: :not_found
         end
       end
     end

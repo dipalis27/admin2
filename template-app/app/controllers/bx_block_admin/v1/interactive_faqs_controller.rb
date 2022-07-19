@@ -49,7 +49,6 @@ module BxBlockAdmin
       end
 
       def update
-        @faq.assign_attributes(faq_params)
         if @faq.update(faq_params)
           render json: InteractiveFaqsSerializer.new(@faq), status: :ok
         else
@@ -97,7 +96,7 @@ module BxBlockAdmin
         begin
           @faq = BxBlockInteractiveFaqs::InteractiveFaqs.find(faq_params[:id])
         rescue 
-          render json: ["errors": "No faq found"], status: :not_found
+          render json: {"error": "No FAQ found"}, status: :not_found
         end
       end
     end

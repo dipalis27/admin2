@@ -80,7 +80,7 @@ module BxBlockAdmin
         begin
           @feedback = BxBlockCatalogue::CustomerFeedback.find(feedback_params[:id])
         rescue 
-          render json: { 'errors': ['Customer feedback not found'] }, status: :not_found
+          render json: { 'error': 'Customer feedback not found' }, status: :not_found
         end
       end
     end
