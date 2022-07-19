@@ -7,7 +7,6 @@
 
 module BxBlockAdmin
   class TaxSerializer < BuilderBase::BaseSerializer
-    attributes :tax_percentage
-    
+    attributes :id, :tax_percentage, :created_at, :updated_at
   end
 end

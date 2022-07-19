@@ -1,10 +1,10 @@
 module BxBlockAdmin
   module V1
     class TaxesController < ApplicationController
-      before_action :set_tax, only: %i(edit update show destroy)
+      before_action :set_tax, only: %i(show)
 
       def index
-        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        per_page = get_per_page_count
         current_page = params[:page].present? ? params[:page].to_i : 1
         taxes = BxBlockOrderManagement::Tax.order(:id).page(current_page).per(per_page)
         options = {}
@@ -29,28 +29,8 @@ module BxBlockAdmin
         end
       end
 
-      def edit
-        render json: serialized_hash(@tax), status: :ok
-      end
-
-      def update
-        if @tax.update(tax_params)
-          render json: serialized_hash(@tax), status: :ok
-        else
-          render json: { errors: @tax.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
-
       def show
         render json: serialized_hash(@tax), status: :ok
-      end
-
-      def destroy
-        if @tax.destroy
-          render json: { message: "Tax deleted successfully." }, status: :ok
-        else
-          render json: { errors: @tax.errors.full_messages }, status: :unprocessable_entity
-        end
       end
 
       private
@@ -70,6 +50,13 @@ module BxBlockAdmin
         # Calls base class method serialized_hash in application_controller
         def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::TaxSerializer)
           super(serializer_class, obj, options)
+        end
+
+         # Returns the count that are required for listing the records.
+         def get_per_page_count
+          return 10 unless params[:per_page].present?
+          return BxBlockOrderManagement::Tax.count if params[:per_page] == "all"
+          params[:per_page].to_i
         end
 
     end
