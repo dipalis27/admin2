@@ -9,10 +9,10 @@ module BxBlockCourse
 		end 
 
 		def create
-			course = BxBlockCourse::Course.create(course_params)
-			if course.present?
-				render json: BxBlockCourse::CourseSerializer.new(course, meta: {message: 'Course created successfully.'
-				}).serializable_hash, status: :ok
+			@course = BxBlockCourse::Course.create(course_params)
+			if @course.present?
+				media_upload
+				render json: BxBlockCourse::CourseSerializer.new(@course, serialization_options).serializable_hash, status: :ok
 			end
 		end
 
@@ -54,5 +54,18 @@ module BxBlockCourse
 			@course =  BxBlockCourse::Course.find(params[:id])
 		end
 
+		def media_upload
+  		return if image_params.blank?
+    	@course.image.attach({ io: StringIO.new(Base64.decode64(image_params[:image_url])),
+                       content_type: 'image/jpg', filename: 'image' })
+    end
+
+    def image_params
+    	params[:image].permit(:image_url)
+    end
+
+    def serialization_options
+      { params: { host: request.protocol + request.host_with_port } }
+    end
 	end
 end
