@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       resource :admin_user, only: [:show, :update] do
         collection do
           get :sub_admin_users
+          get :sub_admin_count
           get :permissions
         end
         member do
