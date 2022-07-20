@@ -59,48 +59,5 @@ RSpec.describe BxBlockAdmin::V1::TaxesController do
       end
     end
 
-    context 'PATCH /update' do
-      context 'with a valid authorization token' do
-        subject do
-          tax = FactoryBot.create(:tax).attributes.except("created_at", "updated_at")
-          patch :update, params: tax.merge({token: @token})
-        end
-
-        it { is_expected.to have_http_status(:success) }
-      end
-      
-      context "with a invalid authorization token" do
-        it 'returns a bad request' do
-          patch :update, params: { id: 1000 }
-          expect(response).to have_http_status(:bad_request)
-        end  
-      end
-    end
-
-    context "DELETE /destroy" do     
-      context 'with a valid authorization token' do
-        subject(:response) do
-          tax = FactoryBot.create(:tax)
-          delete :destroy, params: @request_params.merge(id: tax.id)
-        end
-        let(:response_body) { JSON.parse response.body }
-
-        it 'returns http success' do
-          expect(response).to have_http_status(:success)
-        end
-
-        it 'expects message and success key' do
-          expect(response_body).to have_key("message")
-        end
-      end
-
-      context "with a invalid authorization token" do
-        it 'returns a bad request' do
-          delete :destroy, params: {id: 1}
-          expect(response).to have_http_status(:bad_request)
-        end  
-      end
-    end
-
   end
 end
