@@ -13,15 +13,15 @@ module BxBlockAdmin
         if variant.save
           render json: serialized_hash(variant), status: :ok          
         else
-          render json: serialized_hash(variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: variant.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
       def update
-        if @variant.update_attributes(variant_params)
+        if @variant.update(variant_params)
           render json: serialized_hash(@variant), status: :ok
         else
-          render json: serialized_hash(@variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: @variant.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -33,7 +33,7 @@ module BxBlockAdmin
         if @variant.destroy
           render json: { message: "Variant deleted successfully.", success: true }, status: :ok
         else
-          render json: serialized_hash(@variant, serializer_class: BxBlockCatalogue::ErrorSerializer), status: :unprocessable_entity
+          render json: { errors: @variant.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -78,7 +78,7 @@ module BxBlockAdmin
             variant = BxBlockCatalogue::Variant.new(name: variant_hash[:name])
             variant_properties_hash = variant_hash.dig(:variant_properties_attributes)
             if variant_properties_hash
-              # Because variant must atleast one property, otherwise variant should not be saved.
+              # Because variant must have atleast one property, otherwise variant should not be saved.
               variant_properties_hash = variant_properties_hash.map{|variant_property_params| variant_property_params.permit(:name) }
               variant.variant_properties.build(variant_properties_hash)
               variants << variant if variant.save
@@ -98,7 +98,7 @@ module BxBlockAdmin
           begin
             @variant = BxBlockCatalogue::Variant.find(params[:id])
           rescue => exception
-            render json: { error: "Variant not found." }, status: :not_found
+            render json: { error: ["Variant not found."] }, status: :not_found
           end
         end
 
