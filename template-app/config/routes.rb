@@ -86,5 +86,6 @@ Rails.application.routes.draw do
   end
   namespace :bx_block_course do
     resources :lessons
+    post 'duplicate_method', to: 'lessons#duplicate_method'
   end
 end

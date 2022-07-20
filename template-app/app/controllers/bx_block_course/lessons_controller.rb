@@ -21,6 +21,8 @@ module BxBlockCourse
 			end
 		end
 
+
+
 		def show
 			if @lesson.present?
 				render json: BxBlockCourse::LessonSerializer.new(@lesson).serializable_hash, status: :ok
@@ -32,6 +34,7 @@ module BxBlockCourse
 		def update
 			if @lesson.present? 
 				@lesson.update(lesson_params)
+
 				render json: BxBlockCourse::LessonSerializer.new(@lesson, meta: {message: 'Lesson update successfully.'
 				}).serializable_hash, status: :ok
 			else
@@ -41,11 +44,11 @@ module BxBlockCourse
 			end
 		end
 
-		def duplicate
+		def duplicate_method
 			record = BxBlockCourse::Lesson.find_by(id: params[:data][:id])
 			duplicate = record.dup 
 			if duplicate.save
-				render json: BxBlockCourse::LessonSerializer.new(duplicate, meta: {message: ' Duplicate Module created successfully.'
+				render json: BxBlockCourse::LessonSerializer.new(duplicate, meta: {message: ' Duplicate lesson created successfully.'
 				}).serializable_hash, status: :ok
 			else
 				render json:{message: "Duplicate lesson not created"}, status: :not_found
@@ -61,10 +64,14 @@ module BxBlockCourse
 			end
 		end
 
+		def lesson_setting
+
+		end
+
 		private
 
 		def lesson_params
-			params.require(:data).permit(:lesson_title, :description ,:modulee_id , :pdf ,:select_type, :text , :youtube_url)
+			params.require(:data).permit(:lesson_title, :description ,:modulee_id , :pdf ,:select_type, :text , :youtube_url , :make_this_a_prerequisite , :enable_discussion_for_this_lesson)
 		end
 
 		def set_lesson

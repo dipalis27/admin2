@@ -25,10 +25,10 @@ module BxBlockCourse
 		end
 
 		def update
-			if @course.present? 
+			if @course.present?
+				media_upload
 				@course.update(course_params)
-				render json: BxBlockCourse::CourseSerializer.new(@course, meta: {message: 'Course update successfully.'
-				}).serializable_hash, status: :ok	
+				render json: BxBlockCourse::CourseSerializer.new(@course, serialization_options).serializable_hash, status: :ok	
 			else
 				errors = @subscription.errors.full_messages
 				render :json => {:errors => [{:course => errors.first}]},
