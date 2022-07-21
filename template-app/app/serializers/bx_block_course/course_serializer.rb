@@ -4,6 +4,14 @@ module BxBlockCourse
       :course_name,
       :discription
     ]
+    attribute :modulees do |object, params|
+      if object.present?
+        BxBlockCourse::ModuleeSerializer.new(
+          object.modulees, { params: params }
+          ).serializable_hash[:data]
+      end
+    end
+    
     attribute :image do |object, params|
       host = params[:host] || ''
 

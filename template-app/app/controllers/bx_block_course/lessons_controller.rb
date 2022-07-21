@@ -71,7 +71,8 @@ module BxBlockCourse
 		private
 
 		def lesson_params
-			params.require(:data).permit(:lesson_title, :description ,:modulee_id , :pdf ,:select_type, :text , :youtube_url , :make_this_a_prerequisite , :enable_discussion_for_this_lesson)
+			params.require(:data).permit(:lesson_title, :description, :select_type , :modulee_id , :youtube_url , :text, :title , :content , :make_this_a_prerequisite ,
+			:enable_discussion_for_this_lesson , :pdf)
 		end
 
 		def set_lesson
