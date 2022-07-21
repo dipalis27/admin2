@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_18_094243) do
+ActiveRecord::Schema.define(version: 2022_07_20_084528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,9 @@ ActiveRecord::Schema.define(version: 2022_07_18_094243) do
     t.string "gst_code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "country_id"
+    t.string "code"
+    t.index ["country_id"], name: "index_address_states_on_country_id"
   end
 
   create_table "admin_profiles", force: :cascade do |t|
@@ -293,8 +296,8 @@ ActiveRecord::Schema.define(version: 2022_07_18_094243) do
     t.string "gst_number"
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
-    t.integer "template_selection", default: 0
-    t.jsonb "color_palet", default: "{}"
+    t.integer "template_selection"
+    t.string "color_palet", default: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}"
     t.integer "address_state_id"
     t.string "navigation_item1"
     t.string "navigation_item2"
@@ -425,6 +428,13 @@ ActiveRecord::Schema.define(version: 2022_07_18_094243) do
     t.index ["sub_category_id"], name: "index_categories_sub_categories_on_sub_category_id"
   end
 
+  create_table "cities", force: :cascade do |t|
+    t.string "name"
+    t.integer "address_state_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "contacts", force: :cascade do |t|
     t.bigint "account_id"
     t.string "name"
@@ -435,6 +445,13 @@ ActiveRecord::Schema.define(version: 2022_07_18_094243) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "purpose_of_contact"
     t.index ["account_id"], name: "index_contacts_on_account_id"
+  end
+
+  create_table "countries", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "coupon_codes", force: :cascade do |t|
@@ -860,6 +877,7 @@ ActiveRecord::Schema.define(version: 2022_07_18_094243) do
     t.decimal "charge"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "free_shipping", default: true
   end
 
   create_table "sms_otps", force: :cascade do |t|
