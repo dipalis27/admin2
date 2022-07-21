@@ -64,10 +64,6 @@ module BxBlockCourse
 			end
 		end
 
-		def lesson_setting
-
-		end
-
 		private
 
 		def lesson_params
