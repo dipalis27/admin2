@@ -50,7 +50,7 @@ RSpec.describe BxBlockAdmin::V1::CustomerFeedbacksController, type: :controller 
       it 'when feedback is not present ' do
         request.headers['token'] = @token
         get :show, params: {"id":12}
-        expectation = HashWithIndifferentAccess.new({"error" => "No feedback found"})
+        expectation = HashWithIndifferentAccess.new({"error" => "Customer feedback not found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end
@@ -63,14 +63,13 @@ RSpec.describe BxBlockAdmin::V1::CustomerFeedbacksController, type: :controller 
       it 'when admin_user provide all the fields' do
         request.headers['token'] = @token
         put :update, params: {"id": @feedback.id,"description": Faker::Lorem.sentence, 'customer_name': Faker::Lorem.word, "position": 1}
-        expect(JSON.parse(response.body)["message"]).to eq("Feedback updated successfully")
         expect(response.status).to eq(200)
       end
       
       it 'when customer feedback is not present' do
         request.headers['token'] = @token
         put :update, params: {"id":45, "description": Faker::Lorem.sentence, 'customer_name': Faker::Lorem.word, "position": 1}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"error" => "Customer feedback not found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end

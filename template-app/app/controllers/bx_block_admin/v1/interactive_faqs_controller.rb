@@ -3,12 +3,13 @@ module BxBlockAdmin
   module V1
 
     class InteractiveFaqsController < ApplicationController
-      
-      def index
-        @faq = BxBlockInteractiveFaqs::InteractiveFaqs.all
+      before_action :set_faq, only:[:show, :update, :destroy]
 
-        if @faq.present?
-          render json: @faq, status: :ok
+      def index
+        @faqs = BxBlockInteractiveFaqs::InteractiveFaqs.all
+
+        if @faqs.present?
+          render json: InteractiveFaqsSerializer.new(@faqs), status: :ok
         else
           render json: { message: "No FAQ found"}, status: 404
         end
@@ -18,7 +19,7 @@ module BxBlockAdmin
         @faq = BxBlockInteractiveFaqs::InteractiveFaqs.create(faq_params)
 
         if @faq.save
-          render json: @faq, status: :ok
+          render json: InteractiveFaqsSerializer.new(@faq), status: :ok
         else
           render json: { errors: @faq.errors.full_messages }, status: 400
         end
@@ -44,21 +45,14 @@ module BxBlockAdmin
       end
 
       def show
-        begin
-          @faq = BxBlockInteractiveFaqs::InteractiveFaqs.find(params[:id])
-          render json: @faq, status: :ok
-        rescue 
-          render(json: { error: "No FAQ found" }, status:404)
-        end
+        render json: InteractiveFaqsSerializer.new(@faq), status: :ok
       end
 
       def update
-        @faq = BxBlockInteractiveFaqs::InteractiveFaqs.find(params[:id])
-
         if @faq.update(faq_params)
-          render json: { data: @faq,  message: "FAQ updated successfully" }, status: :ok
+          render json: InteractiveFaqsSerializer.new(@faq), status: :ok
         else
-          render(json:{ error: "No FAQ found"}, status:404)
+          render json:{ "errors": @faq.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
@@ -85,19 +79,25 @@ module BxBlockAdmin
       end
 
       def destroy
-        @faq = BxBlockInteractiveFaqs::InteractiveFaqs.find(params[:id])
-
         if @faq.destroy
           render json: { message: "FAQ deleted successfully.", success: true}, status: :ok
         else
-          render json: {message: "No FAQ found", success:false}, status: :unprocessable_entity
+          render json: {"errors": @faq.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
       private
 
       def faq_params
-        params.permit(:title, :content)
+        params.permit(:id, :title, :content)
+      end
+
+      def set_faq
+        begin
+          @faq = BxBlockInteractiveFaqs::InteractiveFaqs.find(faq_params[:id])
+        rescue 
+          render json: {"error": "No FAQ found"}, status: :not_found
+        end
       end
     end
     
