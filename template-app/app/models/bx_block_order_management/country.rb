@@ -6,6 +6,6 @@ module BxBlockOrderManagement
     validates_uniqueness_of :code, :name
 
     has_many :address_states
-    
+    has_one :currency
   end
 end

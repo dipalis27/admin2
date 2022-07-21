@@ -32,11 +32,14 @@ BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 12)
 BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 15)
 BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 18)
 
-# Create allowed countries
+# Create allowed countries and its currency
 countties = YAML.load_file("#{Rails.root}/config/countries.yml")
+symbols = BxBlockOrderManagement::Currency::COUNTRY_SYMBOLS
 countties.each do |country|
-  BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
+  object = BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
+  object.create_currency(name: symbols[country[0]][0], symbol: symbols[country[0]][1]) if object.currency.nil?
 end
+
 # States with their gst codes
 countties = BxBlockOrderManagement::Country.all
 countties.each do |country|
