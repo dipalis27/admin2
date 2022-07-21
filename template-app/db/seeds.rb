@@ -32,11 +32,14 @@ BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 12)
 BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 15)
 BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 18)
 
-# Create allowed countries
+# Create allowed countries and its currency
 countties = YAML.load_file("#{Rails.root}/config/countries.yml")
+symbols = BxBlockOrderManagement::Currency::COUNTRY_SYMBOLS
 countties.each do |country|
-  BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
+  object = BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
+  object.create_currency(name: symbols[country[0]][0], symbol: symbols[country[0]][1]) if object.currency.nil?
 end
+
 # States with their gst codes
 countties = BxBlockOrderManagement::Country.all
 countties.each do |country|
@@ -57,19 +60,23 @@ countties.each do |country|
     end
   else
     states = CS.states(country.code.to_sym)
-    states.each do |state|
-      address_state = country.address_states.find_or_create_by(code: state[0].to_s.downcase, name: state[1])
+    if states
+      states.each do |state|
+        address_state = country.address_states.find_or_create_by(code: state[0].to_s.downcase, name: state[1])
+      end
     end
     states = country.address_states
     states.each do |state|
       if state.cities.blank?
         cities = CS.cities(state.code.to_sym, country.code.to_sym)
-        cities_array = []
-        cities.each do |city|
-          city_hash = {name: city, address_state_id: state.id, created_at: Time.now, updated_at: Time.now}
-          cities_array << city_hash
+        if cities
+          cities_array = []
+          cities.each do |city|
+            city_hash = {name: city, address_state_id: state.id, created_at: Time.now, updated_at: Time.now}
+            cities_array << city_hash
+          end
+          BxBlockOrderManagement::City.insert_all(cities_array)
         end
-        BxBlockOrderManagement::City.insert_all(cities_array)
       end
     end
   end

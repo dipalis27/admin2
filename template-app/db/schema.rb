@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_20_084528) do
+ActiveRecord::Schema.define(version: 2022_07_21_085938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -474,6 +474,7 @@ ActiveRecord::Schema.define(version: 2022_07_20_084528) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "discription"
+    t.boolean "is_private", default: false
   end
 
   create_table "courses_student_profiles", id: false, force: :cascade do |t|
@@ -481,6 +482,15 @@ ActiveRecord::Schema.define(version: 2022_07_20_084528) do
     t.bigint "course_id"
     t.index ["course_id"], name: "index_courses_student_profiles_on_course_id"
     t.index ["student_profile_id"], name: "index_courses_student_profiles_on_student_profile_id"
+  end
+
+  create_table "currencies", force: :cascade do |t|
+    t.string "name"
+    t.string "symbol"
+    t.bigint "country_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["country_id"], name: "index_currencies_on_country_id"
   end
 
   create_table "customer_feedbacks", force: :cascade do |t|
@@ -615,6 +625,10 @@ ActiveRecord::Schema.define(version: 2022_07_20_084528) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "youtube_url"
     t.string "text"
+    t.string "title"
+    t.string "content"
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "enable_discussion_for_this_lesson", default: false
     t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
   end
 
@@ -1011,6 +1025,7 @@ ActiveRecord::Schema.define(version: 2022_07_20_084528) do
   add_foreign_key "catalogues_tags", "tags"
   add_foreign_key "categories_sub_categories", "categories"
   add_foreign_key "categories_sub_categories", "sub_categories"
+  add_foreign_key "currencies", "countries"
   add_foreign_key "delivery_address_orders", "delivery_addresses"
   add_foreign_key "delivery_address_orders", "orders"
   add_foreign_key "delivery_addresses", "accounts"

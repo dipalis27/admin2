@@ -6,7 +6,13 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        categories = BxBlockCategoriesSubCategories::Category.order(updated_at: :desc).page(current_page).per(per_page)
+        categories =
+          unless params[:search].present?
+            BxBlockCategoriesSubCategories::Category.all
+          else
+            BxBlockCategoriesSubCategories::Category.left_joins(:sub_categories).where("LOWER(categories.name) LIKE LOWER(:search) OR LOWER(sub_categories.name) LIKE LOWER(:search)", search: "%#{params[:search]}%").distinct
+          end
+        categories = categories.order(updated_at: :desc).page(current_page).per(per_page)
         options = {}
         options[:meta] = {
           pagination: {

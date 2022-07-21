@@ -50,7 +50,7 @@ RSpec.describe BxBlockAdmin::V1::PaymentsController, type: :controller do
       it 'when static page is not present ' do
         request.headers['token'] = @token
         get :show, params: {"id":12}
-        expectation = HashWithIndifferentAccess.new({"error" => "No API configuration found"})
+        expectation = HashWithIndifferentAccess.new({"errors" => "API configuration not found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end
@@ -64,14 +64,13 @@ RSpec.describe BxBlockAdmin::V1::PaymentsController, type: :controller do
       it 'when API is present in the database' do
         request.headers['token'] = @token
         put :update, params: {"id": @api.id, "configuration_type": "razorpay", 'api_key': "qwerty", 'api_secret_key': "asdfghjk"}
-        expect(JSON.parse(response.body)["message"]).to eq("API Configuration updated successfully")
         expect(response.status).to eq(200)
       end
       
-      it 'when static page is not present' do
+      it 'when API  is not present' do
         request.headers['token'] = @token
         put :update, params: {"id":98, 'api_key': "hgadf", 'api_secret_key': "zxcvbn"}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"errors" => "API configuration not found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end

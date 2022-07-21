@@ -21,6 +21,10 @@ module BxBlockAdmin
         render json: AdminUserSerializer.new(AdminUser.sub_admin).serializable_hash, status: :ok
       end
 
+      def sub_admin_count
+        render json: { sub_admin_count: AdminUser.sub_admin.count }, status: :ok
+      end
+
       def show_sub_admin
         render json: AdminUserSerializer.new(@admin_user).serializable_hash, status: :ok
       end

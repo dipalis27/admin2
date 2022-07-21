@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       resource :admin_user, only: [:show, :update] do
         collection do
           get :sub_admin_users
+          get :sub_admin_count
           get :permissions
         end
         member do
@@ -85,5 +86,6 @@ Rails.application.routes.draw do
   end
   namespace :bx_block_course do
     resources :lessons
+    post 'duplicate_method', to: 'lessons#duplicate_method'
   end
 end
