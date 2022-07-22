@@ -73,6 +73,7 @@ class AdminUser < ApplicationRecord
     ## Callbacks
     #################
     #after_update :send_account_activated_email, if: :saved_change_to_activated?
+    before_validation :remove_empty_permissions
     before_create :create_admin_profile
 
     # def active_for_authentication?
@@ -96,7 +97,6 @@ class AdminUser < ApplicationRecord
     end
 
     def change_email_keywords(content, customer: nil, product: nil, variant: nil)
-
         default_email_setting = BxBlockSettings::DefaultEmailSetting.first
         contact_us =  BxBlockContactUs::Contact.where(account_id: customer&.id).last
         BxBlockSettings::EmailSetting::EMAIL_KEYWORDS.each do |key|
@@ -151,6 +151,10 @@ class AdminUser < ApplicationRecord
         if permissions.any?{|p| !(PERMISSIONS).include?(p)}
             errors.add(:permissions, "are invalid")
         end
+    end
+
+    def remove_empty_permissions
+        permissions.reject!(&:empty?)
     end
 
     protected
