@@ -87,12 +87,25 @@ Rails.application.routes.draw do
   namespace :bx_block_course do
     resources :courses
   end
+
   namespace :bx_block_course do
     resources :modulees 
     post 'duplicate', to: 'modulees#duplicate'
   end
+
   namespace :bx_block_course do
     resources :lessons
-    post 'duplicate_method', to: 'lessons#duplicate_method'
+    post 'duplicate_lesson', to: 'lessons#duplicate_lesson'
   end
+  
+  namespace :bx_block_course do
+    resources :assignments
+    post 'duplicate_assignment', to: 'assignments#duplicate_assignment'
+  end
+  
+  namespace :bx_block_course do
+    resources :quizzes
+    post 'duplicate_quiz', to: 'quizzes#duplicate_quiz'
+  end
+
 end
