@@ -7,7 +7,7 @@ module BxBlockCourse
 			if quiz.present?
 				render json: BxBlockCourse::QuizSerializer.new(quiz).serializable_hash, status: :ok
 			else
-				render json: { error: "quiz not found." }, status: 404
+				render json: { error: quiz.errors.full_messages }, status: 404
 			end
 		end
 
@@ -25,7 +25,7 @@ module BxBlockCourse
 			if @quiz.present?
 				render json: BxBlockCourse::QuizSerializer.new(@quiz).serializable_hash, status: :ok
 			else
-				render json: { error: "Quiz not found." }, status: 404
+				render json: { error: @quiz.errors.full_messages }, status: 404
 			end
 		end
 

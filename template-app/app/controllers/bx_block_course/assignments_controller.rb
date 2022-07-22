@@ -1,13 +1,13 @@
 module BxBlockCourse
 	class AssignmentsController < ApplicationController
 		before_action :set_assignment , only: [:update, :destroy, :show]
-		
+
 		def index
 			assignment = BxBlockCourse::Assignment.all 
 			if assignment.present?
 				render json: BxBlockCourse::AssignmentSerializer.new(assignment).serializable_hash, status: :ok
 			else
-				render json: { error: "assignment not found." }, status: 404
+				render json: { error: assignment.errors.full_messages }, status: 404
 			end
 		end
 
@@ -17,7 +17,7 @@ module BxBlockCourse
 				render json: BxBlockCourse::AssignmentSerializer.new(assignment, meta: {message: 'Assignment created successfully.'
 				}).serializable_hash, status: :ok
 			else
-				render json: { error: "Assignment not created." }, status: 404	
+				render json: { errors: assignment.errors.full_messages }, status: 404	
 			end
 		end 
 
@@ -37,7 +37,7 @@ module BxBlockCourse
 			if @assignment.present?
 				render json: BxBlockCourse::AssignmentSerializer.new(@assignment).serializable_hash, status: :ok
 			else
-				render json: { error: "Assignment not found." }, status: 404
+				render json: { error: @assignment.errors.full_messages }, status: 404
 			end
 		end
 
