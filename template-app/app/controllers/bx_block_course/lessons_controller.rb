@@ -44,7 +44,7 @@ module BxBlockCourse
 			end
 		end
 
-		def duplicate_method
+		def duplicate_lesson
 			record = BxBlockCourse::Lesson.find_by(id: params[:data][:id])
 			duplicate = record.dup 
 			if duplicate.save
@@ -68,7 +68,7 @@ module BxBlockCourse
 
 		def lesson_params
 			params.require(:data).permit(:lesson_title, :description, :select_type , :modulee_id , :youtube_url , :text, :title , :content , :make_this_a_prerequisite ,
-			:enable_discussion_for_this_lesson , :pdf)
+			:enable_discussion_for_this_lesson , :pdf , :status)
 		end
 
 		def set_lesson
