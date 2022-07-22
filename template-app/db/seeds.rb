@@ -35,47 +35,50 @@ BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 18)
 # Create allowed countries and its currency
 countties = YAML.load_file("#{Rails.root}/config/countries.yml")
 symbols = BxBlockOrderManagement::Currency::COUNTRY_SYMBOLS
-countties.each do |country|
-  object = BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
-  object.create_currency(name: symbols[country[0]][0], symbol: symbols[country[0]][1]) if object.currency.nil?
+if countties.present?
+  countties.each do |country|
+    object = BxBlockOrderManagement::Country.find_or_create_by(code: country[0], name: country[1])
+    object.create_currency(name: symbols[country[0]][0], symbol: symbols[country[0]][1]) if object.currency.nil?
+  end
 end
-
 # States with their gst codes
 countties = BxBlockOrderManagement::Country.all
-countties.each do |country|
-  if country.code.eql?('in')
-    STATES_WITH_GST_CODES = [[1, 'JAMMU AND KASHMIR', 'JK'],[2, 'HIMACHAL PRADESH', 'HP'],[3, 'PUNJAB', 'PB'],[4, 'CHANDIGARH', 'CT'],[5, 'UTTARAKHAND', 'UK'],[6, 'HARYANA', 'HR'],[7, 'DELHI', 'DL'],[8, 'RAJASTHAN', 'RJ'],[9, 'UTTAR PRADESH', 'UP'],[10, 'BIHAR', 'BR'],[11, 'SIKKIM', 'SK'],[12, 'ARUNACHAL PRADESH', 'AP'],[13, 'NAGALAND', 'NL'],[14, 'MANIPUR', 'MN'],[15, 'MIZORAM', 'MZ'],[16, 'TRIPURA', 'TR'],[17, 'MEGHALAYA', 'ML'],[18, 'ASSAM', 'AS'],[19, 'WEST BENGAL', 'WB'],[20, 'JHARKHAND', 'JH'],[21, 'ODISHA', 'OR'],[22, 'CHATTISGARH', 'CT'],[23, 'MADHYA PRADESH', 'MP'],[24, 'GUJARAT', 'GJ'],[26, 'DADRA AND NAGAR HAVELI AND DAMAN AND DIU', 'DN'],[27, 'MAHARASHTRA', 'MH'],[28, 'ANDHRA PRADESH', 'AP'],[29, 'KARNATAKA', 'KA'],[30, 'GOA', 'GA'],[31, 'LAKSHADWEEP', 'LD'],[32, 'KERALA', 'KL'],[33, 'TAMIL NADU', 'TN'],[34, 'PUDUCHERRY', 'PY'],[35, 'ANDAMAN AND NICOBAR ISLANDS', 'AN'],[36, 'TELANGANA', 'TG'],[37, 'ANDHRA PRADESH', 'AP'],[38, 'LADAKH', 'LA']]
-    STATES_WITH_GST_CODES.each do |state|
-      address_state = BxBlockOrderManagement::AddressState.find_or_create_by(gst_code: state[0], name: state[1])
-      address_state.update_columns(country_id: country.id, code: state[2].to_s.downcase) if address_state.country_id.blank?
-      if address_state.cities.blank?
-        cities = CS.cities(address_state.code.to_sym, address_state.country.code.to_sym)
-        cities_array = []
-        cities.each do |city|
-          city_hash = {name: city, address_state_id: address_state.id, created_at: Time.now, updated_at: Time.now}
-          cities_array << city_hash
-        end
-        BxBlockOrderManagement::City.insert_all(cities_array)
-      end
-    end
-  else
-    states = CS.states(country.code.to_sym)
-    if states
-      states.each do |state|
-        address_state = country.address_states.find_or_create_by(code: state[0].to_s.downcase, name: state[1])
-      end
-    end
-    states = country.address_states
-    states.each do |state|
-      if state.cities.blank?
-        cities = CS.cities(state.code.to_sym, country.code.to_sym)
-        if cities
+if countties.present?
+  countties.each do |country|
+    if country.code.eql?('in')
+      STATES_WITH_GST_CODES = [[1, 'JAMMU AND KASHMIR', 'JK'],[2, 'HIMACHAL PRADESH', 'HP'],[3, 'PUNJAB', 'PB'],[4, 'CHANDIGARH', 'CT'],[5, 'UTTARAKHAND', 'UK'],[6, 'HARYANA', 'HR'],[7, 'DELHI', 'DL'],[8, 'RAJASTHAN', 'RJ'],[9, 'UTTAR PRADESH', 'UP'],[10, 'BIHAR', 'BR'],[11, 'SIKKIM', 'SK'],[12, 'ARUNACHAL PRADESH', 'AP'],[13, 'NAGALAND', 'NL'],[14, 'MANIPUR', 'MN'],[15, 'MIZORAM', 'MZ'],[16, 'TRIPURA', 'TR'],[17, 'MEGHALAYA', 'ML'],[18, 'ASSAM', 'AS'],[19, 'WEST BENGAL', 'WB'],[20, 'JHARKHAND', 'JH'],[21, 'ODISHA', 'OR'],[22, 'CHATTISGARH', 'CT'],[23, 'MADHYA PRADESH', 'MP'],[24, 'GUJARAT', 'GJ'],[26, 'DADRA AND NAGAR HAVELI AND DAMAN AND DIU', 'DN'],[27, 'MAHARASHTRA', 'MH'],[28, 'ANDHRA PRADESH', 'AP'],[29, 'KARNATAKA', 'KA'],[30, 'GOA', 'GA'],[31, 'LAKSHADWEEP', 'LD'],[32, 'KERALA', 'KL'],[33, 'TAMIL NADU', 'TN'],[34, 'PUDUCHERRY', 'PY'],[35, 'ANDAMAN AND NICOBAR ISLANDS', 'AN'],[36, 'TELANGANA', 'TG'],[37, 'ANDHRA PRADESH', 'AP'],[38, 'LADAKH', 'LA']]
+      STATES_WITH_GST_CODES.each do |state|
+        address_state = BxBlockOrderManagement::AddressState.find_or_create_by(gst_code: state[0], name: state[1])
+        address_state.update_columns(country_id: country.id, code: state[2].to_s.downcase) if address_state.country_id.blank?
+        if address_state.cities.blank?
+          cities = CS.cities(address_state.code.to_sym, address_state.country.code.to_sym)
           cities_array = []
           cities.each do |city|
-            city_hash = {name: city, address_state_id: state.id, created_at: Time.now, updated_at: Time.now}
+            city_hash = {name: city, address_state_id: address_state.id, created_at: Time.now, updated_at: Time.now}
             cities_array << city_hash
           end
           BxBlockOrderManagement::City.insert_all(cities_array)
+        end
+      end
+    else
+      states = CS.states(country.code.to_sym)
+      if states
+        states.each do |state|
+          address_state = country.address_states.find_or_create_by(code: state[0].to_s.downcase, name: state[1])
+        end
+      end
+      states = country.address_states
+      states.each do |state|
+        if state.cities.blank?
+          cities = CS.cities(state.code.to_sym, country.code.to_sym)
+          if cities
+            cities_array = []
+            cities.each do |city|
+              city_hash = {name: city, address_state_id: state.id, created_at: Time.now, updated_at: Time.now}
+              cities_array << city_hash
+            end
+            BxBlockOrderManagement::City.insert_all(cities_array)
+          end
         end
       end
     end
