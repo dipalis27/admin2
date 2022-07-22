@@ -6,7 +6,7 @@ module BxBlockAdmin
       before_action :set_faq, only:[:show, :update, :destroy]
 
       def index
-        @faqs = BxBlockInteractiveFaqs::InteractiveFaqs.all
+        @faqs = BxBlockInteractiveFaqs::InteractiveFaqs.all.order(created_at: :asc)
 
         if @faqs.present?
           render json: InteractiveFaqsSerializer.new(@faqs), status: :ok
