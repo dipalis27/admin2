@@ -3,7 +3,8 @@ module BxBlockAdmin
   module V1
 
     class PaymentsController < ApplicationController
-      
+      before_action :set_api, only:[:show, :update]
+
       def index
         @apis = BxBlockApiConfiguration::ApiConfiguration.all
         
@@ -25,28 +26,29 @@ module BxBlockAdmin
       end
       
       def show
-        begin
-          @api = BxBlockApiConfiguration::ApiConfiguration.find(params[:id])
-          render json: PaymentSerializer.new(@api).serializable_hash, success: :ok
-        rescue 
-          render(json: { error: "No API configuration found" }, status:404)
-        end
+        render json: PaymentSerializer.new(@api).serializable_hash, success: :ok
       end
 
       def update
-        @api = BxBlockApiConfiguration::ApiConfiguration.find(params[:id])
-
         if @api.update(api_params)
-          render json: { data: PaymentSerializer.new(@api).serializable_hash, message: "API Configuration updated successfully"}, status: 200
+          render json: PaymentSerializer.new(@api).serializable_hash, status: :ok
         else
-          render json: {errors: "API configuration not found"}, status: :not_found
+          render json: {"errors": @api.errors.full_messages}, status: :unprocessable_entity
         end
       end
 
       private
 
       def api_params
-        params.permit(:configuration_type, :api_key, :api_secret_key)
+        params.permit(:id, :configuration_type, :api_key, :api_secret_key)
+      end
+
+      def set_api
+        begin
+          @api = BxBlockApiConfiguration::ApiConfiguration.find(api_params[:id])
+        rescue 
+          render json: {"errors": "API configuration not found"}, status: 404
+        end
       end
     end
   end

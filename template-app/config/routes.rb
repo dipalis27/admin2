@@ -74,18 +74,38 @@ Rails.application.routes.draw do
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
       resources :coupon_codes, except: [:edit, :new]
+      resources :locations, only: [] do
+        collection do
+          get :countries
+          get 'countries/:country_id/states', to: 'locations#states'
+          get 'states/:state_id/cities', to: 'locations#cities'
+        end
+      end
     end
   end
 
   namespace :bx_block_course do
     resources :courses
   end
+
   namespace :bx_block_course do
     resources :modulees 
     post 'duplicate', to: 'modulees#duplicate'
   end
+
   namespace :bx_block_course do
     resources :lessons
-    post 'duplicate_method', to: 'lessons#duplicate_method'
+    post 'duplicate_lesson', to: 'lessons#duplicate_lesson'
   end
+  
+  namespace :bx_block_course do
+    resources :assignments
+    post 'duplicate_assignment', to: 'assignments#duplicate_assignment'
+  end
+  
+  namespace :bx_block_course do
+    resources :quizzes
+    post 'duplicate_quiz', to: 'quizzes#duplicate_quiz'
+  end
+
 end

@@ -1,6 +1,7 @@
 module BxBlockBanner
   class Banner < BxBlockBanner::ApplicationRecord
     self.table_name = :banners
+    extend BxBlockAdmin::ModelUtilities
 
     ATTACHMENT_SIZE = {
       web_banner: {

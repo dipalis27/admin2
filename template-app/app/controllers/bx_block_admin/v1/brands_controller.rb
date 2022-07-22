@@ -6,7 +6,7 @@ module BxBlockAdmin
       def index
         per_page = get_per_page_count
         current_page = params[:page].present? ? params[:page].to_i : 1
-        brands = BxBlockCatalogue::Brand.page(current_page).per(per_page)
+        brands = BxBlockCatalogue::Brand.order(id: :desc).page(current_page).per(per_page)
         options = {}
         options[:meta] = {
           pagination: {
