@@ -6,7 +6,12 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        catalogues = BxBlockCatalogue::Catalogue.order(created_at: :desc).page(current_page).per(per_page)
+        if params[:search].present? || params[:filters].present?
+          catalogue_array = BxBlockCatalogue::Catalogue.search(params)
+          catalogues = Kaminari.paginate_array(catalogue_array).page(current_page).per(per_page)
+        else
+          catalogues = BxBlockCatalogue::Catalogue.order(created_at: :desc).page(current_page).per(per_page)  
+        end
         options = {}
         options[:meta] = {
           pagination: {
