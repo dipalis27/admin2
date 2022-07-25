@@ -80,10 +80,14 @@ module BxBlockAdmin
 
     def change_object_attributes(object, disabled, base64)
       object.disabled = disabled if disabled.present?
-      if base64.present?
-        image_path, image_extension = store_base64_image(base64)
-        object.image.attach(io: File.open(image_path), filename: "image.#{image_extension}")
-        File.delete(image_path) if File.exist?(image_path)
+      unless base64.nil?
+        unless base64.blank?
+          image_path, image_extension = store_base64_image(base64)
+          object.image.attach(io: File.open(image_path), filename: "image.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        else
+          object.image.detach
+        end
       end
       object
     end
