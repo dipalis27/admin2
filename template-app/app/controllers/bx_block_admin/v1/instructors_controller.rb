@@ -6,7 +6,7 @@ module BxBlockAdmin
       def index
         allinstructors = BxBlockInstructorData::Instructor.all
         if allinstructors.present?
-          render json: BxBlockInstructorData::InstructorSerializer.new(allinstructors).serializable_hash, status: :ok
+          render json: BxBlockInstructorsData::InstructorSerializer.new(allinstructors, serialization_options).serializable_hash, status: :ok
         end
       end
 
@@ -24,7 +24,7 @@ module BxBlockAdmin
         if @instructor.present?
           media_upload
           @instructor.update(instructor_params)
-          render json: BxBlockInstructorData::InstructorSerializer.new(@instructor, serialization_options).serializable_hash, status: :ok
+          render json: BxBlockInstructorsData::InstructorSerializer.new(@instructor, serialization_options).serializable_hash, status: :ok
         else
           render json: {'errors' => [@instructor.errors.full_messages.to_sentence]}, status: :unprocessable_entity
         end
@@ -32,9 +32,9 @@ module BxBlockAdmin
 
       def show
         if @instructor.present?
-          render json: BxBlockInstructorData::InstructorSerializer.new(@instructor).serializable_hash, status: :ok
+          render json: BxBlockInstructorsData::InstructorSerializer.new(@instructor, serialization_options).serializable_hash, status: :ok
         else
-          render json: {'errors' => ['Student not found']}, status: :not_found
+          render json: {'errors' => [@instructor.errors.full_messages.to_sentence]}, status: :not_found
         end
       end
 
@@ -43,7 +43,7 @@ module BxBlockAdmin
           @instructor.destroy
           render json: { success: true }, status: :ok
         else
-          render json: { 'errors': @course.errors.full_messages }, status: :unprocessable_entity
+          render json: { 'errors': @instructor.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -53,7 +53,7 @@ module BxBlockAdmin
           params.require(:data).permit(:instructor_name, :email)
         end
 
-        def set_course
+        def instructor
           @instructor =  BxBlockInstructorData::Instructor.find(params[:id])
         end
 
