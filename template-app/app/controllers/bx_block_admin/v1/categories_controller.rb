@@ -1,12 +1,18 @@
 module BxBlockAdmin
   module V1
     class CategoriesController < ApplicationController
-      before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category]
+      before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category, :validate_category]
 
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        categories = BxBlockCategoriesSubCategories::Category.order(name: :asc).page(current_page).per(per_page)
+        categories =
+          unless params[:search].present?
+            BxBlockCategoriesSubCategories::Category.all
+          else
+            BxBlockCategoriesSubCategories::Category.left_joins(:sub_categories).where("LOWER(categories.name) LIKE LOWER(:search) OR LOWER(sub_categories.name) LIKE LOWER(:search)", search: "%#{params[:search]}%").distinct
+          end
+        categories = categories.order(updated_at: :desc).page(current_page).per(per_page)
         options = {}
         options[:meta] = {
           pagination: {
@@ -23,14 +29,14 @@ module BxBlockAdmin
       def create
         categories, errors = ChangeCategoriesSubCategories.new(category_params['categories']).call
         render json: {
-          categories: BxBlockAdmin::CategorySerializer.new(categories, serialization_options).serializable_hash,
+          categories: BxBlockAdmin::CategorySerializer.new(categories).serializable_hash,
           errors: errors
         }, status: :ok
       end
 
       def show
         if @category
-          render json: BxBlockAdmin::CategorySerializer.new(@category, serialization_options).serializable_hash, status: :ok
+          render json: BxBlockAdmin::CategorySerializer.new(@category).serializable_hash, status: :ok
         else
           render json: {'errors' => ['Category not found']}, status: :not_found
         end
@@ -47,7 +53,7 @@ module BxBlockAdmin
 
       def validate_category
         render json: { 'errors' => ['Please pass a name'] }, status: :unprocessable_entity if validate_params[:name].blank?
-        render json: { valid: !BxBlockCategoriesSubCategories::Category.exists?(name: validate_params[:name]) }, status: :ok
+        render json: { valid: !BxBlockCategoriesSubCategories::Category.where.not(id: @category&.id).exists?(name: validate_params[:name]) }, status: :ok
       end
 
       def validate_sub_category
@@ -75,11 +81,6 @@ module BxBlockAdmin
 
       def set_category
         @category = BxBlockCategoriesSubCategories::Category.find_by_id(params[:id])
-      end
-
-      def serialization_options
-        request_hash = { params: {sub_categories: true } }
-        request_hash
       end
     end
   end

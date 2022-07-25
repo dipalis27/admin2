@@ -21,7 +21,10 @@ Rails.application.routes.draw do
           put :reset_password
         end
       end
-      resources :brand_settings, only: [:create, :update, :show, :index]
+      resources :brand_settings, only: [:create, :update, :show, :index] do 
+        put '/update_store_detail', to: "brand_settings#update_store_detail"
+      end
+      get '/get_country_by_currency', to:  "brand_settings#get_country_by_currency"
       post '/add_banner', to: "brand_settings#add_banner"
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
@@ -40,6 +43,7 @@ Rails.application.routes.draw do
         end
       end
       resources :customers, except: [:edit, :new]
+      resources :bulk_uploads, only: [:index, :create, :destroy, :show]
       resources :orders, only: [:index, :show, :update] do
         get :download_csv_report, on: :collection
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
@@ -49,6 +53,7 @@ Rails.application.routes.draw do
       resource :admin_user, only: [:show, :update] do
         collection do
           get :sub_admin_users
+          get :sub_admin_count
           get :permissions
         end
         member do
@@ -64,15 +69,43 @@ Rails.application.routes.draw do
         end
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :payments, only: [:index, :create, :update, :show]
+      resources :taxes, only: [:index, :create, :show]
+      resources :variants, only: [:index, :create, :update, :show, :destroy]
+      resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
+      resources :coupon_codes, except: [:edit, :new]
+      resources :locations, only: [] do
+        collection do
+          get :countries
+          get 'countries/:country_id/states', to: 'locations#states'
+          get 'states/:state_id/cities', to: 'locations#cities'
+        end
+      end
     end
   end
 
   namespace :bx_block_course do
     resources :courses
   end
+
   namespace :bx_block_course do
-    resources :modulees , only: [:index, :new, :create, :update, :show, :destroy]
-   post 'duplicate', to: 'modulees#duplicate'
-    # resources :duplicate,to: 'modulees#duplicate', only: [:create] 
+    resources :modulees 
+    post 'duplicate', to: 'modulees#duplicate'
   end
+
+  namespace :bx_block_course do
+    resources :lessons
+    post 'duplicate_lesson', to: 'lessons#duplicate_lesson'
+  end
+  
+  namespace :bx_block_course do
+    resources :assignments
+    post 'duplicate_assignment', to: 'assignments#duplicate_assignment'
+  end
+  
+  namespace :bx_block_course do
+    resources :quizzes
+    post 'duplicate_quiz', to: 'quizzes#duplicate_quiz'
+  end
+
 end

@@ -7,6 +7,6 @@
 
 module BxBlockAdmin
   class BrandSerializer < BuilderBase::BaseSerializer
-    attributes :name
+    attributes :name, :created_at, :updated_at
   end
 end

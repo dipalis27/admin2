@@ -8,7 +8,7 @@ module BxBlockAdmin
         if params[:term].present?
           orders = BxBlockOrderManagement::Order.not_in_cart.search_by_order_number_or_customer_name(params[:term]).order(order_date: :desc).page(current_page).per(per_page)
         elsif params[:filter].present?
-          orders = BxBlockOrderManagement::Order.not_in_cart.filter_by_date_and_statuses(params[:filter][:from_date], params[:filter][:to_date], params[:filter][:statuses]).order(order_date: :desc).page(current_page).per(per_page)
+          orders = BxBlockOrderManagement::Order.filter_by_date_and_statuses(params[:filter][:from_date], params[:filter][:to_date], params[:filter][:statuses]).order(order_date: :desc).page(current_page).per(per_page)
         elsif params[:status].present?
           orders = BxBlockOrderManagement::Order.not_in_cart.where(status: params[:status]).order(order_date: :desc).page(current_page).per(per_page)
         else
@@ -93,6 +93,7 @@ module BxBlockAdmin
               placed_orders_count: placed_orders.size,
               deliverd_orders_count: deliverd_orders.size,
               refunded_orders_count: refunded_orders.size,            
+              cancelled_orders_count: cancelled_orders.size,            
             }
           }
           options

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_12_084128) do
+ActiveRecord::Schema.define(version: 2022_07_22_093641) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,9 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.string "gst_code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "country_id"
+    t.string "code"
+    t.index ["country_id"], name: "index_address_states_on_country_id"
   end
 
   create_table "admin_profiles", force: :cascade do |t|
@@ -213,6 +216,19 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.boolean "content_guidlines", default: true
   end
 
+  create_table "assignments", force: :cascade do |t|
+    t.string "title"
+    t.string "description"
+    t.string "select_type"
+    t.bigint "lesson_id", null: false
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "enable_discussions_for_this_lesson", default: false
+    t.boolean "status", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["lesson_id"], name: "index_assignments_on_lesson_id"
+  end
+
   create_table "attachments", force: :cascade do |t|
     t.string "image"
     t.string "image_file_name"
@@ -299,6 +315,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.string "navigation_item1"
     t.string "navigation_item2"
     t.boolean "is_whatsapp_integration", default: false
+    t.string "zipcode"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -424,6 +441,13 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.index ["sub_category_id"], name: "index_categories_sub_categories_on_sub_category_id"
   end
 
+  create_table "cities", force: :cascade do |t|
+    t.string "name"
+    t.integer "address_state_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "contacts", force: :cascade do |t|
     t.bigint "account_id"
     t.string "name"
@@ -434,6 +458,13 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "purpose_of_contact"
     t.index ["account_id"], name: "index_contacts_on_account_id"
+  end
+
+  create_table "countries", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "coupon_codes", force: :cascade do |t|
@@ -448,6 +479,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.decimal "max_cart_value"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "limit"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -455,6 +487,23 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "discription"
+    t.boolean "is_private", default: false
+  end
+
+  create_table "courses_student_profiles", id: false, force: :cascade do |t|
+    t.bigint "student_profile_id"
+    t.bigint "course_id"
+    t.index ["course_id"], name: "index_courses_student_profiles_on_course_id"
+    t.index ["student_profile_id"], name: "index_courses_student_profiles_on_student_profile_id"
+  end
+
+  create_table "currencies", force: :cascade do |t|
+    t.string "name"
+    t.string "symbol"
+    t.bigint "country_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["country_id"], name: "index_currencies_on_country_id"
   end
 
   create_table "customer_feedbacks", force: :cascade do |t|
@@ -578,6 +627,23 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "status", default: 1
+  end
+
+  create_table "lessons", force: :cascade do |t|
+    t.string "lesson_title"
+    t.string "description"
+    t.string "select_type"
+    t.bigint "modulee_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "youtube_url"
+    t.string "text"
+    t.string "title"
+    t.string "content"
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "enable_discussion_for_this_lesson", default: false
+    t.boolean "status"
+    t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
   end
 
   create_table "modulees", force: :cascade do |t|
@@ -807,6 +873,24 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "quizzes", force: :cascade do |t|
+    t.string "select_type"
+    t.string "quiz_title"
+    t.string "question"
+    t.string "question_type"
+    t.string "description"
+    t.string "choise"
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "gradeable", default: false
+    t.boolean "enable_discussions_for_this_lesson", default: false
+    t.boolean "status", default: false
+    t.boolean "correct_answer", default: false
+    t.bigint "lesson_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["lesson_id"], name: "index_quizzes_on_lesson_id"
+  end
+
   create_table "recent_searches", force: :cascade do |t|
     t.string "search_term"
     t.datetime "created_at", precision: 6, null: false
@@ -860,6 +944,12 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["account_id"], name: "index_social_auths_on_account_id"
+  end
+
+  create_table "student_profiles", force: :cascade do |t|
+    t.string "student_name"
+    t.string "student_email"
+    t.integer "level", default: 0
   end
 
   create_table "sub_categories", force: :cascade do |t|
@@ -951,6 +1041,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assignments", "lessons"
   add_foreign_key "catalogue_variant_properties", "catalogue_variants"
   add_foreign_key "catalogue_variant_properties", "catalogues"
   add_foreign_key "catalogue_variant_properties", "variant_properties"
@@ -966,10 +1057,12 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
   add_foreign_key "catalogues_tags", "tags"
   add_foreign_key "categories_sub_categories", "categories"
   add_foreign_key "categories_sub_categories", "sub_categories"
+  add_foreign_key "currencies", "countries"
   add_foreign_key "delivery_address_orders", "delivery_addresses"
   add_foreign_key "delivery_address_orders", "orders"
   add_foreign_key "delivery_addresses", "accounts"
   add_foreign_key "email_setting_categories", "email_setting_tabs"
+  add_foreign_key "lessons", "modulees"
   add_foreign_key "modulees", "courses"
   add_foreign_key "notification_groups", "notification_settings"
   add_foreign_key "notification_subgroups", "notification_groups"
@@ -983,6 +1076,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_084128) do
   add_foreign_key "product_notifies", "accounts"
   add_foreign_key "product_notifies", "catalogue_variants"
   add_foreign_key "product_notifies", "catalogues"
+  add_foreign_key "quizzes", "lessons"
   add_foreign_key "reviews", "accounts"
   add_foreign_key "reviews", "catalogues"
   add_foreign_key "reviews", "order_items"

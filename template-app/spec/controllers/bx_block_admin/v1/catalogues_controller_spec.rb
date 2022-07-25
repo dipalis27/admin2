@@ -167,12 +167,12 @@ RSpec.describe BxBlockAdmin::V1::CataloguesController, type: :controller do
           it { is_expected.to have_key(:status) }
           it { is_expected.to have_key(:tax_amount) }
           it { is_expected.to have_key(:price_including_tax) }
-          it { is_expected.to have_key(:catalogue_variants) }
+          it { is_expected.to have_key(:catalogue_variants_attributes) }
           it { is_expected.to have_key(:tags) }
           it { is_expected.to have_key(:brand) }
           it { is_expected.to have_key(:category) }
-          it { is_expected.to have_key(:subscriptions) }
-          it { is_expected.to have_key(:attachments) }        
+          # it { is_expected.to have_key(:subscriptions) }
+          it { is_expected.to have_key(:catalogue_attachments) }        
         end
       end
 

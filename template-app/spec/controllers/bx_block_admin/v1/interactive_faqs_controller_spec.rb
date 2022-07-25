@@ -64,14 +64,13 @@ RSpec.describe BxBlockAdmin::V1::InteractiveFaqsController, type: :controller do
       it 'when admin_user provide all the fields' do
         request.headers['token'] = @token
         put :update, params: {"id": @faq.id,"title": Faker::Lorem.word, 'content': Faker::Lorem.sentence}
-        expect(JSON.parse(response.body)["message"]).to eq("FAQ updated successfully")
         expect(response.status).to eq(200)
       end
       
       it 'when static page is not present' do
         request.headers['token'] = @token
         put :update, params: {"id":45, "title": Faker::Lorem.word, 'content': Faker::Lorem.sentence}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"error" => "No FAQ found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end
@@ -93,7 +92,7 @@ RSpec.describe BxBlockAdmin::V1::InteractiveFaqsController, type: :controller do
       it 'when faq is not present in the database' do
         request.headers['token'] = @token
         put :destroy, params: {"id": 12}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"error" => "No FAQ found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end

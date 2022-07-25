@@ -72,7 +72,7 @@ RSpec.describe BxBlockAdmin::V1::HelpCentersController, type: :controller do
       it 'when static page is not present' do
         request.headers['token'] = @token
         put :update, params: {"id":45, "title": Faker::Lorem.word, 'description': Faker::Lorem.sentence, 'help_center_type': "about_us"}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"error" => "No static pages found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end
@@ -94,7 +94,7 @@ RSpec.describe BxBlockAdmin::V1::HelpCentersController, type: :controller do
       it 'when help center is not present in the database' do
         request.headers['token'] = @token
         put :destroy, params: {"id": 12}
-        expectation = HashWithIndifferentAccess.new({"errors" => ["Record not found"]})
+        expectation = HashWithIndifferentAccess.new({"error" => "No static pages found"})
         expect(JSON.parse(response.body)).to eq(expectation)
         expect(response.status).to eq(404)
       end
