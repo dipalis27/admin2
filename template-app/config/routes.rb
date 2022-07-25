@@ -73,12 +73,14 @@ Rails.application.routes.draw do
       resources :taxes, only: [:index, :create, :show]
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
+      resources :instructors, only: [:index, :create, :show, :update, :destroy]
       resources :coupon_codes, except: [:edit, :new]
     end
   end
 
   namespace :bx_block_course do
     resources :courses
+    post 'private_student', to: 'courses#private_student'
   end
   namespace :bx_block_course do
     resources :modulees 
