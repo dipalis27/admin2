@@ -93,6 +93,7 @@ Rails.application.routes.draw do
   namespace :bx_block_course do
     resources :modulees 
     post 'duplicate', to: 'modulees#duplicate'
+    get 'get_quiz_assignment/:id' , to: 'modulees#get_quiz_assignment'
   end
 
   namespace :bx_block_course do

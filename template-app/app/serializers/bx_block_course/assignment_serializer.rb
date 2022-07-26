@@ -2,7 +2,7 @@ module BxBlockCourse
 class AssignmentSerializer
   include JSONAPI::Serializer
  attributes *[
-      :lesson_id,
+      :modulee_id,
       :title,
       :description,
       :select_type,

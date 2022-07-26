@@ -2,7 +2,7 @@ module BxBlockCourse
   class QuizSerializer
     include JSONAPI::Serializer
       attributes *[
-      :lesson_id,
+      :modulee_id,
       :select_type,
       :quiz_title,
       :question,
