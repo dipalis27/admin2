@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_21_085938) do
+ActiveRecord::Schema.define(version: 2022_07_22_093641) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -216,6 +216,19 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
     t.boolean "content_guidlines", default: true
   end
 
+  create_table "assignments", force: :cascade do |t|
+    t.string "title"
+    t.string "description"
+    t.string "select_type"
+    t.bigint "lesson_id", null: false
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "enable_discussions_for_this_lesson", default: false
+    t.boolean "status", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["lesson_id"], name: "index_assignments_on_lesson_id"
+  end
+
   create_table "attachments", force: :cascade do |t|
     t.string "image"
     t.string "image_file_name"
@@ -296,8 +309,8 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
     t.string "gst_number"
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
-    t.integer "template_selection"
-    t.string "color_palet", default: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}"
+    t.integer "template_selection", default: 0
+    t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
     t.string "navigation_item1"
     t.string "navigation_item2"
@@ -629,6 +642,7 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
     t.string "content"
     t.boolean "make_this_a_prerequisite", default: false
     t.boolean "enable_discussion_for_this_lesson", default: false
+    t.boolean "status"
     t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
   end
 
@@ -859,6 +873,24 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "quizzes", force: :cascade do |t|
+    t.string "select_type"
+    t.string "quiz_title"
+    t.string "question"
+    t.string "question_type"
+    t.string "description"
+    t.string "choise"
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "gradeable", default: false
+    t.boolean "enable_discussions_for_this_lesson", default: false
+    t.boolean "status", default: false
+    t.boolean "correct_answer", default: false
+    t.bigint "lesson_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["lesson_id"], name: "index_quizzes_on_lesson_id"
+  end
+
   create_table "recent_searches", force: :cascade do |t|
     t.string "search_term"
     t.datetime "created_at", precision: 6, null: false
@@ -890,7 +922,6 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
     t.decimal "charge"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "free_shipping", default: true
   end
 
   create_table "sms_otps", force: :cascade do |t|
@@ -1010,6 +1041,7 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assignments", "lessons"
   add_foreign_key "catalogue_variant_properties", "catalogue_variants"
   add_foreign_key "catalogue_variant_properties", "catalogues"
   add_foreign_key "catalogue_variant_properties", "variant_properties"
@@ -1044,6 +1076,7 @@ ActiveRecord::Schema.define(version: 2022_07_21_085938) do
   add_foreign_key "product_notifies", "accounts"
   add_foreign_key "product_notifies", "catalogue_variants"
   add_foreign_key "product_notifies", "catalogues"
+  add_foreign_key "quizzes", "lessons"
   add_foreign_key "reviews", "accounts"
   add_foreign_key "reviews", "catalogues"
   add_foreign_key "reviews", "order_items"
