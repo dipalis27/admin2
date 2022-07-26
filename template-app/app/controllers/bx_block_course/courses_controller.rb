@@ -1,6 +1,7 @@
 module BxBlockCourse
 	class CoursesController < ApplicationController
 		before_action :set_course, only: [:update, :destroy, :show]
+		
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
