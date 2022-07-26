@@ -21,6 +21,10 @@ module BxBlockAdmin
         render json: AdminUserSerializer.new(AdminUser.sub_admin).serializable_hash, status: :ok
       end
 
+      def sub_admin_count
+        render json: { sub_admin_count: AdminUser.sub_admin.count }, status: :ok
+      end
+
       def show_sub_admin
         render json: AdminUserSerializer.new(@admin_user).serializable_hash, status: :ok
       end
@@ -40,11 +44,7 @@ module BxBlockAdmin
       end
 
       def update_sub_admin
-        @admin_user.assign_attributes(sub_admin_params.except(:permissions))
-        permissions = @admin_user.permissions
-        permissions << sub_admin_params[:permissions]
-        @admin_user.permissions = permissions.flatten.compact.uniq
-        if @admin_user.save
+        if @admin_user.update(sub_admin_params)
           @admin_user.admin_profile.present? ? @admin_user.admin_profile.update(name: @admin_user.name, phone: @admin_user.phone_number, email: @admin_user.email) : BxBlockRoleAndPermission::AdminProfile.create(name: @admin_user.name, phone: @admin_user.phone_number, email: @admin_user.email, admin_user_id: @admin_user.id)
           render json: AdminUserSerializer.new(@admin_user).serializable_hash, status: :ok
         else

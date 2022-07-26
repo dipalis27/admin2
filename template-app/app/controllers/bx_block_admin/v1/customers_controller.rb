@@ -9,14 +9,19 @@ module BxBlockAdmin
           customers = customers.where("LOWER(full_name) LIKE LOWER(:search) OR LOWER(full_phone_number) LIKE LOWER(:search) OR LOWER(email) LIKE LOWER(:search)", search: "%#{params[:search]}%")
         end
 
-        customers.page(params[:page]).per(params[:per_page])
+        customers = customers.page(params[:page]).per(params[:per_page])
         render json: CustomerSerializer.new(customers).serializable_hash, status: :ok
       end
 
       def create
         customer = AccountBlock::Account.new(customer_params)
         customer.type = 'EmailAccount'
-        customer = attach_image(customer, image_params[:image], 'profile pic') if image_params.present?
+        if image_params.present?
+          image_path, image_extension = store_base64_image(image_params[:image])
+          customer.image.attach(io: File.open(image_path), filename: "profile pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
+
         if customer.save
           render json: CustomerSerializer.new(customer).serializable_hash, status: :ok
         else
@@ -29,7 +34,11 @@ module BxBlockAdmin
       end
 
       def update
-        @customer = attach_image(@customer, image_params[:image], 'profile pic') if image_params.present?
+        if image_params.present?
+          image_path, image_extension = store_base64_image(image_params[:image])
+          @customer.image.attach(io: File.open(image_path), filename: "profile pic.#{image_extension}")
+          File.delete(image_path) if File.exist?(image_path)
+        end
         @customer.assign_attributes(customer_params)
         if @customer.save
           render json: CustomerSerializer.new(@customer).serializable_hash, status: :ok

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_05_103141) do
+ActiveRecord::Schema.define(version: 2022_07_21_085938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,9 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.string "gst_code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "country_id"
+    t.string "code"
+    t.index ["country_id"], name: "index_address_states_on_country_id"
   end
 
   create_table "admin_profiles", force: :cascade do |t|
@@ -293,12 +296,13 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.string "gst_number"
     t.string "highlight_primary_color"
     t.string "highlight_secondary_color"
-    t.integer "template_selection", default: 0
-    t.jsonb "color_palet", default: "{}"
+    t.integer "template_selection"
+    t.string "color_palet", default: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}"
     t.integer "address_state_id"
     t.string "navigation_item1"
     t.string "navigation_item2"
     t.boolean "is_whatsapp_integration", default: false
+    t.string "zipcode"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -424,6 +428,13 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.index ["sub_category_id"], name: "index_categories_sub_categories_on_sub_category_id"
   end
 
+  create_table "cities", force: :cascade do |t|
+    t.string "name"
+    t.integer "address_state_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "contacts", force: :cascade do |t|
     t.bigint "account_id"
     t.string "name"
@@ -434,6 +445,13 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "purpose_of_contact"
     t.index ["account_id"], name: "index_contacts_on_account_id"
+  end
+
+  create_table "countries", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "coupon_codes", force: :cascade do |t|
@@ -448,12 +466,31 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.decimal "max_cart_value"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "limit"
   end
 
   create_table "courses", force: :cascade do |t|
     t.string "course_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "discription"
+    t.boolean "is_private", default: false
+  end
+
+  create_table "courses_student_profiles", id: false, force: :cascade do |t|
+    t.bigint "student_profile_id"
+    t.bigint "course_id"
+    t.index ["course_id"], name: "index_courses_student_profiles_on_course_id"
+    t.index ["student_profile_id"], name: "index_courses_student_profiles_on_student_profile_id"
+  end
+
+  create_table "currencies", force: :cascade do |t|
+    t.string "name"
+    t.string "symbol"
+    t.bigint "country_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["country_id"], name: "index_currencies_on_country_id"
   end
 
   create_table "customer_feedbacks", force: :cascade do |t|
@@ -577,6 +614,30 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "status", default: 1
+  end
+
+  create_table "lessons", force: :cascade do |t|
+    t.string "lesson_title"
+    t.string "description"
+    t.string "select_type"
+    t.bigint "modulee_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "youtube_url"
+    t.string "text"
+    t.string "title"
+    t.string "content"
+    t.boolean "make_this_a_prerequisite", default: false
+    t.boolean "enable_discussion_for_this_lesson", default: false
+    t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
+  end
+
+  create_table "modulees", force: :cascade do |t|
+    t.string "module_title"
+    t.bigint "course_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["course_id"], name: "index_modulees_on_course_id"
   end
 
   create_table "notification_groups", force: :cascade do |t|
@@ -829,6 +890,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.decimal "charge"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "free_shipping", default: true
   end
 
   create_table "sms_otps", force: :cascade do |t|
@@ -851,6 +913,12 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["account_id"], name: "index_social_auths_on_account_id"
+  end
+
+  create_table "student_profiles", force: :cascade do |t|
+    t.string "student_name"
+    t.string "student_email"
+    t.integer "level", default: 0
   end
 
   create_table "sub_categories", force: :cascade do |t|
@@ -957,10 +1025,13 @@ ActiveRecord::Schema.define(version: 2022_07_05_103141) do
   add_foreign_key "catalogues_tags", "tags"
   add_foreign_key "categories_sub_categories", "categories"
   add_foreign_key "categories_sub_categories", "sub_categories"
+  add_foreign_key "currencies", "countries"
   add_foreign_key "delivery_address_orders", "delivery_addresses"
   add_foreign_key "delivery_address_orders", "orders"
   add_foreign_key "delivery_addresses", "accounts"
   add_foreign_key "email_setting_categories", "email_setting_tabs"
+  add_foreign_key "lessons", "modulees"
+  add_foreign_key "modulees", "courses"
   add_foreign_key "notification_groups", "notification_settings"
   add_foreign_key "notification_subgroups", "notification_groups"
   add_foreign_key "notifications", "accounts"

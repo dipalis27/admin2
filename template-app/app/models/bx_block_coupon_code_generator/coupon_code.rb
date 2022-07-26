@@ -33,6 +33,7 @@ module BxBlockCouponCodeGenerator
     validates :description, length: { maximum: 200 }
     validates :code, length: { maximum: 50 }, presence: true
     validates :code, uniqueness: true
+    validates :limit, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 
     validates :discount_type, acceptance: {
         accept: [DISCOUNT_TYPE[:flat], DISCOUNT_TYPE[:percentage]]

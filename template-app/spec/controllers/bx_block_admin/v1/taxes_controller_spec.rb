@@ -17,11 +17,10 @@ RSpec.describe BxBlockAdmin::V1::TaxesController do
         expect(response.status).to eq(200)
       end
 
-      it 'tax is not present' do
+      it 'response body should have data key' do
         get :index, params: @request_params
-        expectation = HashWithIndifferentAccess.new({"message" => "No tax found"})
-        expect(JSON.parse(response.body)).to eq(expectation)
-        expect(response).to have_http_status(:not_found)
+        response_body = JSON.parse response.body
+        expect(response_body).to have_key("data")
       end
     end
 
@@ -51,10 +50,14 @@ RSpec.describe BxBlockAdmin::V1::TaxesController do
       it 'when static page is not present ' do
         request.headers['token'] = @token
         get :show, params: {"id":12}
-        expectation = HashWithIndifferentAccess.new({"error" => "No taxes found"})
-        expect(JSON.parse(response.body)).to eq(expectation)
+        # expectation = HashWithIndifferentAccess.new({"errors" => ["No taxes found"]})
+        # expect(JSON.parse(response.body)).to eq(expectation)
+        # expect(response.status).to eq(404)
+        response_body = JSON.parse response.body
+        expect(response_body).to have_key("errors")
         expect(response.status).to eq(404)
       end
     end
+
   end
 end

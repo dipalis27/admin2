@@ -33,7 +33,9 @@
 
 module BxBlockAdmin
   class CatalogueSerializer < BuilderBase::BaseSerializer
-    attributes :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax
+    extend AttachmentHelper
+
+    attributes :id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax
     
     attribute :tags do |object|
       object.tags.select(:id, :name)
@@ -60,14 +62,11 @@ module BxBlockAdmin
 
     attribute :catalogue_attachments do |object|
       object.attachments.select{ |attachment| attachment.image.attached? }.map do |attachment|
-        {
-          image_url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(attachment.image, only_path: true),
-          is_default: attachment.is_default 
-        }
+        attachment_hash(attachment, $hostname)
       end
     end
     
-    attribute :catalogue_variant_attributes do |object|
+    attribute :catalogue_variants_attributes do |object|
       if object.catalogue_variants.exists?  
         object.catalogue_variants.map do |catalogue_variant|
           {
@@ -84,7 +83,7 @@ module BxBlockAdmin
             block_qty: catalogue_variant.block_qty,
             is_default: catalogue_variant.is_default,
             catalogue_variant_properties_attributes: catalogue_variant.catalogue_variant_properties.map { |variant_property| { variant_id: variant_property.variant_id, variant_property_id: variant_property.id } }, 
-            catalogue_variant_attachments: catalogue_variant.attachments.select{ |attachment| attachment.image.attached? }.map { |attachment| {   image_url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(attachment.image, only_path: true), is_default: attachment.is_default } }
+            catalogue_variant_attachments: catalogue_variant.attachments.select{ |attachment| attachment.image.attached? }.map { |attachment| attachment_hash(attachment, $hostname) }
           }
         end
       end

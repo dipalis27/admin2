@@ -22,7 +22,7 @@ module BxBlockAdmin
     def create_category_sub_categories(cat_par)
       category = BxBlockCategoriesSubCategories::Category.new(name: cat_par['name'])
       category = change_object_attributes(category, cat_par['disabled'], cat_par['image'])
-      cat_par['sub_categories_attributes'].each do |sub_cat_par|
+      cat_par['sub_categories_attributes']&.each do |sub_cat_par|
         category = add_sub_category(category, sub_cat_par)
       end
 
@@ -40,7 +40,7 @@ module BxBlockAdmin
 
       category.name = cat_par['name'] if cat_par['name'].present?
       category = change_object_attributes(category, cat_par['disabled'], cat_par['image'])
-      cat_par['sub_categories_attributes'].each do |sub_cat_par|
+      cat_par['sub_categories_attributes']&.each do |sub_cat_par|
         if sub_cat_par['id'].present?
           update_sub_category(category, sub_cat_par)
         else
@@ -80,7 +80,11 @@ module BxBlockAdmin
 
     def change_object_attributes(object, disabled, base64)
       object.disabled = disabled if disabled.present?
-      object = attach_image(object, base64, 'image') if base64.present?
+      if base64.present?
+        image_path, image_extension = store_base64_image(base64)
+        object.image.attach(io: File.open(image_path), filename: "image.#{image_extension}")
+        File.delete(image_path) if File.exist?(image_path)
+      end
       object
     end
   end
