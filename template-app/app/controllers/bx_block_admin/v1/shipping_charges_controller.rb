@@ -17,10 +17,14 @@ module BxBlockAdmin
       end
 
       def update
-        if @shipping_charge.update(shipping_charge_params)
-          render json: BxBlockAdmin::ShippingChargeSerializer.new(@shipping_charge).serializable_hash, status: :ok
+        if @shipping_charge
+          if @shipping_charge.update(shipping_charge_params)
+            render json: BxBlockAdmin::ShippingChargeSerializer.new(@shipping_charge).serializable_hash, status: :ok
+          else
+            render json: {errors: [@shipping_charge.errors.full_messages.to_sentence]}, status: :unprocessable_entity
+          end
         else
-          render json: {errors: [@shipping_charge.errors.full_messages.to_sentence]}, status: :unprocessable_entity
+          render json: {errors: ['Shipping charge not found.']}, status: :unprocessable_entity
         end
       end
 
