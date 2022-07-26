@@ -1,17 +1,17 @@
 module BxBlockAdmin
   module V1
     class InstructorsController < ApplicationController
-      before_action :instructor, only: [:show, :update, :destroy]
+      before_action :set_instructor, only: [:show, :update, :destroy]
 
       def index
-        allinstructors = BxBlockInstructorData::Instructor.all
-        if allinstructors.present?
-          render json: BxBlockInstructorsData::InstructorSerializer.new(allinstructors, serialization_options).serializable_hash, status: :ok
+        instructors = BxBlockInstructorData::Instructor.all
+        if instructors.present?
+          render json: BxBlockInstructorsData::InstructorSerializer.new(instructors, serialization_options).serializable_hash, status: :ok
         end
       end
 
       def create
-        @instructor = BxBlockInstructorData::Instructor.create(instructor_params)
+        @instructor = BxBlockInstructorData::Instructor.new(instructor_params)
         if @instructor.save
           media_upload
           render json: BxBlockInstructorsData::InstructorSerializer.new(@instructor, serialization_options).serializable_hash, status: :ok
@@ -53,7 +53,7 @@ module BxBlockAdmin
           params.require(:data).permit(:instructor_name, :email)
         end
 
-        def instructor
+        def set_instructor
           @instructor =  BxBlockInstructorData::Instructor.find(params[:id])
         end
 
