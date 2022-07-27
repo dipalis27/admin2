@@ -1,6 +1,6 @@
 module BxBlockCourse
 	class ModuleesController < ApplicationController
-        before_action :set_modulee, only: [:update, :destroy, :show]
+        before_action :set_modulee, only: [:update, :destroy, :show , :get_quiz_assignment]
         def index
         	modulee = BxBlockCourse::Modulee.all 
         	if modulee.present?
@@ -16,6 +16,14 @@ module BxBlockCourse
 			else
 				render json:{message: "Module not created"}, status: :ok
 			end
+		end
+
+		def get_quiz_assignment
+			if @modulee.present?
+				render json: BxBlockCourse::QuizAssignmentSerializer.new(@modulee, params: {current_user: @current_user}).serializable_hash, status: :ok
+			else
+				render json: { error: @modulee.errors.full_messages }, status: 404
+			end		
 		end
 
 		def show

@@ -24,5 +24,9 @@ module BxBlockCourse
         }
       end
     end
+
+    attribute :private_students do |object|
+      object.student_profiles
+    end
   end
 end

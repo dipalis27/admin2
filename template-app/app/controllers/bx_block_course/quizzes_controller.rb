@@ -65,7 +65,7 @@ module BxBlockCourse
 
 		def quiz_params
 			params.require(:data).permit( :select_type , :quiz_title , :question , :question_type , :description, :choise, :make_this_a_prerequisite, :gradeable ,:enable_discussions_for_this_lesson , :correct_answer, 
-				:lesson_id)
+				:modulee_id)
 		end
 
 		def set_quiz

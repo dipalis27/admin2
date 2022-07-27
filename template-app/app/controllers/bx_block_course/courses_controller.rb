@@ -1,6 +1,7 @@
 module BxBlockCourse
 	class CoursesController < ApplicationController
 		before_action :set_course, only: [:update, :destroy, :show]
+		
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
@@ -45,6 +46,18 @@ module BxBlockCourse
 			end
 		end
 
+		def private_student
+			course = Course.find(studnet_params[:course_id])
+			if course
+				studnet_params[:student_ids].each do |data|
+					CourseStudentProfile.create(student_profile_id: data, course_id: studnet_params[:course_id])
+				end
+				render json: BxBlockCourse::CourseSerializer.new(course, serialization_options).serializable_hash, status: :ok
+			else
+				render json: { message: "course is not found" }
+			end
+		end
+
 		private
 		def course_params
 			params.require(:data).permit(:course_name, :discription)
@@ -58,6 +71,10 @@ module BxBlockCourse
   		return if image_params.blank?
     	@course.image.attach({ io: StringIO.new(Base64.decode64(image_params[:image_url])),
                        content_type: 'image/jpg', filename: 'image' })
+    end
+
+    def studnet_params
+    	params[:data].permit(:course_id, :is_private, student_ids: [])
     end
 
     def image_params

@@ -5,7 +5,8 @@ module BxBlockStudentsData
     validates :student_email, :presence => true, :uniqueness => true,
                       :format => {:with => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\Z/i}
 
-    has_and_belongs_to_many :courses, class_name: "BxBlockCourse::Course"
+    has_many :courses_student_profiles, class_name: 'BxBlockCourse::CourseStudentProfile'
+    has_many :courses, through: :courses_student_profiles, class_name: "BxBlockCourse::CourseStudentProfile"
 
   end
 end

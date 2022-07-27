@@ -73,6 +73,7 @@ Rails.application.routes.draw do
       resources :taxes, only: [:index, :create, :show]
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
+      resources :instructors, only: [:index, :create, :show, :update, :destroy]
       resources :coupon_codes, except: [:edit, :new]
       resources :locations, only: [] do
         collection do
@@ -82,16 +83,23 @@ Rails.application.routes.draw do
         end
       end
       resources :default_email_settings, only: [:new, :create, :edit, :show, :update, :destroy]
+      resources :push_notifications, only: [:index, :create, :show, :update, :destroy] do
+        member do
+          get :send_notification
+        end
+      end
     end
   end
 
   namespace :bx_block_course do
     resources :courses
+    post 'private_student', to: 'courses#private_student'
   end
 
   namespace :bx_block_course do
     resources :modulees 
     post 'duplicate', to: 'modulees#duplicate'
+    get 'get_quiz_assignment/:id' , to: 'modulees#get_quiz_assignment'
   end
 
   namespace :bx_block_course do
