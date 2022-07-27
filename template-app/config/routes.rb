@@ -81,6 +81,7 @@ Rails.application.routes.draw do
           get 'states/:state_id/cities', to: 'locations#cities'
         end
       end
+      resources :default_email_settings, only: [:new, :create, :edit, :show, :update, :destroy]
     end
   end
 
