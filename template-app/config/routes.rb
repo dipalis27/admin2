@@ -82,6 +82,11 @@ Rails.application.routes.draw do
           get 'states/:state_id/cities', to: 'locations#cities'
         end
       end
+      resources :push_notifications, only: [:index, :create, :show, :update, :destroy] do
+        member do
+          get :send_notification
+        end
+      end
     end
   end
 
