@@ -17,5 +17,17 @@ module BxBlockAdmin
       end
       [image_path, image_extension]
     end
+
+    def set_image(object, base64, image)
+      return object if base64.nil?
+      unless base64.blank?
+        image_path, image_extension = store_base64_image(base64)
+        object.send(image).attach(io: File.open(image_path), filename: "image.#{image_extension}")
+        File.delete(image_path) if File.exist?(image_path)
+      else
+        object.send(image).detach
+      end
+      object
+    end
   end
 end

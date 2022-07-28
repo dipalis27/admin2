@@ -90,6 +90,11 @@ Rails.application.routes.draw do
           get :send_notification
         end
       end
+      resources :app_submission_requirements, only: [:index] do
+        collection do
+          put :update
+        end
+      end
     end
   end
 

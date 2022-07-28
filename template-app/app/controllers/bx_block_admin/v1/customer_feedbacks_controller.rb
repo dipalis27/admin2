@@ -1,7 +1,5 @@
 module BxBlockAdmin
-
   module V1
-
     class CustomerFeedbacksController < ApplicationController
       before_action :process_image, only: [:create, :update]
       before_action :set_feedback, only: [:show, :update, :destroy]
