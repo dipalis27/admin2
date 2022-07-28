@@ -122,8 +122,9 @@ module BxBlockAdmin
       def banner_params
         params.permit(:banner_position, :web_banner, attachments_attributes:[:id, :image,:position, :url])
       end
+      
       def update_store_detail_params
-        params.permit(:heading, :currency_type, :phone_number, :country, :address_state_id, :address, :zipcode)
+        params.permit(:heading, :currency_type, :phone_number, :country, :country_id, :currency_id, :address_state_id, :address, :zipcode)
       end
     end
     
