@@ -69,8 +69,11 @@ Rails.application.routes.draw do
         end
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :taxes, only: [:index, :create, :edit, :update, :show, :destroy]
+      resources :shipping_charges, except: [:new, :edit, :patch]
+      resources :zipcodes, except: [:new, :edit, :patch]
+      resources :shipping_integrations, except: [:new, :edit, :patch]
       resources :payments, only: [:index, :create, :update, :show]
-      resources :taxes, only: [:index, :create, :show]
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
       resources :instructors, only: [:index, :create, :show, :update, :destroy]
