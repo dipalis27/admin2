@@ -23,7 +23,7 @@ module BxBlockAdmin
         if email_setting.save
           render json: serialized_hash(email_setting), status: :ok
         else
-          render json: error_serialized_hash(email_setting), status: :unprocessable_entity          
+          render json: { errors: email_setting.errors.full_messages }, status: :unprocessable_entity          
         end
       end
 
@@ -39,7 +39,7 @@ module BxBlockAdmin
         if @email_setting.save
           render json: serialized_hash(@email_setting), status: :ok
         else
-          render json: error_serialized_hash(@email_setting), status: :unprocessable_entity          
+          render json: { errors: @email_setting.errors.full_messages }, status: :unprocessable_entity          
         end
       end
       
@@ -63,10 +63,6 @@ module BxBlockAdmin
 
         def serialized_hash(obj, options = {})
           BxBlockAdmin::EmailSettingSerializer.new(obj, options).serializable_hash
-        end
-
-        def error_serialized_hash(obj)
-          BxBlockCatalogue::ErrorSerializer.new(obj).serializable_hash
         end
 
     end
