@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_22_093641) do
+ActiveRecord::Schema.define(version: 2022_07_28_141318) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -165,7 +165,7 @@ ActiveRecord::Schema.define(version: 2022_07_22_093641) do
   end
 
   create_table "app_categories", force: :cascade do |t|
-    t.bigint "app_store_requirement_id"
+    t.bigint "app_submission_requirement_id"
     t.string "product_title"
     t.string "app_category"
     t.string "review_username"
@@ -174,7 +174,7 @@ ActiveRecord::Schema.define(version: 2022_07_22_093641) do
     t.string "app_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["app_store_requirement_id"], name: "index_app_categories_on_app_store_requirement_id"
+    t.index ["app_submission_requirement_id"], name: "index_app_categories_on_app_submission_requirement_id"
   end
 
   create_table "app_requirements", force: :cascade do |t|
@@ -183,7 +183,7 @@ ActiveRecord::Schema.define(version: 2022_07_22_093641) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "app_store_requirements", force: :cascade do |t|
+  create_table "app_submission_requirements", force: :cascade do |t|
     t.string "app_name"
     t.string "short_description"
     t.string "description"
