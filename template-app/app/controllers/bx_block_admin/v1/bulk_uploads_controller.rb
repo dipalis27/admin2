@@ -45,6 +45,7 @@ module BxBlockAdmin
 
       def destroy
         if @bulk_image
+          @bulk_image.destroy
           render json: { 'messages': ["Image deleted successfully."] }, status: :ok
         else
           return render json: {errors: ["Image not found"]}, status: :unprocessable_entity

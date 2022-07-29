@@ -1,6 +1,7 @@
 module BxBlockAdmin
   module V1
     class BrandsController < ApplicationController
+      rescue_from ActiveRecord::InvalidForeignKey, with: :foreign_key_violation
       before_action :set_brand, only: %i(update show destroy)
 
       def index
@@ -73,6 +74,14 @@ module BxBlockAdmin
           return 10 unless params[:per_page].present?
           return BxBlockCatalogue::Brand.count if params[:per_page] == "all"
           params[:per_page].to_i
+        end
+
+        def foreign_key_violation(exception)
+          if exception.message.include?("catalogues")
+            render json: { errors: "Unable to delete, products exists with the brand." }, status: :unprocessable_entity
+          else
+            render json: { errors: exception.message }, status: :unprocessable_entity  
+          end  
         end
 
     end

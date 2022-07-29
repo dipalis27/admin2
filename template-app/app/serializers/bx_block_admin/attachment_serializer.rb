@@ -1,6 +1,6 @@
 module BxBlockAdmin
   class AttachmentSerializer < BuilderBase::BaseSerializer
-    attributes :attachable_type, :attachable_id, :position, :is_default
+    attributes :id, :attachable_type, :attachable_id, :position, :is_default
 
     attribute :url do |object|
       $hostname + Rails.application.routes.url_helpers.rails_blob_url(object.image, only_path: true) if object.image.present? && object.image.attached?

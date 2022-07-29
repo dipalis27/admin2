@@ -63,7 +63,7 @@ module BxBlockCourse
 
 		private 
 		def assignment_params 
-			params.require(:data).permit(:title, :description, :select_type , :lesson_id , :pdf , :make_this_a_prerequisite , :status , :enable_discussions_for_this_lesson)
+			params.require(:data).permit(:title, :description, :select_type , :modulee_id , :pdf , :make_this_a_prerequisite , :status , :enable_discussions_for_this_lesson)
 		end
 
 		def set_assignment

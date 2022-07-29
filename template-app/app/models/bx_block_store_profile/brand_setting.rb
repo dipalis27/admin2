@@ -1,7 +1,7 @@
 module BxBlockStoreProfile
   class BrandSetting < BxBlockStoreProfile::ApplicationRecord
     self.table_name = :brand_settings
-    
+    include BxBlockStoreProfile::Country
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
 
     COLOR_PALET = [
@@ -20,6 +20,7 @@ module BxBlockStoreProfile
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
     has_one_base64_attached :favicon_logo
+    belongs_to :store_country, class_name: "BxBlockOrderManagement::Country", foreign_key: "country_id", optional: true
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
 
     # Callbacks
@@ -33,8 +34,10 @@ module BxBlockStoreProfile
     validate :validate_phone_number
 
     # Enum Values
-    enum country: ['india', 'uk']
+    enum country: self::COUNTRIES
     enum template_selection: ['Minimal', 'Prime', 'Bold', 'Ultra', 'Essence']
+
+    before_save :assign_country_and_currency, if: :country_id_changed?
 
     def cropped_image=(val)
       @cropped_image = val
@@ -238,6 +241,15 @@ module BxBlockStoreProfile
     def update_onboarding_step
       step_update_service = BxBlockAdmin::UpdateStepCompletion.new('branding', self.class.to_s)
       step_update_service.call
+    end
+
+    def assign_country_and_currency
+      selected_country = self.store_country
+      if selected_country.present?
+        code = selected_country.code
+        self.country = (code == 'in' ? 'india' : (code == 'gb' ? 'uk' : code))
+        self.currency_type = selected_country.currency&.symbol
+      end
     end
 
     def validate_phone_number
