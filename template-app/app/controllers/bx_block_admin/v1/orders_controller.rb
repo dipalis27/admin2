@@ -58,6 +58,28 @@ module BxBlockAdmin
         end
       end
 
+      def send_to_shiprocket
+        @order = BxBlockOrderManagement::Order.includes(:order_items).find_by_id(params[:order_id])
+        if @order.present?
+          ship_rocket = BxBlockOrderManagement::ShipRocket.new
+          if ship_rocket.authorize
+            response = ship_rocket.post_order(@order.id)
+            json_response = JSON.parse(response.body)
+            if json_response['errors'].present?
+              return render json: { errors: [json_response['errors']]}, status: :unprocessable_entity
+            else
+              @order.update_shipment_details(json_response)
+              @order.update_tracking(json_response)  if @order.order_items.present?
+              return render json: { 'messages': "Order has been sent to Shiprocket." }, status: :ok
+            end
+          else
+            render json: { errors: ["Unable to authorize Shiprocket credentials and please check Shiprocket email and password."]}, status: :unprocessable_entity
+          end
+        else
+          render json: { errors: ["Order not found"]}, status: :unprocessable_entity
+        end
+      end
+
       private
         
         def set_order

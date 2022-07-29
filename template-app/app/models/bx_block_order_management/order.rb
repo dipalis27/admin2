@@ -382,6 +382,13 @@ module BxBlockOrderManagement
       self.update_attributes(logistics_ship_rocket_enabled: true, ship_rocket_order_id: json_response['order_id'], ship_rocket_shipment_id: json_response['shipment_id'], ship_rocket_status: json_response['status'].to_s.downcase, ship_rocket_status_code: json_response['status_code'], ship_rocket_onboarding_completed_now: json_response['onboarding_completed_now'], ship_rocket_awb_code: json_response['awb_code'], ship_rocket_courier_company_id: json_response['courier_company_id'], ship_rocket_courier_name: json_response['courier_name'], order_status_id: order_status_id.present? ? order_status_id : self.order_status_id )
     end
 
+    def update_tracking(json_response)
+      self.order_items.each do |order_item|
+        tracking = BxBlockOrderManagement::Tracking.find_or_create_by(date: DateTime.current, status: json_response['status'].to_s.downcase )
+        order_item.order_trackings.create(tracking_id: tracking.id)
+      end
+    end
+
     def update_ship_rocket_order_status
       if self.cancelled? && self.logistics_ship_rocket_enabled && self.ship_rocket_order_id.present?
         ship_rocket = BxBlockOrderManagement::ShipRocket.new
