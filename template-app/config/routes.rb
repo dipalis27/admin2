@@ -70,8 +70,11 @@ Rails.application.routes.draw do
         end
       end
       resources :brands, only: [:index, :create, :update, :show, :destroy]
+      resources :taxes, only: [:index, :create, :edit, :update, :show, :destroy]
+      resources :shipping_charges, except: [:new, :edit, :patch]
+      resources :zipcodes, except: [:new, :edit, :patch]
+      resources :shipping_integrations, except: [:new, :edit, :patch]
       resources :payments, only: [:index, :create, :update, :show]
-      resources :taxes, only: [:index, :create, :show]
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
       resources :instructors, only: [:index, :create, :show, :update, :destroy]
@@ -81,6 +84,16 @@ Rails.application.routes.draw do
           get :countries
           get 'countries/:country_id/states', to: 'locations#states'
           get 'states/:state_id/cities', to: 'locations#cities'
+        end
+      end
+      resources :push_notifications, only: [:index, :create, :show, :update, :destroy] do
+        member do
+          get :send_notification
+        end
+      end
+      resources :app_submission_requirements, only: [:index] do
+        collection do
+          put :update
         end
       end
     end
