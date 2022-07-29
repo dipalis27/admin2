@@ -2,8 +2,8 @@ module BxBlockApiConfiguration
   class AppSubmissionRequirement < ApplicationRecord
     attr_accessor :json_attached
 
-    self.table_name = :app_store_requirements
-    has_many :app_categories, foreign_key: :app_store_requirement_id
+    self.table_name = :app_submission_requirements
+    has_many :app_categories
 
     has_one_attached :app_icon
     has_one_attached :common_feature_banner
@@ -23,8 +23,8 @@ module BxBlockApiConfiguration
 
     after_commit :upload_json
 
-    validate :app_icon_field
-    validates :common_feature_banner, content_type: ['image/png', 'image/jpg', 'image/jpeg'], dimension: { width: 1024, height: 500, message: 'Common feature banner can be only of 1024*500' }
+    # validate :app_icon_field
+    # validates :common_feature_banner, content_type: ['image/png', 'image/jpg', 'image/jpeg'], dimension: { width: 1024, height: 500, message: 'Common feature banner can be only of 1024*500' }
 
     validate :check_default_price
     validate :check_auto_price_conversion
