@@ -4,8 +4,13 @@ module BxBlockAdmin
       before_action :set_default_email_setting, only: %i(edit update show destroy)
       before_action :default_email_setting_exists?, only: %i(new create)
 
+      def index
+        default_email_settings = BxBlockSettings::DefaultEmailSetting.all
+        render json: serialized_hash(default_email_settings), status: :ok
+      end
+
       def new
-        render json: { required_fields: required_fields, send_email_copy_methods: email_copy_methods }, status: :ok
+        render json: data_body, status: :ok
       end
 
       def create
@@ -19,7 +24,7 @@ module BxBlockAdmin
       end
 
       def edit
-        render json: { required_fields: required_fields, send_email_copy_methods: email_copy_methods }, status: :ok
+        render json: data_body, status: :ok
       end
 
       def update
@@ -83,6 +88,19 @@ module BxBlockAdmin
             obj.logo.attach(io: File.open(logo_path), filename: "#{obj.brand_name}-logo.#{logo_extension}")
             File.delete(logo_path) if File.exist?(logo_path)
           end
+        end
+
+        def brand_setting_hash
+          brand_setting = BxBlockStoreProfile::BrandSetting.last
+          logo_url = ""
+          if brand_setting.present? && brand_setting.try(:logo).present? 
+            logo_url = $hostname + Rails.application.routes.url_helpers.rails_blob_url(brand_setting.logo, only_path: true)  
+          end
+          return { brand_name: brand_setting.try(:heading), logo: logo_url }
+        end
+
+        def data_body
+          { required_fields: required_fields, send_email_copy_methods: email_copy_methods }.merge(brand_setting_hash)
         end
 
     end

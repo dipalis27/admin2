@@ -57,12 +57,13 @@ module BxBlockAdmin
           begin
             @email_setting = BxBlockSettings::EmailSetting.find(params[:id])
           rescue => exception
-            render json: { message: "EmailSetting not found." }, status: :not_found
+            render json: { errors: ["EmailSetting not found."] }, status: :not_found
           end
         end
 
-        def serialized_hash(obj, options = {})
-          BxBlockAdmin::EmailSettingSerializer.new(obj, options).serializable_hash
+        # Calls base class method serialized_hash in application_controller
+        def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::EmailSettingSerializer)
+          super(serializer_class, obj, options)
         end
 
     end
