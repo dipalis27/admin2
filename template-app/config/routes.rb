@@ -47,6 +47,7 @@ Rails.application.routes.draw do
       resources :orders, only: [:index, :show, :update] do
         get :download_csv_report, on: :collection
         put 'update_delivery_address/:id', to: 'orders#update_delivery_address'
+        post :send_to_shiprocket
       end
       resources :customer_feedbacks, only: [:index, :create, :update, :show]
       resources :email_settings, only: [:index, :create, :edit, :update, :show, :destroy]
@@ -77,6 +78,7 @@ Rails.application.routes.draw do
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
       resources :instructors, only: [:index, :create, :show, :update, :destroy]
+      resources :levels, only: [:index, :create, :show, :update, :destroy]
       resources :coupon_codes, except: [:edit, :new]
       resources :locations, only: [] do
         collection do
