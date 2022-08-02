@@ -98,6 +98,7 @@ Rails.application.routes.draw do
           put :update
         end
       end
+      resources :qr_codes, except: [:edit, :new]
     end
   end
 
