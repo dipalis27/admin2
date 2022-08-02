@@ -220,13 +220,13 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.string "title"
     t.string "description"
     t.string "select_type"
-    t.bigint "lesson_id", null: false
     t.boolean "make_this_a_prerequisite", default: false
     t.boolean "enable_discussions_for_this_lesson", default: false
     t.boolean "status", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["lesson_id"], name: "index_assignments_on_lesson_id"
+    t.bigint "modulee_id"
+    t.index ["modulee_id"], name: "index_assignments_on_modulee_id"
   end
 
   create_table "attachments", force: :cascade do |t|
@@ -316,6 +316,8 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.string "navigation_item2"
     t.boolean "is_whatsapp_integration", default: false
     t.string "zipcode"
+    t.integer "country_id"
+    t.integer "currency_id"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -482,6 +484,13 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.integer "limit"
   end
 
+  create_table "course_instructors", force: :cascade do |t|
+    t.integer "course_id"
+    t.integer "instructor_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "courses", force: :cascade do |t|
     t.string "course_name"
     t.datetime "created_at", precision: 6, null: false
@@ -490,7 +499,7 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.boolean "is_private", default: false
   end
 
-  create_table "courses_student_profiles", id: false, force: :cascade do |t|
+  create_table "courses_student_profiles", force: :cascade do |t|
     t.bigint "student_profile_id"
     t.bigint "course_id"
     t.index ["course_id"], name: "index_courses_student_profiles_on_course_id"
@@ -621,6 +630,13 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.integer "status", default: 1
   end
 
+  create_table "instructors", force: :cascade do |t|
+    t.string "instructor_name"
+    t.string "email"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "interactive_faqs", force: :cascade do |t|
     t.string "title"
     t.text "content"
@@ -644,6 +660,12 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.boolean "enable_discussion_for_this_lesson", default: false
     t.boolean "status"
     t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
+  end
+
+  create_table "levels", force: :cascade do |t|
+    t.string "level_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "modulees", force: :cascade do |t|
@@ -885,10 +907,10 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.boolean "enable_discussions_for_this_lesson", default: false
     t.boolean "status", default: false
     t.boolean "correct_answer", default: false
-    t.bigint "lesson_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["lesson_id"], name: "index_quizzes_on_lesson_id"
+    t.bigint "modulee_id"
+    t.index ["modulee_id"], name: "index_quizzes_on_modulee_id"
   end
 
   create_table "recent_searches", force: :cascade do |t|
@@ -922,6 +944,7 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.decimal "charge"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "free_shipping", default: true
   end
 
   create_table "sms_otps", force: :cascade do |t|
@@ -1041,7 +1064,7 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "assignments", "lessons"
+  add_foreign_key "assignments", "modulees"
   add_foreign_key "catalogue_variant_properties", "catalogue_variants"
   add_foreign_key "catalogue_variant_properties", "catalogues"
   add_foreign_key "catalogue_variant_properties", "variant_properties"
@@ -1076,7 +1099,7 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
   add_foreign_key "product_notifies", "accounts"
   add_foreign_key "product_notifies", "catalogue_variants"
   add_foreign_key "product_notifies", "catalogues"
-  add_foreign_key "quizzes", "lessons"
+  add_foreign_key "quizzes", "modulees"
   add_foreign_key "reviews", "accounts"
   add_foreign_key "reviews", "catalogues"
   add_foreign_key "reviews", "order_items"

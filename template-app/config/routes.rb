@@ -87,7 +87,7 @@ Rails.application.routes.draw do
           get 'states/:state_id/cities', to: 'locations#cities'
         end
       end
-      resources :default_email_settings
+      resources :default_email_settings, only: [:index, :new, :create, :edit, :update, :destroy]
       resources :push_notifications, only: [:index, :create, :show, :update, :destroy] do
         member do
           get :send_notification
