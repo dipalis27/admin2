@@ -74,7 +74,11 @@ Rails.application.routes.draw do
       resources :shipping_charges, except: [:new, :edit, :patch]
       resources :zipcodes, except: [:new, :edit, :patch]
       resources :shipping_integrations, except: [:new, :edit, :patch]
-      resources :payments, only: [:index, :create, :update, :show]
+      resources :payments, only: [:index, :create, :update, :show] do
+        collection do
+          get :get_status
+        end
+      end
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
       resources :instructors, only: [:index, :create, :show, :update, :destroy]
