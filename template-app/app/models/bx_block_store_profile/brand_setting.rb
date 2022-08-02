@@ -26,6 +26,7 @@ module BxBlockStoreProfile
     # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
+    after_commit :update_defaul_email_settings
 
     # Validations
     validates_presence_of :address_state_id, if: :country_india?
@@ -234,6 +235,22 @@ module BxBlockStoreProfile
 
     def country_india?
       self.country == 'india' ? true : false
+    end
+
+    def update_defaul_email_settings
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
+      hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
+      logo_url = hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true) if self.logo.attached?
+      begin
+        downloaded_image = open(logo_url)
+        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
+        blob = ActiveStorage::Attachment.find_by(record_id: 20, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
+        extension = blob.content_type.split("/").last
+        defaul_email_setting.logo.attach(io: downloaded_image, filename: "logo"+extension)
+      rescue Exception => error
+        Rails.logger.info "============== Error: #{error.message}=============="
+      end
     end
 
     private

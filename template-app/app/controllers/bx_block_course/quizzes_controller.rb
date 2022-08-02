@@ -64,12 +64,20 @@ module BxBlockCourse
 		private
 
 		def quiz_params
-			params.require(:data).permit( :select_type , :quiz_title , :question , :question_type , :description, :choise, :make_this_a_prerequisite, :gradeable ,:enable_discussions_for_this_lesson , :correct_answer, 
-				:modulee_id)
+			params.require(:data).permit( :select_type, :quiz_title, :question_type, :make_this_a_prerequisite, :gradeable, :enable_discussions_for_this_lesson, 
+				:modulee_id, :questions_attributes => [:id, :question_title, :description, choices_attributes: [ :choice_title , :is_correct_answer]])
 		end
 
 		def set_quiz
 			@quiz = BxBlockCourse::Quiz.find(params[:id])
+		end
+
+		def question_params
+			params.require(:data).permit \
+			:id,
+			:question_title,
+			:description,
+			choices_attributes: [:id , :choice_title , :is_correct_answer]
 		end
 	end
 end
