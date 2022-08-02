@@ -79,10 +79,5 @@ module BxBlockCourse
 			:description,
 			choices_attributes: [:id , :choice_title , :is_correct_answer]
 		end
-
-		def choice_params
-			params.require(:data).permit \
-			:id, :choice_title, :is_correct_answer 
-		end
 	end
 end
