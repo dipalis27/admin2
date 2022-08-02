@@ -23,7 +23,7 @@ module BxBlockAdmin
         if email_setting.save
           render json: serialized_hash(email_setting), status: :ok
         else
-          render json: error_serialized_hash(email_setting), status: :unprocessable_entity          
+          render json: { errors: email_setting.errors.full_messages }, status: :unprocessable_entity          
         end
       end
 
@@ -35,11 +35,11 @@ module BxBlockAdmin
       end
 
       def update
-        @email_setting.update_attributes(email_setting_params)
+        @email_setting.update(email_setting_params)
         if @email_setting.save
           render json: serialized_hash(@email_setting), status: :ok
         else
-          render json: error_serialized_hash(@email_setting), status: :unprocessable_entity          
+          render json: { errors: @email_setting.errors.full_messages }, status: :unprocessable_entity          
         end
       end
       
@@ -57,16 +57,13 @@ module BxBlockAdmin
           begin
             @email_setting = BxBlockSettings::EmailSetting.find(params[:id])
           rescue => exception
-            render json: { message: "EmailSetting not found." }, status: :not_found
+            render json: { errors: ["EmailSetting not found."] }, status: :not_found
           end
         end
 
-        def serialized_hash(obj, options = {})
-          BxBlockAdmin::EmailSettingSerializer.new(obj, options).serializable_hash
-        end
-
-        def error_serialized_hash(obj)
-          BxBlockCatalogue::ErrorSerializer.new(obj).serializable_hash
+        # Calls base class method serialized_hash in application_controller
+        def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::EmailSettingSerializer)
+          super(serializer_class, obj, options)
         end
 
     end
