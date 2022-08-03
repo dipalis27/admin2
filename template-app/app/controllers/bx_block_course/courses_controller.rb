@@ -5,7 +5,7 @@ module BxBlockCourse
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
-				render json: BxBlockCourse::CourseSerializer.new(courses).serializable_hash, status: :ok
+				render json: BxBlockCourse::CourseSerializer.new(courses, serialization_options).serializable_hash, status: :ok
 			end
 		end 
 
@@ -19,7 +19,7 @@ module BxBlockCourse
 
 		def show
 			if @course.present?
-				render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
+				render json: BxBlockCourse::CourseSerializer.new(@course, serialization_options).serializable_hash, status: :ok
 			else
 				render json: { error: "Course not found." }, status: 404
 			end
@@ -46,7 +46,7 @@ module BxBlockCourse
 			end
 		end
 
-		def private_student
+		def add_course_students
 			course = Course.find(studnet_params[:course_id])
 			if course
 				studnet_params[:student_ids].each do |data|
