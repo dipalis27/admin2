@@ -9,6 +9,11 @@ module BxBlockCourse
 			end
 		end 
 
+		def search_course
+			@course = BxBlockCourse::Course.where('course_name ILIKE :search', search: "%#{search_params[:query]}%")
+			render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
+		end
+
 		def create
 			@course = BxBlockCourse::Course.create(course_params)
 			if @course.present?
@@ -84,5 +89,9 @@ module BxBlockCourse
     def serialization_options
       { params: { host: request.protocol + request.host_with_port } }
     end
+    
+    def search_params
+			params.permit(:query)
+		end
 	end
 end
