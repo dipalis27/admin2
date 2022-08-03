@@ -39,7 +39,14 @@ module BxBlockAdmin
 
       def get_status
         if (ENV['RAZORPAY_KEY'] && ENV['RAZORPAY_SECRET']).present?
-          render json: {api_key: ENV['RAZORPAY_KEY'], api_secret_key: ENV['RAZORPAY_SECRET']}, status: :ok
+          render json: {
+            data:{
+              attributes:{
+                api_key: ENV['RAZORPAY_KEY'],
+                api_secret_key: ENV['RAZORPAY_SECRET']
+              }
+            }
+          }
         else
           razorpay = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay")
           render json: PaymentSerializer.new(razorpay).serializable_hash, status: :ok
