@@ -39,18 +39,7 @@ module BxBlockAdmin
 
       def get_status
         if (ENV['RAZORPAY_KEY'] && ENV['RAZORPAY_SECRET']).present?
-          begin
-            url = URI("https://staging.cloud-marketplace.builder.ai/api/accounts/#{ENV['RAZORPAY_ACCOUNT_ID']}")
-            http = Net::HTTP.new(url.host, url.port);
-            http.use_ssl = true
-            request = Net::HTTP::Get.new(url)
-            request.basic_auth 'local_cat', 'password'
-            response = http.request request
-            live_status = JSON.parse(response.body)["data"]["live_status"]
-            render json: {api_key: ENV['RAZORPAY_KEY'], api_secret_key: ENV['RAZORPAY_SECRET'], live_status: live_status}, status: :ok
-          rescue 
-            render json: {api_key: ENV['RAZORPAY_KEY'], api_secret_key: ENV['RAZORPAY_SECRET'], live_status: "Not Activated"}, status: :ok
-          end
+          render json: {api_key: ENV['RAZORPAY_KEY'], api_secret_key: ENV['RAZORPAY_SECRET']}, status: :ok
         else
           razorpay = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay")
           render json: PaymentSerializer.new(razorpay).serializable_hash, status: :ok
