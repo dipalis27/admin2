@@ -64,7 +64,7 @@ module BxBlockAdmin
         end
 
         def image_params
-          params[:image].permit(:image_url)
+          params[:data].permit(:image_url)
         end
 
         def serialization_options
