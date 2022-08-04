@@ -5,20 +5,8 @@ module BxBlockAdmin
       before_action :set_brand, only: %i(update show destroy)
 
       def index
-        per_page = get_per_page_count
-        current_page = params[:page].present? ? params[:page].to_i : 1
-        brands = BxBlockCatalogue::Brand.order(id: :desc).page(current_page).per(per_page)
-        options = {}
-        options[:meta] = {
-          pagination: {
-            current_page: brands.current_page,
-            next_page: brands.next_page,
-            prev_page: brands.prev_page,
-            total_pages: brands.total_pages,
-            total_count: brands.total_count
-          }
-        }      
-        render json: serialized_hash(brands, options: options), status: :ok  
+        brands = BxBlockCatalogue::Brand.order(id: :desc).page(params[:page]).per(params[:per_page])
+        render json: serialized_hash(brands, options: pagination_data(brands, params[:per_page])), status: :ok  
       end
 
       def create
@@ -67,13 +55,6 @@ module BxBlockAdmin
         # Calls base class method serialized_hash in application_controller
         def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::BrandSerializer)
           super(serializer_class, obj, options)
-        end
-
-        # Returns the count that are required for listing the records.
-        def get_per_page_count
-          return 10 unless params[:per_page].present?
-          return BxBlockCatalogue::Brand.count if params[:per_page] == "all"
-          params[:per_page].to_i
         end
 
         def foreign_key_violation(exception)

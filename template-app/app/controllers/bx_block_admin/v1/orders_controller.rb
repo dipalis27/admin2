@@ -14,7 +14,7 @@ module BxBlockAdmin
         else
           orders =  BxBlockOrderManagement::Order.includes(:account, :order_items).not_in_cart.order(order_date: :desc).page(current_page).per(per_page)
         end       
-        render json: BxBlockAdmin::OrderSerializer.new(orders, pagination_payload(orders)).serializable_hash, status: :ok
+        render json: BxBlockAdmin::OrderSerializer.new(orders, pagination_payload(orders, per_page)).serializable_hash, status: :ok
       end
 
       def show
@@ -99,7 +99,7 @@ module BxBlockAdmin
           request_hash
         end
 
-        def pagination_payload(orders)
+        def pagination_payload(orders, per_page)
           placed_orders = orders.where(status: 'placed')
           deliverd_orders = orders.where(status: 'delivered')
           cancelled_orders = orders.where(status: 'cancelled')
@@ -114,8 +114,10 @@ module BxBlockAdmin
               total_count: orders.total_count,
               placed_orders_count: placed_orders.size,
               deliverd_orders_count: deliverd_orders.size,
-              refunded_orders_count: refunded_orders.size,            
-              cancelled_orders_count: cancelled_orders.size,            
+              refunded_orders_count: refunded_orders.size,
+              cancelled_orders_count: cancelled_orders.size,
+              current_count: orders.count,
+              per_page: per_page
             }
           }
           options

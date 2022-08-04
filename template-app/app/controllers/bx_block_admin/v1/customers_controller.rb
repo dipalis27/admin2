@@ -4,13 +4,15 @@ module BxBlockAdmin
       before_action :set_customer, only: %i(show update destroy)
 
       def index
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
         customers = AccountBlock::Account.where.not(type: 'guest_account')
         if params[:search].present?
           customers = customers.where("LOWER(full_name) LIKE LOWER(:search) OR LOWER(full_phone_number) LIKE LOWER(:search) OR LOWER(email) LIKE LOWER(:search)", search: "%#{params[:search]}%")
         end
 
-        customers = customers.page(params[:page]).per(params[:per_page])
-        render json: CustomerSerializer.new(customers).serializable_hash, status: :ok
+        customers = customers.page(current_page).per(per_page)
+        render json: CustomerSerializer.new(customers, pagination_data(customers, per_page)).serializable_hash, status: :ok
       end
 
       def create
