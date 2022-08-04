@@ -43,7 +43,9 @@ module BxBlockAdmin
             data:{
               attributes:{
                 api_key: ENV['RAZORPAY_KEY'],
-                api_secret_key: ENV['RAZORPAY_SECRET']
+                api_secret_key: ENV['RAZORPAY_SECRET'],
+                razorpay_account_id: ENV['RAZORPAY_ACCOUNT_ID'],
+                razorpay_variables: (ENV['RAZORPAY_KEY'] && ENV['RAZORPAY_SECRET']).present?
               }
             }
           }
