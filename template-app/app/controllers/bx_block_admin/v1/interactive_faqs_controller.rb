@@ -30,7 +30,7 @@ module BxBlockAdmin
         ary = []
         params["_json"].each do |attrs|
           ActiveRecord::Base.transaction do
-            obj = BxBlockInteractiveFaqs::InteractiveFaqs.new(title: attrs[:title], content: attrs[:content])
+            obj = BxBlockInteractiveFaqs::InteractiveFaqs.new(title: attrs[:title], content: attrs[:content], status: attrs[:status])
             obj.save!
             ary.push(obj)
           end
@@ -64,6 +64,7 @@ module BxBlockAdmin
             obj = BxBlockInteractiveFaqs::InteractiveFaqs.find(attrs[:id])
             obj.title = attrs[:title]
             obj.content = attrs[:content]
+            obj.status = attrs[:status]
             # obj = BxBlockInteractiveFaqs::InteractiveFaqs.new(title: attrs[:title], content: attrs[:content])
             obj.save!
             ary.push(obj)
