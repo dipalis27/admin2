@@ -5,9 +5,14 @@ module BxBlockCourse
 		def index
 			courses = BxBlockCourse::Course.all
 			if courses.present?
-				render json: BxBlockCourse::CourseSerializer.new(courses).serializable_hash, status: :ok
+				render json: BxBlockCourse::CourseSerializer.new(courses, serialization_options).serializable_hash, status: :ok
 			end
 		end 
+
+		def search_course
+			@course = BxBlockCourse::Course.where('course_name ILIKE :search', search: "%#{search_params[:query]}%")
+			render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
+		end
 
 		def create
 			@course = BxBlockCourse::Course.create(course_params)
@@ -19,7 +24,7 @@ module BxBlockCourse
 
 		def show
 			if @course.present?
-				render json: BxBlockCourse::CourseSerializer.new(@course).serializable_hash, status: :ok
+				render json: BxBlockCourse::CourseSerializer.new(@course, serialization_options).serializable_hash, status: :ok
 			else
 				render json: { error: "Course not found." }, status: 404
 			end
@@ -46,7 +51,7 @@ module BxBlockCourse
 			end
 		end
 
-		def private_student
+		def add_course_students
 			course = Course.find(studnet_params[:course_id])
 			if course
 				studnet_params[:student_ids].each do |data|
@@ -78,11 +83,15 @@ module BxBlockCourse
     end
 
     def image_params
-    	params[:image].permit(:image_url)
+    	params[:data].permit(:image_url)
     end
 
     def serialization_options
       { params: { host: request.protocol + request.host_with_port } }
     end
+    
+    def search_params
+			params.permit(:query)
+		end
 	end
 end

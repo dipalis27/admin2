@@ -108,7 +108,8 @@ Rails.application.routes.draw do
 
   namespace :bx_block_course do
     resources :courses
-    post 'private_student', to: 'courses#private_student'
+    post 'add_course_students', to: 'courses#add_course_students'
+    get 'search_course', to: 'courses#search_course'
   end
 
   namespace :bx_block_course do

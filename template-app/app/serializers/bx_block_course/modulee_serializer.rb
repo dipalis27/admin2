@@ -13,5 +13,21 @@ module BxBlockCourse
         ).serializable_hash[:data]
       end
     end
+
+    attribute :assignments do |object, params|
+      if object.present?
+        BxBlockCourse::AssignmentSerializer.new(
+          object.assignments, { params: params }
+          ).serializable_hash[:data]
+      end
+    end
+    
+    attribute :quizzes do |object, params|
+      if object.present?
+        BxBlockCourse::QuizSerializer.new(
+          object.quizzes, { params: params }
+          ).serializable_hash[:data]
+      end
+    end
   end
 end

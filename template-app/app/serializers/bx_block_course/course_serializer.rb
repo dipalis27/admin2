@@ -2,7 +2,8 @@ module BxBlockCourse
   class CourseSerializer < BuilderBase::BaseSerializer
      attributes *[
       :course_name,
-      :discription
+      :discription,
+      :is_private
     ]
     attribute :modulees do |object, params|
       if object.present?
@@ -25,8 +26,12 @@ module BxBlockCourse
       end
     end
 
-    attribute :private_students do |object|
+    attribute :students do |object|
       object.student_profiles
+    end
+
+    attribute :instructors do |object, params|
+      BxBlockInstructorsData::InstructorSerializer.new(object.instructors, { params: params })
     end
   end
 end
