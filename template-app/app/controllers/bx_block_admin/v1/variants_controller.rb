@@ -4,8 +4,8 @@ module BxBlockAdmin
       before_action :set_variant, only: %i(update show destroy)
 
       def index
-        variants = BxBlockCatalogue::Variant.all
-        render json: serialized_hash(variants), status: :ok
+        variants = BxBlockCatalogue::Variant.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
+        render json: serialized_hash(variants, options: pagination_data(variants, params[:per_page])), status: :ok
       end
 
       def create

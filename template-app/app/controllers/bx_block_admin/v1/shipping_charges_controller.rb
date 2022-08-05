@@ -2,9 +2,12 @@ module BxBlockAdmin
   module V1
     class ShippingChargesController < ApplicationController
       before_action :set_shipping_charge, only: [:show, :update, :destroy]
+
       def index
-        shipping_charges = BxBlockShippingCharge::ShippingCharge.all
-        render json: BxBlockAdmin::ShippingChargeSerializer.new(shipping_charges).serializable_hash, status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        shipping_charges = BxBlockShippingCharge::ShippingCharge.order(updated_at: :desc).page(current_page).per(per_page)
+        render json: BxBlockAdmin::ShippingChargeSerializer.new(shipping_charges, pagination_data(shipping_charges, per_page)).serializable_hash, status: :ok
       end
 
       def create

@@ -4,13 +4,16 @@ module BxBlockAdmin
       before_action :student_profile, only: [:show, :update, :destroy]
 
       def index
-        if params[:search_term].present?
-          @student = BxBlockStudentsData::StudentProfile.where("student_name ILIKE (?) or student_email ILIKE (?)", "%#{params[:search_term]}%", "%#{params[:search_term]}%")
-          render json: BxBlockStudentsData::StudentSerializer.new(@student).serializable_hash, status: :ok
-        else
-          @allstudent = BxBlockStudentsData::StudentProfile.all
-          render json: BxBlockStudentsData::StudentSerializer.new(@allstudent).serializable_hash, status: :ok
-        end
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        students =
+          if params[:search_term].present?
+            BxBlockStudentsData::StudentProfile.where("student_name ILIKE (?) or student_email ILIKE (?)", "%#{params[:search_term]}%", "%#{params[:search_term]}%")
+          else
+            BxBlockStudentsData::StudentProfile.all
+          end
+        students = students.order(updated_at: :desc).page(current_page).per(per_page)
+        render json: BxBlockStudentsData::StudentSerializer.new(students, pagination_data(students, per_page)).serializable_hash, status: :ok
       end
 
       def create

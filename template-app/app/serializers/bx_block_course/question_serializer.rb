@@ -8,7 +8,7 @@ module BxBlockCourse
       :description  
     ]
 
-    attribute :choices do |object, params|
+    attribute :choices_attributes do |object, params|
         object.choices   
     end
   end

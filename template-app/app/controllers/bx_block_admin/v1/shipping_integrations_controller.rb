@@ -4,8 +4,10 @@ module BxBlockAdmin
       before_action :set_api_configuration, only: [:show, :update, :destroy]
       
       def index
-        api_configurations = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k'])
-        render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configurations).serializable_hash, status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        api_configurations = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).order(updated_at: :desc).page(current_page).per(per_page)
+        render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configurations, pagination_data(api_configurations, per_page)).serializable_hash, status: :ok
       end
 
       def create
