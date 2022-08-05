@@ -5,11 +5,11 @@ module BxBlockAdmin
       before_action :set_feedback, only: [:show, :update, :destroy]
       
       def index
-        @feedbacks = BxBlockCatalogue::CustomerFeedback.all 
-        
-        if @feedbacks.present?
-          @feedbacks = @feedbacks.order(created_at: "desc").page(params[:page]).per(10)
-          render json: CustomerFeedbackSerializer.new(@feedbacks).serializable_hash, status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        feedbacks = BxBlockCatalogue::CustomerFeedback.order(updated_at: :desc).page(current_page).per(per_page)
+        if feedbacks.present?
+          render json: CustomerFeedbackSerializer.new(feedbacks, pagination_data(feedbacks, per_page)).serializable_hash, status: :ok
         else
           render json: { message: "No feedbacks found"}, status: 404
         end

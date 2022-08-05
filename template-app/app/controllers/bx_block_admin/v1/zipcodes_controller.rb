@@ -7,17 +7,7 @@ module BxBlockAdmin
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
         zipcodes = BxBlockZipcode::Zipcode.order(created_at: :desc).page(current_page).per(per_page)
-        options = {}
-        options[:meta] = {
-          pagination: {
-            current_page: zipcodes.current_page,
-            next_page: zipcodes.next_page,
-            prev_page: zipcodes.prev_page,
-            total_pages: zipcodes.total_pages,
-            total_count: zipcodes.total_count
-          }
-        }
-        render json: BxBlockAdmin::ZipcodeSerializer.new(zipcodes, options).serializable_hash, status: :ok      
+        render json: BxBlockAdmin::ZipcodeSerializer.new(zipcodes, pagination_data(zipcodes, per_page)).serializable_hash, status: :ok      
       end
 
       def create

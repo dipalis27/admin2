@@ -4,10 +4,12 @@ module BxBlockAdmin
       before_action :set_instructor, only: [:show, :update, :destroy]
 
       def index
-        instructors = BxBlockInstructorData::Instructor.all
-        if instructors.present?
-          render json: BxBlockInstructorsData::InstructorSerializer.new(instructors, serialization_options).serializable_hash, status: :ok
-        end
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        instructors = BxBlockInstructorData::Instructor.order(updated_at: :desc).page(current_page).per(per_page)
+        options = pagination_data(instructors, per_page)
+        options[:params] = { host: request.protocol + request.host_with_port }
+        render json: BxBlockInstructorsData::InstructorSerializer.new(instructors, options).serializable_hash, status: :ok
       end
 
       def create

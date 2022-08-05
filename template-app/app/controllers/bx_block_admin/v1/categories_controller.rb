@@ -4,26 +4,14 @@ module BxBlockAdmin
       before_action :set_category, only: [:show, :update, :destroy, :validate_sub_category, :validate_category]
 
       def index
-        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
-        current_page = params[:page].present? ? params[:page].to_i : 1
         categories =
           unless params[:search].present?
             BxBlockCategoriesSubCategories::Category.all
           else
             BxBlockCategoriesSubCategories::Category.left_joins(:sub_categories).where("LOWER(categories.name) LIKE LOWER(:search) OR LOWER(sub_categories.name) LIKE LOWER(:search)", search: "%#{params[:search]}%").distinct
           end
-        categories = categories.order(updated_at: :desc).page(current_page).per(per_page)
-        options = {}
-        options[:meta] = {
-          pagination: {
-            current_page: categories.current_page,
-            next_page: categories.next_page,
-            prev_page: categories.prev_page,
-            total_pages: categories.total_pages,
-            total_count: categories.total_count
-          }
-        }
-        render json: BxBlockAdmin::CategorySerializer.new(categories, options).serializable_hash, status: :ok
+        categories = categories.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
+        render json: BxBlockAdmin::CategorySerializer.new(categories, pagination_data(categories, params[:per_page])).serializable_hash, status: :ok
       end
 
       def create
