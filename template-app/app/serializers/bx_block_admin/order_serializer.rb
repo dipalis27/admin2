@@ -31,5 +31,9 @@ module BxBlockAdmin
     attribute :account do |object|
       BxBlockAdmin::AccountSerializer.new(object.account)
     end
+
+    attribute :package do |object|
+      BxBlockAdmin::PackageSerializer.new(object.package)
+    end
   end
 end
