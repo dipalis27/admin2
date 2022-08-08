@@ -106,6 +106,8 @@ Rails.application.routes.draw do
       resources :packages, only: [:index, :create, :update, :destroy]
     end
   end
+  
+  resources :ship_rocket_callbacks, only: [:create]
 
   namespace :bx_block_course do
     resources :courses

@@ -12,10 +12,7 @@ module BxBlockApiConfiguration
 
     accepts_nested_attributes_for :app_categories, allow_destroy: true
 
-    validates :app_name, presence: true
-    validates :short_description, presence: true
-    validates :description, presence: true
-    validates_presence_of :first_name, :last_name, :email, :address, :city, :state, :postal_code, :country_name
+    validates_presence_of :app_name, :short_description, :description, :first_name, :last_name, :email, :address, :city, :state, :postal_code, :country_name
 
     validates_length_of :app_name, maximum: 30
     validates_length_of :short_description, maximum: 80

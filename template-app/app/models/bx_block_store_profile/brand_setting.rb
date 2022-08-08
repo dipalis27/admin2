@@ -22,8 +22,8 @@ module BxBlockStoreProfile
     has_one_base64_attached :favicon_logo
     belongs_to :store_country, class_name: "BxBlockOrderManagement::Country", foreign_key: "country_id", optional: true
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
-    belongs_to :city, class_name: "BxBlockOrderManagement::City", foreign_key: 'city_id', optional: true
-    
+    belongs_to :city, class_name: "BxBlockOrderManagement::City", foreign_key: "city_id", optional: true
+
     # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
