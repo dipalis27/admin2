@@ -105,6 +105,8 @@ Rails.application.routes.draw do
       resources :qr_codes, except: [:edit, :new]
     end
   end
+  
+  resources :ship_rocket_callbacks, only: [:create]
 
   namespace :bx_block_course do
     resources :courses
