@@ -116,7 +116,7 @@ module BxBlockAdmin
       private
 
       def brand_settings_params
-        params.permit(:heading, :sub_heading, :contact_us_email_copy, :order_email_copy, :header_color, :common_button_color, :button_hover_color, :brand_text_color, :active_tab_color, :inactive_tab_color, :active_text_color, :inactive_text_color, :country, :currency_type, :phone_number, :fb_link, :instagram_link, :twitter_link, :youtube_link, :button_hover_text_color, :border_color, :sidebar_bg_color, :copyright_message, :wishlist_icon_color, :wishlist_btn_text_color, :order_detail_btn_color, :api_key, :auth_domain, :database_url, :project_id, :storage_bucket, :messaging_sender_id, :app_id, :measurement_id, :is_facebook_login, :is_google_login, :is_apple_login, :transparent_color, :grey_color, :black_color, :white_color, :primary_color, :background_grey_color, :extra_button_color, :header_text_color, :header_subtext_color, :background_color, :secondary_color, :secondary_button_color, :address, :gst_number, :highlight_primary_color, :highlight_secondary_color, :address_state_id, :template_selection, :color_palet, :whatsapp_number, :whatsapp_message, :navigation_item1, :navigation_item2, :is_whatsapp_integration)
+        params.permit(:heading, :sub_heading, :contact_us_email_copy, :order_email_copy, :header_color, :common_button_color, :button_hover_color, :brand_text_color, :active_tab_color, :inactive_tab_color, :active_text_color, :inactive_text_color, :country, :currency_type, :phone_number, :fb_link, :instagram_link, :twitter_link, :youtube_link, :button_hover_text_color, :border_color, :sidebar_bg_color, :copyright_message, :wishlist_icon_color, :wishlist_btn_text_color, :order_detail_btn_color, :api_key, :auth_domain, :database_url, :project_id, :storage_bucket, :messaging_sender_id, :app_id, :measurement_id, :is_facebook_login, :is_google_login, :is_apple_login, :transparent_color, :grey_color, :black_color, :white_color, :primary_color, :background_grey_color, :extra_button_color, :header_text_color, :header_subtext_color, :background_color, :secondary_color, :secondary_button_color, :address, :gst_number, :highlight_primary_color, :highlight_secondary_color, :address_state_id, :template_selection, :color_palet, :whatsapp_number, :whatsapp_message, :navigation_item1, :navigation_item2, :is_whatsapp_integration, :zipcode, :whatsapp_number, :city_id, :area_code, :whatsapp_message, :address_line_2)
       end
 
       def banner_params
@@ -124,7 +124,7 @@ module BxBlockAdmin
       end
       
       def update_store_detail_params
-        params.permit(:heading, :contact_us_email_copy, :order_email_copy, :currency_type, :phone_number, :country, :country_id, :currency_id, :address_state_id, :address, :zipcode)
+        params.permit(:heading, :contact_us_email_copy, :order_email_copy, :currency_type, :phone_number, :country, :country_id, :currency_id, :address_state_id, :address, :zipcode, :whatsapp_number, :city_id, :area_code, :whatsapp_message, :address_line_2)
       end
     end
     
