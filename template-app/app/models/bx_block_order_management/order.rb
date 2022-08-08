@@ -73,6 +73,7 @@ module BxBlockOrderManagement
 
     has_many :delivery_address_orders
     has_many :delivery_addresses, through: :delivery_address_orders
+    belongs_to :package, optional: true
 
     has_one_attached :pdf_invoice
 

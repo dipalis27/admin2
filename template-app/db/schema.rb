@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_28_141318) do
+ActiveRecord::Schema.define(version: 2022_08_08_104054) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -318,6 +318,11 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.string "zipcode"
     t.integer "country_id"
     t.integer "currency_id"
+    t.string "order_email_copy"
+    t.string "contact_us_email_copy"
+    t.string "area_code"
+    t.string "whatsapp_number"
+    t.integer "city_id"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -441,6 +446,15 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.bigint "sub_category_id", null: false
     t.index ["category_id"], name: "index_categories_sub_categories_on_category_id"
     t.index ["sub_category_id"], name: "index_categories_sub_categories_on_sub_category_id"
+  end
+
+  create_table "choices", force: :cascade do |t|
+    t.string "choice_title"
+    t.boolean "is_correct_answer"
+    t.bigint "question_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_choices_on_question_id"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -866,8 +880,18 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.boolean "is_subscribed"
     t.string "stripe_payment_method_id"
     t.string "pdf_invoice_url"
+    t.integer "package_id"
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["coupon_code_id"], name: "index_orders_on_coupon_code_id"
+  end
+
+  create_table "packages", force: :cascade do |t|
+    t.string "name"
+    t.float "length"
+    t.float "width"
+    t.float "height"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "product_notifies", force: :cascade do |t|
@@ -893,6 +917,15 @@ ActiveRecord::Schema.define(version: 2022_07_28_141318) do
     t.string "url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "questions", force: :cascade do |t|
+    t.string "question_title"
+    t.bigint "quiz_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "description"
+    t.index ["quiz_id"], name: "index_questions_on_quiz_id"
   end
 
   create_table "quizzes", force: :cascade do |t|
