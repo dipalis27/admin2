@@ -13,7 +13,7 @@ module BxBlockAdmin
     def call
       assign_attributes_to_requirement
       @errors.push(@requirement.errors.full_messages) unless @requirement.save
-      [@requirement, @errors, @paths]
+      [@requirement, @errors.flatten, @paths]
     end
 
     def assign_attributes_to_requirement
