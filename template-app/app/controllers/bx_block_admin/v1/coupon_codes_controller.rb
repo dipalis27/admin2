@@ -4,18 +4,10 @@ module BxBlockAdmin
       before_action :set_coupon, only: %i(show update destroy)
 
       def index
-        coupons = BxBlockCouponCodeGenerator::CouponCode.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
-        options = {}
-        options[:meta] = {
-          pagination: {
-            current_page: coupons.current_page,
-            next_page: coupons.next_page,
-            prev_page: coupons.prev_page,
-            total_pages: coupons.total_pages,
-            total_count: coupons.total_count
-          }
-        }
-        render json: CouponCodeSerializer.new(coupons, options).serializable_hash, status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        coupons = BxBlockCouponCodeGenerator::CouponCode.order(updated_at: :desc).page(current_page).per(per_page)
+        render json: CouponCodeSerializer.new(coupons, pagination_data(coupons, per_page)).serializable_hash, status: :ok
       end
 
       def create

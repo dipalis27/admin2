@@ -23,7 +23,7 @@ module BxBlockStoreProfile
     belongs_to :store_country, class_name: "BxBlockOrderManagement::Country", foreign_key: "country_id", optional: true
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
     belongs_to :city, class_name: "BxBlockOrderManagement::City", foreign_key: "city_id", optional: true
-    
+
     # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
@@ -33,7 +33,7 @@ module BxBlockStoreProfile
     validates_presence_of :address_state_id, if: :country_india?
     validates :heading, :logo, :country, presence: true
     validates_length_of :heading, maximum: 18
-    validate :validate_phone_number
+    #validate :validate_phone_number
 
     # Enum Values
     enum country: self::COUNTRIES

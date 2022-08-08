@@ -14,6 +14,10 @@ module BxBlockAdmin
       object.store_country&.id
     end
 
+    attribute :city do |object|
+      object.city&.name
+    end
+
     attribute :logo do |object|
       $hostname + Rails.application.routes.url_helpers.rails_blob_url(object.logo, only_path: true) if object.logo.present? && object.logo.attached?
     end

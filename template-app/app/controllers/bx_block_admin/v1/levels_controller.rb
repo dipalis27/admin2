@@ -4,8 +4,10 @@ module BxBlockAdmin
       before_action :get_level, only: [:show, :update, :destroy]
 
       def index
-        @levels = BxBlockLevel::Level.all
-        render json: BxBlockLevel::LevelSerializer.new(@levels).serializable_hash, status: :ok
+        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+        current_page = params[:page].present? ? params[:page].to_i : 1
+        levels = BxBlockLevel::Level.order(updated_at: :desc).page(current_page).per(per_page)
+        render json: BxBlockLevel::LevelSerializer.new(levels, pagination_data(levels, per_page)).serializable_hash, status: :ok
       end
 
       def create
