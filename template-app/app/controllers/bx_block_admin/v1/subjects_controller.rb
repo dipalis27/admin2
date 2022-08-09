@@ -17,7 +17,7 @@ module BxBlockAdmin
 				if subject.present?
 					render json: BxBlockSubject::SubjectSerializer.new(subject).serializable_hash, status: :ok
 				else
-					render json: { error: subject.errors.full_messages }, status: 404
+					render json: { error: subject.errors.full_messages }, status: :unprocessable_entity
 				end
 			end
 
@@ -46,7 +46,7 @@ module BxBlockAdmin
 					@subject.destroy
 					render json: { success: true }, status: :ok
 				else
-					render json: { 'errors': @subject.errors.full_messages }, status: :unprocessable_entity	
+					render json: { 'errors': @subject.errors.full_messages }, status: 404	
 				end
 			end
 
