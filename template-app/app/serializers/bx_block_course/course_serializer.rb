@@ -33,5 +33,9 @@ module BxBlockCourse
     attribute :instructors do |object, params|
       BxBlockInstructorsData::InstructorSerializer.new(object.instructors, { params: params })
     end
+
+    attribute :levels do |object, params|
+      BxBlockLevel::LevelSerializer.new(object.levels, { params: params })
+    end
   end
 end
