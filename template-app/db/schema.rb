@@ -323,6 +323,8 @@ ActiveRecord::Schema.define(version: 2022_08_08_104054) do
     t.string "area_code"
     t.string "whatsapp_number"
     t.integer "city_id"
+    t.string "whatsapp_message"
+    t.string "address_line_2"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -972,6 +974,13 @@ ActiveRecord::Schema.define(version: 2022_08_08_104054) do
     t.index ["order_item_id"], name: "index_reviews_on_order_item_id"
   end
 
+  create_table "ship_rocket_raws", force: :cascade do |t|
+    t.json "payload"
+    t.string "shipment_status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "shipping_charges", force: :cascade do |t|
     t.decimal "below"
     t.decimal "charge"
@@ -1015,6 +1024,12 @@ ActiveRecord::Schema.define(version: 2022_08_08_104054) do
     t.bigint "category_id"
     t.boolean "disabled", default: false
     t.index ["category_id"], name: "index_sub_categories_on_category_id"
+  end
+
+  create_table "subjects", force: :cascade do |t|
+    t.string "subject_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "subscription_orders", force: :cascade do |t|
