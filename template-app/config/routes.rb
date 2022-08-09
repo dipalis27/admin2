@@ -81,6 +81,7 @@ Rails.application.routes.draw do
       end
       resources :variants, only: [:index, :create, :update, :show, :destroy]
       resources :student_profiles, only: [:index, :create, :show, :update, :destroy]
+      resources :subjects, only: [:index, :create, :show, :update, :destroy]
       resources :instructors, only: [:index, :create, :show, :update, :destroy]
       resources :levels, only: [:index, :create, :show, :update, :destroy]
       resources :coupon_codes, except: [:edit, :new]
@@ -135,5 +136,4 @@ Rails.application.routes.draw do
     resources :quizzes
     post 'duplicate_quiz', to: 'quizzes#duplicate_quiz'
   end
-
 end
