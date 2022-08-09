@@ -124,7 +124,7 @@ module BxBlockAdmin
       end
       
       def update_store_detail_params
-        params.permit(:heading, :contact_us_email_copy, :order_email_copy, :currency_type, :phone_number, :country, :country_id, :currency_id, :address_state_id, :address, :zipcode, :whatsapp_number, :city_id, :area_code, :whatsapp_message, :address_line_2)
+        params.permit(:heading, :contact_us_email_copy, :order_email_copy, :currency_type, :phone_number, :country, :country_id, :currency_id, :address_state_id, :address, :zipcode, :whatsapp_number, :city_id, :area_code, :whatsapp_message, :address_line_2, :gst_number)
       end
     end
     

@@ -104,7 +104,7 @@ Rails.application.routes.draw do
         end
       end
       resources :qr_codes, except: [:edit, :new]
-      resources :packages, only: [:index, :create, :update, :destroy]
+      resources :packages
     end
   end
   

@@ -1,7 +1,7 @@
 module BxBlockAdmin
   module V1
     class PackagesController < ApplicationController
-      before_action :set_package, only: %i(update destroy)
+      before_action :set_package, only: %i(update show destroy)
 
       def index
         packages = BxBlockOrderManagement::Package.order(id: :desc).page(params[:page]).per(params[:per_page])
@@ -23,6 +23,10 @@ module BxBlockAdmin
         else
           render json: { errors: @package.errors.full_messages }, status: :unprocessable_entity
         end
+      end
+
+      def show
+        render json: serialized_hash(@package), status: :ok
       end
 
       def destroy
