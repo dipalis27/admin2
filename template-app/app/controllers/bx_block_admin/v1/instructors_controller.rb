@@ -6,6 +6,11 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
+        if params[:search_term].present?
+          BxBlockInstructorData::Instructor.where("instructor_name ILIKE (?) or email ILIKE (?)", "%#{params[:search_term]}%", "%#{params[:search_term]}%")
+        else
+          BxBlockInstructorData::Instructor.all.order(updated_at: :desc).page(current_page).per(per_page)
+        end
         instructors = BxBlockInstructorData::Instructor.order(updated_at: :desc).page(current_page).per(per_page)
         options = pagination_data(instructors, per_page)
         options[:params] = { host: request.protocol + request.host_with_port }
