@@ -28,9 +28,7 @@ module BxBlockContactUs
       end
       if @contact.save
         # contact_us_created
-        if BxBlockSettings::EmailSetting.find_by(event_name: "contact us").try(:active)
-          BxBlockEmailNotifications::ContactMailer.with(host: $hostname).contact_us_created(@contact, @current_user).deliver
-        end
+        BxBlockEmailNotifications::ContactMailer.with(host: $hostname).contact_us_created(@contact, @current_user).deliver
         render json: {
               success: true,
               message: ' ',

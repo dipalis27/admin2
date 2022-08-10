@@ -10,7 +10,7 @@ PodDisruptionBudget:
 
 # Specify additional values that will be presented as environment variables to the pod.
 appExtConfig:
-  PROJECT_TYPE: "freemium" 
+  PROJECT_TYPE: "studio_store" 
   HOST_URL: "freefree-238464-ruby.b238464.dev.centralindia.az.svc.builder.ai/"
   RUBY_ANALYTICS_TOKEN: "ADvoiejfyI6IHGJbitMe9MGLbkPRxj6n"
   DL_APP_NAME: "ecommerceapp"

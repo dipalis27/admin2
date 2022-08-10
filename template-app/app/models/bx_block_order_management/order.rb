@@ -73,11 +73,8 @@ module BxBlockOrderManagement
 
     has_many :delivery_address_orders
     has_many :delivery_addresses, through: :delivery_address_orders
-    belongs_to :package, optional: true
 
-    has_one_attached :pdf_invoice
-
-    validates :status, presence: true, inclusion: { in: (Rails.env.development? || Rails.env.production?) ? BxBlockOrderManagement::OrderStatus.pluck(:status) : ORDER_STATUS }
+    validates :status, presence: true, inclusion: { in: BxBlockOrderManagement::OrderStatus.pluck(:status) }
     # validates :shipping_charge, :shipping_discount, :shipping_total, :shipping_net_amt, presence: true
 
     accepts_nested_attributes_for :order_items, allow_destroy: true
@@ -93,9 +90,6 @@ module BxBlockOrderManagement
     scope :not_in_cart, -> { where.not(status: ['in_cart','created']) }
     scope :total_sale_amount, -> { where(status: 'placed').map(&:total).compact.sum }
     scope :one_day_sale, -> { where(status: 'placed', placed_at: (Time.now - 24.hours)..Time.now).map(&:total).compact.sum }
-    scope :one_day_orders, -> (date) {where(order_date: date.in_time_zone('UTC').beginning_of_day..date.in_time_zone('UTC').end_of_day)}
-    scope :search_by_order_number_or_customer_name, -> (term) { joins(:account).where("lower(order_number) like (?) OR lower(accounts.full_name) like (?)", "%#{term.to_s.downcase}%", "%#{term.to_s.downcase}%")}
-    scope :filter_by_date_and_statuses, -> (from, to, statuses) { where(order_date: from.in_time_zone('UTC').beginning_of_day..to.in_time_zone('UTC').end_of_day).where(status: statuses)}
 
     enum deliver_by: %i[fedex]
     before_update :set_status
@@ -105,8 +99,7 @@ module BxBlockOrderManagement
     after_save :send_email_to_customer, if: :saved_change_to_order_status_id?
     after_save :update_product_stock, if: :saved_change_to_status?
     before_save :update_ship_rocket_order_status, if: :order_status_id_changed?
-    after_save :upload_invoice_to_s3, if: :saved_change_to_status?
-    
+
     NOTIFICATION_KEYS = {
       PLACED: 'PLACED',
       CANCELLED: 'CANCELLED',
@@ -313,20 +306,12 @@ module BxBlockOrderManagement
     def send_email_to_customer
       return unless self.account&.is_notification_enabled
       return unless self.account&.is_email_valid?
-      if BxBlockSettings::EmailSetting.find_by(event_name: "order status").try(:active)
-        OrderMailer.with(host: $hostname).order_status_notification(self).deliver_now if self.saved_change_to_order_status_id? && !['in_cart', 'created', 'confirmed', 'placed'].include?(self.status)  
-      end
+      OrderMailer.with(host: $hostname).order_status_notification(self).deliver_now if self.saved_change_to_order_status_id? && !['in_cart', 'created', 'confirmed', 'placed'].include?(self.status)
       if self.placed?
-        if BxBlockSettings::EmailSetting.find_by(event_name: "new order").try(:active)
-          OrderMailer.with(host: $hostname).order_placed(self).deliver_later(wait: 10.seconds)
-          if BxBlockSettings::EmailSetting.find_by(event_name: "admin new order").try(:active)
-            OrderMailer.with(host: $hostname).admin_order_placed(self).deliver_later(wait: 10.seconds)
-          end
-        end
+        OrderMailer.with(host: $hostname).order_placed(self).deliver_later(wait: 10.seconds)
+        OrderMailer.with(host: $hostname).admin_order_placed(self).deliver_later(wait: 10.seconds)
       elsif self.confirmed?
-        if BxBlockSettings::EmailSetting.find_by(event_name: "order confirmed").try(:active)
-          OrderMailer.with(host: $hostname).order_confirmed(self).deliver_now
-        end
+        OrderMailer.with(host: $hostname).order_confirmed(self).deliver_now
       end
     end
 
@@ -383,13 +368,6 @@ module BxBlockOrderManagement
       self.update_attributes(logistics_ship_rocket_enabled: true, ship_rocket_order_id: json_response['order_id'], ship_rocket_shipment_id: json_response['shipment_id'], ship_rocket_status: json_response['status'].to_s.downcase, ship_rocket_status_code: json_response['status_code'], ship_rocket_onboarding_completed_now: json_response['onboarding_completed_now'], ship_rocket_awb_code: json_response['awb_code'], ship_rocket_courier_company_id: json_response['courier_company_id'], ship_rocket_courier_name: json_response['courier_name'], order_status_id: order_status_id.present? ? order_status_id : self.order_status_id )
     end
 
-    def update_tracking(json_response)
-      self.order_items.each do |order_item|
-        tracking = BxBlockOrderManagement::Tracking.find_or_create_by(date: DateTime.current, status: json_response['status'].to_s.downcase )
-        order_item.order_trackings.create(tracking_id: tracking.id)
-      end
-    end
-
     def update_ship_rocket_order_status
       if self.cancelled? && self.logistics_ship_rocket_enabled && self.ship_rocket_order_id.present?
         ship_rocket = BxBlockOrderManagement::ShipRocket.new
@@ -442,108 +420,6 @@ module BxBlockOrderManagement
         end
       end
       content
-    end
-
-    def upload_invoice_to_s3
-      return nil if Rails.env.test?
-      return nil if self.pdf_invoice.present?
-      return nil if ['in_cart', 'created'].include?(self.status)
-      doc_pdf = WickedPdf.new.pdf_from_string(
-        ActionController::Base.new().render_to_string(
-          template: "admin/csv/invoice.html.erb",           
-          locals:   { params: {order: self} }       
-        ),
-        pdf:         "Tax Invoice",
-        page_size:   "Letter",
-        orientation: "Landscape",
-        margin: { top:    "0.5in",
-                  bottom: "0.5in",
-                  left:   "0.5in",
-                  right:  "0.5in" },
-        disposition: "attachment"
-      )
-      self.pdf_invoice.attach(io: StringIO.new(doc_pdf), filename: "invoice.pdf", content_type: "application/pdf")
-    end
-
-    def self.generate_csv_report
-      headers = ["id", "order_number", "order_date", "account", "applied_discount", "sub_total", "total", "total_tax", "status", "coupon_code", "delivery_addresses", "cancellation_reason", "is_gift", "placed_at", "confirmed_at", "in_transit_at", "delivered_at", "cancelled_at", "refunded_at", "source", "shipment_id", "delivery_charges", "tracking_url", "schedule_time", "payment_failed_at", "returned_at", "tax_charges", "deliver_by", "tracking_number", "is_error", "delivery_error_message", "payment_pending_at", "is_group", "is_availability_checked", "shipping_charge", "shipping_discount", "shipping_net_amt", "shipping_total", "razorpay_order_id", "length", "breadth", "height", "weight", "ship_rocket_order_id", "ship_rocket_shipment_id", "ship_rocket_status", "ship_rocket_status_code", "ship_rocket_onboarding_completed_now", "ship_rocket_awb_code", "ship_rocket_courier_company_id", "ship_rocket_courier_name", "logistics_ship_rocket_enabled", "availability_checked_at", "is_blocked", "is_subscribed", "stripe_payment_method_id"]
-      orders =  BxBlockOrderManagement::Order.includes(:account, :order_items).not_in_cart.order(order_date: :desc)
-      csv_data = []
-      csv_data << headers
-      response = {}
-      begin
-        orders.each do |order|
-          order_data = order.order_row
-          csv_data << order_data
-        end
-        response[:success] = true
-        response[:data] = csv_data
-      rescue Exception => e
-        response[:success] = false
-        response[:message] = "There is problem in downloading csv report please try after some time. Error: #{e.message}"
-      end
-      response
-    end
-
-    def order_row
-      [
-       self.id,
-       self.order_number,
-       (self.order_date.strftime("%b %d %Y, %I:%M %p") rescue ''),
-       self.account&.full_name, 
-       self.applied_discount,
-       self.sub_total,
-       self.total,
-       self.total_tax,
-       self.status,
-       self.coupon_code&.code, 
-       self.delivery_addresses.first&.full_address,
-       self.cancellation_reason,
-       self.is_gift,
-       (self.placed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.confirmed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.in_transit_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.delivered_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.cancelled_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.refunded_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       self.source, 
-       self.shipment_id, 
-       self.delivery_charges, 
-       self.tracking_url, 
-       self.schedule_time, 
-       (self.payment_failed_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       (self.returned_at.strftime("%b %d %Y, %I:%M %p") rescue ''), 
-       self.tax_charges, 
-       self.deliver_by,
-       self.tracking_number, 
-       self.is_error, 
-       self.delivery_error_message, 
-       (self.payment_pending_at.strftime("%b %d %Y, %I:%M %p") rescue ''),
-       self.is_group,
-       self.is_availability_checked,
-       self.shipping_charge,
-       self.shipping_discount, 
-       self.shipping_net_amt, 
-       self.shipping_total,
-       self.razorpay_order_id,
-       self.length,
-       self.breadth,
-       self.height, 
-       self.weight,
-       self.ship_rocket_order_id,
-       self.ship_rocket_shipment_id, 
-       self.ship_rocket_status,
-       self.ship_rocket_status_code,
-       self.ship_rocket_onboarding_completed_now,
-       self.ship_rocket_awb_code,
-       self.ship_rocket_courier_company_id,
-       self.ship_rocket_courier_name,
-       self.logistics_ship_rocket_enabled,
-       (self.availability_checked_at.strftime("%b %d %Y, %I:%M %p") rescue ''),
-       self.is_blocked,
-       self.is_subscribed,
-       self.stripe_payment_method_id
-       ]
     end
   end
 end

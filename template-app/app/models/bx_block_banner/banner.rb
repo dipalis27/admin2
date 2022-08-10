@@ -1,7 +1,6 @@
 module BxBlockBanner
   class Banner < BxBlockBanner::ApplicationRecord
     self.table_name = :banners
-    extend BxBlockAdmin::ModelUtilities
 
     ATTACHMENT_SIZE = {
       web_banner: {
@@ -48,35 +47,6 @@ module BxBlockBanner
           end
         end
       end
-    end
-
-    def self.validate_and_save(banners)
-      response = {}
-      BxBlockBanner::Banner.transaction do
-        banners.each do |banner_data|
-          banner =  self.find_by_id(banner_data[:id])
-          banner = banner || self.new(banner_position: banner_data[:banner_position], web_banner: true)
-          banner_data[:sub_banners].each do |sub_banner|
-            attachment = banner.attachments.find_by_id(sub_banner[:id])
-            if attachment.present? && sub_banner[:is_delete]
-              attachment.destroy
-              next
-            end
-            if sub_banner[:image].present?
-              attachment = banner.attachments.new(position: sub_banner[:position]) if sub_banner[:id].blank?
-              image_path, image_extension = store_base64_image(sub_banner[:image])
-              attachment.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
-              File.delete(image_path) if File.exist?(image_path)
-            end
-          end
-          banner.save!
-        end
-        response[:success] = true
-      rescue StandardError => e
-        response[:success] = false
-        response[:message] = e.message
-      end
-      response
     end
 
     private

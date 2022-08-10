@@ -41,7 +41,7 @@ module BxBlockPaymentRazorpay
 
       def setup_razorpay
         razorpay_configuration = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: 'razorpay')
-        Razorpay.setup(ENV['razorpay_key']||razorpay_configuration&.api_key, ENV['razorpay_secret']||razorpay_configuration&.api_secret_key)
+        Razorpay.setup(razorpay_configuration&.api_key, razorpay_configuration&.api_secret_key)
       end
     end
   end

@@ -10,7 +10,7 @@ function cropImage(inputId) {
   $("#replaceCroppedImage").on("click", function () {
     var cropper = $("#croppableImage")[$("#croppableImage").length - 1].cropper;
     if (cropper != undefined && cropper != null) {
-      var croppedBase64 = cropper.getCroppedCanvas().toDataURL("image/png");
+      var croppedBase64 = cropper.getCroppedCanvas().toDataURL(cropper.url.split(":")[1].split(";")[0]);
       var attachmentId =
         $("#" + inputFileButtonId).attr("cropped-image-temp-store-id") 
       $(attachmentId).val(croppedBase64);

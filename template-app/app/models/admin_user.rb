@@ -10,53 +10,7 @@ class AdminUser < ApplicationRecord
 
     before_create :track_event
 
-    PERMISSION_KEYWORDS = [
-        ['product','BxBlockCatalogue::Catalogue'],
-        ['category','BxBlockCategoriesSubCategories::Category'],
-        ['order', 'BxBlockOrderManagement::Order'],
-        ['brand', 'BxBlockCatalogue::Brand'],
-        ['coupon', 'BxBlockCouponCodeGenerator::CouponCode'],
-        ['tag', 'BxBlockCatalogue::Tag'],
-        ['user', 'AccountBlock::Account'],
-        ['brand setting', 'BxBlockStoreProfile::BrandSetting'],
-        ['tax', 'BxBlockOrderManagement::Tax'],
-        ['variant', 'BxBlockCatalogue::Variant'],
-        ['email setting', 'BxBlockSettings::EmailSetting']
-    ]
-    # Add routes inside this as per permissions to give access to sub admin
-    PERMISSION_ROUTES = HashWithIndifferentAccess.new({
-        'bx_block_admin/v1/catalogues': 'BxBlockCatalogue::Catalogue',
-        'bx_block_admin/v1/categories': 'BxBlockCategoriesSubCategories::Category', #valid route needed
-        'bx_block_admin/v1/order_reports': 'BxBlockOrderManagement::Order',
-        'bx_block_admin/v1/brand': 'BxBlockCatalogue::Brand', #valid route needed
-        'bx_block_admin/v1/coupon': 'BxBlockCouponCodeGenerator::CouponCode', #valid route needed
-        'bx_block_admin/v1/tag': 'BxBlockCatalogue::Tag', #valid route needed
-        'bx_block_admin/v1/customers': 'AccountBlock::Account',
-        'bx_block_admin/v1/brand_settings': 'BxBlockStoreProfile::BrandSetting',
-        'bx_block_admin/v1/taxes': 'BxBlockOrderManagement::Tax',
-        'bx_block_admin/v1/variants': 'BxBlockCatalogue::Variant',
-        'bx_block_admin/v1/email_settings': 'BxBlockSettings::EmailSetting'
-
-    })
-    PERMISSION_CONVERSIONS = HashWithIndifferentAccess.new({
-        'BxBlockCatalogue::Catalogue': 'catalogue',
-        'BxBlockCategoriesSubCategories::Category': 'category',
-        'BxBlockOrderManagement::Order': 'order',
-        'BxBlockCatalogue::Brand': 'brand',
-        'BxBlockCouponCodeGenerator::CouponCode': 'coupon',
-        'BxBlockCatalogue::Tag': 'tag',
-        'AccountBlock::Account': 'user',
-        'BxBlockStoreProfile::BrandSetting': 'brand setting',
-        'BxBlockOrderManagement::Tax': 'tax',
-        'BxBlockCatalogue::Variant': 'variant',
-        'BxBlockSettings::EmailSetting': 'email setting'
-    })
-    PERMISSIONS = [
-        'BxBlockCatalogue::Catalogue', 'BxBlockCategoriesSubCategories::Category',
-        'BxBlockOrderManagement::Order', 'BxBlockCatalogue::Brand',
-        'BxBlockCouponCodeGenerator::CouponCode', 'BxBlockCatalogue::Tag',
-        'AccountBlock::Account', 'BxBlockStoreProfile::BrandSetting', 'BxBlockOrderManagement::Tax', 'BxBlockCatalogue::Variant', 'BxBlockSettings::EmailSetting'
-    ]
+    PERMISSION_KEYWORDS = [['product','BxBlockCatalogue::Catalogue'], ['category','BxBlockCategoriesSubCategories::Category'], ['order', 'BxBlockOrderManagement::Order'], ['brand', 'BxBlockCatalogue::Brand'], ['coupon', 'BxBlockCouponCodeGenerator::CouponCode'], ['tag', 'BxBlockCatalogue::Tag'], ['user', 'AccountBlock::Account']]
 
     #################
     ## Association
@@ -65,15 +19,14 @@ class AdminUser < ApplicationRecord
     #################
     ## Validations
     #################
-    validates_presence_of :name, if: -> { role == 'sub_admin' }
-    validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, presence: true, if: -> { role == 'sub_admin' }
-    validate :validate_permissions
+    validates :name, :email, :phone_number, presence: true, if: -> { role == 'sub_admin' }
+    validates :phone_number, :numericality => true, :length => { :minimum => 10, :maximum => 15 }, if: -> { role == 'sub_admin' }
+    validates :email, presence: true, format: /\w+@\w+\.{1}[a-zA-Z]{2,}/
 
     #################
     ## Callbacks
     #################
     #after_update :send_account_activated_email, if: :saved_change_to_activated?
-    before_validation :remove_empty_permissions
     before_create :create_admin_profile
 
     # def active_for_authentication?
@@ -97,6 +50,7 @@ class AdminUser < ApplicationRecord
     end
 
     def change_email_keywords(content, customer: nil, product: nil, variant: nil)
+
         default_email_setting = BxBlockSettings::DefaultEmailSetting.first
         contact_us =  BxBlockContactUs::Contact.where(account_id: customer&.id).last
         BxBlockSettings::EmailSetting::EMAIL_KEYWORDS.each do |key|
@@ -108,9 +62,7 @@ class AdminUser < ApplicationRecord
             when 'brand_name'
                 content = content.gsub!("%{#{key}}", default_email_setting&.brand_name.to_s ) || content
             when 'brand_logo'
-                if default_email_setting
-                    content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{$hostname + Rails.application.routes.url_helpers.rails_blob_path(default_email_setting&.logo, only_path: true)}'/></div>" ) || content
-                end
+              content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{$hostname + Rails.application.routes.url_helpers.rails_blob_path(default_email_setting.logo, only_path: true)}'/></div>" ) || content
             when 'recipient_email'
                 content = content.gsub!("%{#{key}}", default_email_setting&.contact_us_email_copy_to.to_s ) || content
             when 'contact_name'
@@ -136,25 +88,6 @@ class AdminUser < ApplicationRecord
     def create_admin_profile
         self.admin_profile = BxBlockRoleAndPermission::AdminProfile.create(name: self&.name, phone: self&.phone_number, email: self&.email) if self.admin_profile.nil?
         self.admin_profile
-    end
-
-    def valid_otp?(otp)
-        (self.otp_code == otp && Time.current <= self.otp_valid_until) rescue false
-    end
-
-    def admin_permissions
-        return ['all'] if super_admin?
-        permissions.map{|p| PERMISSION_CONVERSIONS[p]}
-    end
-
-    def validate_permissions
-        if permissions.any?{|p| !(PERMISSIONS).include?(p)}
-            errors.add(:permissions, "are invalid")
-        end
-    end
-
-    def remove_empty_permissions
-        permissions.reject!(&:empty?)
     end
 
     protected

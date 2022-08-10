@@ -7,7 +7,7 @@ module BxBlockApiConfiguration
 
     has_many :attachments, as: :attachable, class_name: "BxBlockFileUpload::Attachment", dependent: :destroy
     accepts_nested_attributes_for :attachments, allow_destroy: true
-    belongs_to :app_submission_requirement
+    belongs_to :app_submission_requirement, foreign_key: :app_store_requirement_id
 
     APP_TYPE = ['android', 'ios']
 

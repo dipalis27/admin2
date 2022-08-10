@@ -123,17 +123,6 @@ unless BrandSettings::Load.is_loaded_from_gem
           # f.input :highlight_primary_color
           # f.input :highlight_secondary_color
         end
-        # f.inputs "Button Color" do
-        #   f.input :active_text_color, label: 'Regular text color'
-        #   f.input :common_button_color, label: 'Button background color',:hint => image_tag("/assets/common-button-color.jpg")
-        #   f.input :brand_text_color, label: 'Button text color',:hint => image_tag("/assets/common-button-text-color.jpg")
-        #   f.input :button_hover_color, label: 'Button hover color (for web)',:hint => image_tag("/assets/button-hover-color.jpg")
-        # end
-        f.inputs "Other Colors(App)" do
-          f.input :primary_color
-          # f.input :highlight_primary_color
-          # f.input :highlight_secondary_color
-        end
         f.inputs 'Firebase Account' do
           f.input :api_key, label: 'Server key'
           f.input :auth_domain

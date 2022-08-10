@@ -1,52 +1,37 @@
 module BxBlockStoreProfile
   class BrandSetting < BxBlockStoreProfile::ApplicationRecord
     self.table_name = :brand_settings
-    include BxBlockStoreProfile::Country
+    has_one_attached :logo
+    has_one_attached :promotion_banner
+
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
 
-    COLOR_PALET = [
-      "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
-      "{themeName: 'Navy',primaryColor:'#011638',secondaryColor:'#FE5F55'}",
-      "{themeName: 'Bonsai',primaryColor:'#4A6C6F',secondaryColor:'#7FB069'}",
-      "{themeName: 'Forest',primaryColor:'#0B3C49',secondaryColor:'#BE7C4D'}",
-      "{themeName: 'Wood',primaryColor:'#6F1A07',secondaryColor:'#AF9164'}",
-      "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
-      "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
-    ]
-    
-    # Associations
-    has_one_base64_attached :logo
-    has_one_attached :promotion_banner
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
-    has_one_base64_attached :favicon_logo
-    belongs_to :store_country, class_name: "BxBlockOrderManagement::Country", foreign_key: "country_id", optional: true
-    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
-    belongs_to :city, class_name: "BxBlockOrderManagement::City", foreign_key: "city_id", optional: true
 
-    # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
-    after_commit :update_defaul_email_settings
 
-    # Validations
+    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
+
     validates_presence_of :address_state_id, if: :country_india?
     validates :heading, :logo, :country, presence: true
     validates_length_of :heading, maximum: 18
-    #validate :validate_phone_number
+    validate :validate_phone_number
 
-    # Enum Values
-    enum country: self::COUNTRIES
-    enum template_selection: ['Minimal', 'Prime', 'Bold', 'Ultra', 'Essence']
-
-    before_save :assign_country_and_currency, if: :country_id_changed?
+    enum country: ['india', 'uk']
 
     def cropped_image=(val)
       @cropped_image = val
       return if val.blank?
 
-      image_path, image_extension = store_base64_image(val)
-      self.logo.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
+      decoded_data = val.split(",")[1]
+      image_extention = val.split(',').first.gsub("\;base64", "").gsub("data:image/", '') rescue 'png'
+      image_path="tmp/cropped_image." + image_extention
+      File.open(image_path, 'wb') do |f|
+        f.write(Base64.decode64(decoded_data))
+      end
+      self.logo.attach(io: File.open(image_path),filename: image_path.split('/')[1])
       File.delete(image_path) if File.exist?(image_path)
     end
 
@@ -213,18 +198,10 @@ module BxBlockStoreProfile
           },
           TemplateSelections: {
             template_selection: self.template_selection,
-            color_palet: self.get_color_palet
+            color_palet: self.color_palet
           }
       }
       return response
-    end
-
-    def get_color_palet
-      begin
-        JSON.parse(self.color_palet.to_s)
-      rescue
-        self.color_palet
-      end
     end
 
     def get_configurations
@@ -238,36 +215,11 @@ module BxBlockStoreProfile
       self.country == 'india' ? true : false
     end
 
-    def update_defaul_email_settings
-      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
-      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
-      hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
-      logo_url = hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true) if self.logo.attached?
-      begin
-        downloaded_image = open(logo_url)
-        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
-        blob = ActiveStorage::Attachment.find_by(record_id: 20, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
-        extension = blob.content_type.split("/").last
-        defaul_email_setting.logo.attach(io: downloaded_image, filename: "logo"+extension)
-      rescue Exception => error
-        Rails.logger.info "============== Error: #{error.message}=============="
-      end
-    end
-
     private
 
     def update_onboarding_step
       step_update_service = BxBlockAdmin::UpdateStepCompletion.new('branding', self.class.to_s)
       step_update_service.call
-    end
-
-    def assign_country_and_currency
-      selected_country = self.store_country
-      if selected_country.present?
-        code = selected_country.code
-        self.country = (code == 'in' ? 'india' : (code == 'gb' ? 'uk' : code))
-        self.currency_type = selected_country.currency&.symbol
-      end
     end
 
     def validate_phone_number

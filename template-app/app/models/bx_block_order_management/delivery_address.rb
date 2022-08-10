@@ -38,6 +38,7 @@ module BxBlockOrderManagement
     validates :name, :flat_no, :address, :zip_code, :phone_number, :city, :country, presence: true
     validates :phone_number, format: { with: /^(?:\+?\d{1,3}\s*-?)?\(?(?:\d{3})?\)?[- ]?\d{3}[- ]?\d{4}$/, :multiline => true, message: ' is not valid' }
     validates :address_for, presence: true, inclusion: { in: %w(shipping billing billing_and_shipping) }
+
     before_save :assign_state
 
     enum country: ['india', 'uk']

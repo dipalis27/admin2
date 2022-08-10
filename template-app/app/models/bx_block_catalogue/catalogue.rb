@@ -87,9 +87,9 @@ module BxBlockCatalogue
 
     # Callbacks
     before_save :set_stock_qty, :check_product_quantity, :set_current_availablity, :calculate_tax_amount
-    after_save :add_system_sku, :update_default_variant
+    after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
     after_save :remove_draft_products_from_cart, if: -> { self.draft? }
-    before_save :update_available_price, :inventory_low_stock_mailings
+    before_save :update_available_price
     # before_save :accept_cropped_images_only
     before_create :track_event
 
@@ -227,62 +227,6 @@ module BxBlockCatalogue
       end
     end
 
-    def self.search(options = {})
-      search_key = options.dig(:search)
-      filters = options.dig(:filters)
-      outer_condition_array = []
-      subquery_condition_array = []
-      if filters.present?
-        filters.select{ |key,value| value.present? }.each do |column_name, value|
-          case column_name.to_s
-            when "status"
-              status_enum_value = Catalogue.statuses[value.downcase]
-              outer_condition_array << "catalogues.status = #{status_enum_value}"
-            when "categories"
-              if value.is_a?(Array)
-                value.each do |each_value|
-                  subquery_condition_array << "LOWER(categories.name) LIKE '%#{each_value.downcase}%' "
-                end
-              else
-                subquery_condition_array << "LOWER(categories.name) LIKE '%#{value.downcase}%' "
-              end
-            when "sub_categories"
-              if value.is_a?(Array)
-                value.each do |each_value|
-                  subquery_condition_array << "LOWER(sub_categories.name) LIKE '%#{each_value.downcase}%' "
-                end
-              else
-                subquery_condition_array << "LOWER(sub_categories.name) LIKE '%#{value.downcase}%' "
-              end
-          end
-        end
-      end
-      if search_key.present?
-        search_key = search_key.downcase
-        outer_condition_array << "LOWER(catalogues.name) LIKE '%#{search_key}%' "
-        subquery_condition_array.push("LOWER(categories.name) LIKE '%#{search_key}%' ", "LOWER(sub_categories.name) LIKE '%#{search_key}%' ") 
-      end
-      if outer_condition_array.present?
-        outer_condition_string = "WHERE " + outer_condition_array.join(" AND ")
-      end
-      if subquery_condition_array.present?
-        subquery_condition_string = "WHERE "+ subquery_condition_array.join(" OR ")
-        sub_query = " #{outer_condition_string.present? ? 'OR' : 'WHERE' } catalogues.id IN (
-                      SELECT DISTINCT catalogue_id FROM 
-                      (
-                        SELECT csc.*, categories.name AS category_name, sub_categories.name AS sub_category_name FROM catalogues_sub_categories AS csc
-                        INNER JOIN sub_categories on sub_categories.id = csc.sub_category_id
-                        INNER JOIN categories on categories.id = sub_categories.category_id
-                        #{subquery_condition_string}
-                      ) AS catalogues_sub_categories
-                    )"
-      end
-      condition_string = outer_condition_string.to_s + sub_query.to_s
-      query = "SELECT * FROM catalogues
-              #{condition_string}"
-      BxBlockCatalogue::Catalogue.find_by_sql(query)
-    end
-
     private
 
     def has_tax
@@ -290,13 +234,10 @@ module BxBlockCatalogue
     end
 
     def inventory_low_stock_mailings
-      unless self.new_record?
-        if self.stock_qty.to_i <= 10 && self.stock_qty_changed?
-          AdminUser.all.each do |admin|
-            # CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
-            LowStockJob.perform_later($hostname, admin, self)
-          end
-        end  
+      if self.stock_qty.to_i <= 10
+        AdminUser.all.each do |admin|
+          CatalogueVariantMailer.with(host: $hostname).product_low_stock_notification(self, admin).deliver_now if admin.email.present?
+        end
       end
     end
 
