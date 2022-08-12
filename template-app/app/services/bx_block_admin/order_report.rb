@@ -44,5 +44,90 @@ module BxBlockAdmin
       end
       data
     end
+
+    def get_sales(filters)
+      if [3,6,9,12].include?(filters[:duration].to_i)
+        range = time_range(filters)
+        monthly_order(filters,range)
+      elsif filters[:duration].to_s.downcase == 'lifetime'
+        start_date = BxBlockStoreProfile::BrandSetting.first.created_at.to_date
+        end_date = Date.today
+        range = start_date..end_date
+        monthly_order(filters,range)
+      elsif filters[:duration].to_s.downcase == 'today'
+        range = (0..23).to_a.map{|h| h < 10 ? "0#{h}" : h.to_s}
+        hourly_sales = {}
+        range.map{|hour| hourly_sales[hour.to_s.to_sym] = [0] }
+        orders = @orders.where(order_date: Date.today.beginning_of_day..Date.today.end_of_day)
+        accounts_count = AccountBlock::Account.where(created_at: Date.today.beginning_of_day..Date.today.end_of_day).count
+        orders.each do |order|
+          hour = order.order_date.strftime("%H")
+          hourly_sales[hour.to_sym].present? ? (hourly_sales[hour.to_sym] << order.total ) : (hourly_sales[hour.to_sym] = ([] << order.total))
+        end
+        total_sales = {}
+        hourly_sales.keys.each do |key|
+          total_sales[key] = hourly_sales[key].sum.to_f
+        end
+        response_formatter(filters, total_sales, hourly_sales.keys.map(&:to_s), orders.size, accounts_count)
+      elsif filters[:duration].to_i == 1
+        range = Date.today.beginning_of_month..Date.today.end_of_month
+        daily_sales = {}
+        range.to_a.map{|day| daily_sales[day.strftime("%d").to_s.to_sym] = [0] }
+        orders = @orders.where(order_date: range)
+        accounts_count = AccountBlock::Account.where(created_at: range).count
+        orders.each do |order|
+          day = order.order_date.strftime("%d")
+          daily_sales[day.to_s.to_sym].present? ? (daily_sales[day.to_s.to_sym] << order.total ) : (daily_sales[day.to_s.to_sym] = ([] << order.total))
+        end
+        total_sales = {}
+        daily_sales.keys.each do |key|
+          total_sales[key] = daily_sales[key].sum.to_f
+        end
+        response_formatter(filters, total_sales, daily_sales.keys.map(&:to_s), orders.size, accounts_count)
+      end
+    end
+
+    def time_range(filters)
+      duration = filters[:duration]
+      if [3,6,9,12].include?(filters[:duration].to_i)
+        ((Date.today - (duration.to_i - 1).months))..(Date.today)
+      end
+    end
+
+    def month_year(day)
+      "#{day.strftime("%b")}-#{day.strftime("%y")}"
+    end
+
+    def monthly_order(filters,range)
+      months = []
+      total_sales = {}
+      range.to_a.map{|day| months << month_year(day) if !(months.include?(month_year(day)))}
+      months.map{|month| total_sales[month.to_sym]= 0}
+      orders = @orders.where(order_date: range).group_by{|order| order.order_date.beginning_of_month}
+      accounts_count = AccountBlock::Account.where(created_at: range).count
+      orders_count = 0
+      orders.keys.each do |month|
+        month_orders = orders[month]
+        orders_count = orders_count + month_orders.size
+        month_total = month_orders.map{|order| order.total}.sum.to_f
+        total_sales[month_year(month).to_sym] = month_total
+      end
+      response_formatter(filters, total_sales, months, orders_count, accounts_count)
+    end
+
+    def response_formatter(filters, total_sales, range, orders_count, accounts_count)
+      total_sales_values = total_sales.values.sum.to_f
+      avg_order_value = '%.2f' % (total_sales_values / range.size) rescue 0.0
+      total_sales_values = '%.2f' % total_sales_values
+      {
+        filters: {duration: filters[:duration]}, 
+        totals: total_sales,
+        avg_order_value: avg_order_value,
+        total_sales: total_sales_values,
+        accounts_count: accounts_count,
+        orders_count: orders_count,
+        range: range
+      }
+    end
   end
 end
