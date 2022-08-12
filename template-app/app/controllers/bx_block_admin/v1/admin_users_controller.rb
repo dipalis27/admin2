@@ -39,7 +39,7 @@ module BxBlockAdmin
         if @admin_user.save
           render json: AdminUserSerializer.new(@admin_user).serializable_hash, status: :ok
         else
-          render json: {'errors' => @admin_user.errors.full_messages}, status: :unprocessable_entity
+          render json: {'errors' => @admin_user.errors.full_messages.uniq}, status: :unprocessable_entity
         end
       end
 
