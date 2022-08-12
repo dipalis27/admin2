@@ -46,7 +46,7 @@ module AccountBlock
     # -> { where a
     validates :full_name, presence: true
     validates :email, uniqueness: true, presence: true
-    validates_presence_of :password, on: :create
+    validates_presence_of :password, on: :create, if: -> { self.guest != true }
     # validates :user_name, presence: true, uniqueness: true
     # validates :password_digest, presence: true, uniqueness: true
 
