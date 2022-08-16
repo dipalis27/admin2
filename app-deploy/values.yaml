@@ -24,6 +24,11 @@ appExtConfig:
   SMTP_USERNAME: "WE4CX23WXDSU33WDOAAEWAK6JU"
   SMTP_PORT: "587"
   SMTP_ADDRESS: "smtp.develmail.com"
+  RAZORPAY_ACCOUNT_ID: db4ef223-2d89-466b-af3f-2d1ea8ec47e1
+  RAZORPAY_KEY: rzp_test_partner_HvNtfwKofLatVR
+  RAZORPAY_PARTNER_ACCOUNT_ID: acc_K3zDiv8wUoXEJV
+  RAZORPAY_SECRET: TNmHFEsjx4HicHYPfdp7VEOo
+
 
 image:
   repository:  gitlab.builder.ai:5000/template-app
