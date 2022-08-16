@@ -66,7 +66,7 @@ module BxBlockAdmin
             response = ship_rocket.post_order(@order.id)
             json_response = JSON.parse(response.body)
             if json_response['errors'].present?
-              return render json: { errors: [json_response['errors']]}, status: :unprocessable_entity
+              return render json: { errors: json_response['errors'].values.flatten }, status: :unprocessable_entity
             else
               @order.update_shipment_details(json_response)
               @order.update_tracking(json_response)  if @order.order_items.present?
