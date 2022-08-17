@@ -30,7 +30,12 @@ Rails.application.routes.draw do
       post '/add_banner', to: "brand_settings#add_banner"
       put '/update_banner', to: "brand_settings#update_banner"
       delete '/destroy_banner', to: "brand_settings#destroy_banner"
-      resources :catalogues, only: [:index, :create, :show, :update, :destroy]
+      resources :catalogues, except: [:new, :edit] do
+        collection do
+          get :download_sample_csv
+          post :upload_csv
+        end
+      end
       resources :categories, only: [:index, :create, :show, :destroy] do
         collection do
           get :validate_category
