@@ -283,6 +283,26 @@ module BxBlockCatalogue
       BxBlockCatalogue::Catalogue.find_by_sql(query)
     end
 
+    def self.generate_sample_csv
+      csv_data = []
+      variant_properties = []
+
+      variants = BxBlockCatalogue::Variant.all.pluck(:name)
+      BxBlockCatalogue::Variant.all.each do |variant|
+        variant_properties.push(BxBlockCatalogue::VariantProperty.all.where(variant_id: variant.id).first.name)
+      end
+
+      cols = ["category", "sub_category", "brand", "tags", "name", "sku", "description", "manufacture_date", "length", "breadth", "height", "availability", "stock_qty", "weight", "price", "on_sale", "sale_price", "recommended", "discount", "block_qty", "tax", "variant_price", "variant_stock_qty", "variant_on_sale", "variant_sale_price", "variant_discount_price", "variant_length", "variant_breadth", "variant_height", "variant_block_qty", "variant_tax", "default"]
+      variants.map { |name| cols << 'variant_' + name }.flatten
+      csv_data << cols
+
+      data = ["Category 1","Sub Category 1","Brand 1","Tag 1","Aspire","SKU834","acer description","26/02/21","12","13","14","in_stock","13","10","15000","FALSE","13500","TRUE","500","1","14.0","16000","4","FALSE","15500","","12","13","14","2","12.0","TRUE"]
+      variant_properties.map { |name| data << name }.flatten
+      csv_data << data
+
+      csv_data
+    end
+
     private
 
     def has_tax

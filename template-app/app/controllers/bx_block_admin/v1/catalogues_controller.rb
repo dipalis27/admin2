@@ -46,6 +46,38 @@ module BxBlockAdmin
         end
       end
 
+      def download_sample_csv
+        render json: { csv_data: BxBlockCatalogue::Catalogue.generate_sample_csv }, status: :ok
+      end
+
+      def upload_csv
+        if params[:upload_csv]
+          if params[:upload_csv].content_type.include?("csv")
+            csv_errors = {}
+            count, csv_errors = CsvDb.convert_save("BxBlockCatalogue::Catalogue", params[:upload_csv])
+
+            success_message = "#{count} products uploaded/updated successfully. \n"
+            error_message = nil
+            if csv_errors.present?
+              error_message = "CSV has error(s) on: \n"
+              csv_errors.each do |error|
+                error_message += error[0] + error[1].join(", ")
+              end
+            end
+
+            if count > 0
+              render json: { message: success_message, errors: error_message }, status: :ok
+            else
+              render json: { errors: error_message }, status: :ok
+            end
+          else
+            render json: { errors: "File format not valid!" }, status: :unprocessable_entity
+          end
+        else
+          render json: { errors: "Please select a file" }, status: :unprocessable_entity
+        end
+      end
+
       private
 
         def toggle_params
