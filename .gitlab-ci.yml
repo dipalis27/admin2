@@ -1,6 +1,8 @@
 #CDE Custom area
 variables:
- PROJECT_TYPE: "freemium" 
+ PROJECT_TYPE: "studio_store" 
+ SS_APP_TYPE: "ecommerce" 
+ 
 #End - CDE Custom area
 
 
