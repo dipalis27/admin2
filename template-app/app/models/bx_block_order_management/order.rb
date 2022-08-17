@@ -94,8 +94,12 @@ module BxBlockOrderManagement
     scope :total_sale_amount, -> { where(status: 'placed').map(&:total).compact.sum }
     scope :one_day_sale, -> { where(status: 'placed', placed_at: (Time.now - 24.hours)..Time.now).map(&:total).compact.sum }
     scope :one_day_orders, -> (date) {where(order_date: date.in_time_zone('UTC').beginning_of_day..date.in_time_zone('UTC').end_of_day)}
+    # Search
     scope :search_by_order_number_or_customer_name, -> (term) { joins(:account).where("lower(order_number) like (?) OR lower(accounts.full_name) like (?)", "%#{term.to_s.downcase}%", "%#{term.to_s.downcase}%")}
-    scope :filter_by_date_and_statuses, -> (from, to, statuses) { where(order_date: from.in_time_zone('UTC').beginning_of_day..to.in_time_zone('UTC').end_of_day).where(status: statuses)}
+    # Filter
+    scope :filter_by_date, -> (from, to) { where(order_date: from.in_time_zone('UTC').beginning_of_day..to.in_time_zone('UTC').end_of_day)}
+    scope :filter_by_statuses, -> (statuses) {where(status: statuses)}
+    scope :filter_by_amount, -> (from_amount, to_amount) {where(total: from_amount..to_amount)}
 
     enum deliver_by: %i[fedex]
     before_update :set_status
