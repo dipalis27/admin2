@@ -46,6 +46,20 @@ module BxBlockAdmin
         end
       end
 
+      def bulk_delete
+        begin
+          catalogues = BxBlockCatalogue::Catalogue.find(params[:ids])
+          if catalogues.present?
+            catalogues.map(&:destroy)
+            render json: { message: "Products deleted successfully.", success: true}, status: :ok  
+          else
+            render json: { errors: ["Products not found."] }, status: :not_found  
+          end
+        rescue => exception
+          render json: { errors: ["Products not found."] }, status: :not_found
+        end
+      end
+
       private
 
         def toggle_params
