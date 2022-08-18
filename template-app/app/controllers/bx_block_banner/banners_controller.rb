@@ -34,7 +34,7 @@ module BxBlockBanner
     end
 
     def mobile_banners_list
-      banners = BxBlockBanner::Banner.where.not(web_banner: true)
+      banners = BxBlockBanner::Banner.all
       render json: {
           data: {
               banners: BannerSerializer.new(banners)
