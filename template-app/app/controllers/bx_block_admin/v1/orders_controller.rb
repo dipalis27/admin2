@@ -3,16 +3,27 @@ module BxBlockAdmin
     class OrdersController < ApplicationController
       before_action :set_order, only: [:show, :update, :update_delivery_address]
       def index
+        orders = BxBlockOrderManagement::Order.not_in_cart.order(order_date: :desc)
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        if params[:term].present?
-          orders = BxBlockOrderManagement::Order.not_in_cart.search_by_order_number_or_customer_name(params[:term]).order(order_date: :desc).page(current_page).per(per_page)
-        elsif params[:filter].present?
-          orders = BxBlockOrderManagement::Order.filter_by_date_and_statuses(params[:filter][:from_date], params[:filter][:to_date], params[:filter][:statuses]).order(order_date: :desc).page(current_page).per(per_page)
-        elsif params[:status].present?
-          orders = BxBlockOrderManagement::Order.not_in_cart.where(status: params[:status]).order(order_date: :desc).page(current_page).per(per_page)
-        else
-          orders =  BxBlockOrderManagement::Order.includes(:account, :order_items).not_in_cart.order(order_date: :desc).page(current_page).per(per_page)
+          if params[:term].present?
+            orders = orders.not_in_cart.search_by_order_number_or_customer_name(params[:term]).page(current_page).per(per_page)
+          end
+          if params[:filter].present?
+            if params[:filter][:from_date].present? && params[:filter][:to_date].present?
+              orders = orders.filter_by_date(params[:filter][:from_date], params[:filter][:to_date]).page(current_page).per(per_page)
+            end
+            if params[:filter][:statuses].present?
+              orders = orders.filter_by_statuses(params[:filter][:statuses]).page(current_page).per(per_page)
+            end
+            if params[:filter][:from_amount].present? && params[:filter][:to_amount]
+              orders = orders.filter_by_amount(params[:filter][:from_amount], params[:filter][:to_amount]).page(current_page).per(per_page)
+            end
+
+          elsif params[:status].present?
+            orders = orders.not_in_cart.where(status: params[:status]).order(order_date: :desc).page(current_page).per(per_page)
+          else
+          orders =  orders.includes(:account, :order_items).not_in_cart.order(order_date: :desc).page(current_page).per(per_page)
         end       
         render json: BxBlockAdmin::OrderSerializer.new(orders, pagination_payload(orders, per_page)).serializable_hash, status: :ok
       end

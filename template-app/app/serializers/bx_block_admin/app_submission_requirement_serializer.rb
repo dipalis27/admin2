@@ -1,6 +1,6 @@
 module BxBlockAdmin
   class AppSubmissionRequirementSerializer < BuilderBase::BaseSerializer
-    attributes :app_name, :short_description, :description,
+    attributes :app_name, :short_description, :description, :tags,
       :website, :email, :phone, :first_name, :last_name, :country_name, :state, :city,
       :postal_code, :address,
       :privacy_policy_url, :support_url, :marketing_url, :terms_and_conditions_url,

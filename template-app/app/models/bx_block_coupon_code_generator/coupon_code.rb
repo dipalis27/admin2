@@ -74,7 +74,7 @@ module BxBlockCouponCodeGenerator
 
     def discount_value
       if discount&.negative? || discount&.>(MAX_DISCOUNT_VALUE)
-        errors.add(:discount, 'Discount value is out of bounds')
+        errors.add(:discount, 'value is out of bounds')
       end
     end
 

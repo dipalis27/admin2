@@ -4,13 +4,18 @@ module BxBlockAdmin
       before_action :set_shipping_charge, only: [:show, :update, :destroy]
 
       def index
-        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
-        current_page = params[:page].present? ? params[:page].to_i : 1
-        shipping_charges = BxBlockShippingCharge::ShippingCharge.order(updated_at: :desc).page(current_page).per(per_page)
-        render json: BxBlockAdmin::ShippingChargeSerializer.new(shipping_charges, pagination_data(shipping_charges, per_page)).serializable_hash, status: :ok
+        shipping_charge = BxBlockShippingCharge::ShippingCharge.first
+        if shipping_charge.present?
+          render json: BxBlockAdmin::ShippingChargeSerializer.new(shipping_charge).serializable_hash, status: :ok
+        else
+          render json: {errors: ["Shipping charge not found."]}, status: :unprocessable_entity
+        end
       end
 
       def create
+        shipping_charge = BxBlockShippingCharge::ShippingCharge.first
+        return render json: {errors: ["Shipping charge already exist."]}, status: :unprocessable_entity if shipping_charge.present?
+        
         shipping_charge = BxBlockShippingCharge::ShippingCharge.new(shipping_charge_params)
         if shipping_charge.save
           render json: BxBlockAdmin::ShippingChargeSerializer.new(shipping_charge).serializable_hash, status: :ok
