@@ -4,7 +4,12 @@ module BxBlockAdmin
       before_action :set_order, only: [:show, :update, :update_delivery_address]
       def index
         orders = BxBlockOrderManagement::Order.not_in_cart.order(order_date: :desc)
+        @placed_orders_count = orders.where(status: 'placed').size
+        @deliverd_orders_count = orders.where(status: 'delivered').size
+        @cancelled_orders_count = orders.where(status: 'cancelled').size
+        @refunded_orders_count = orders.where(status: 'refunded').size
         @total_count = orders.size
+
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
           if params[:term].present?
@@ -112,10 +117,6 @@ module BxBlockAdmin
         end
 
         def pagination_payload(orders, per_page)
-          placed_orders = orders.where(status: 'placed')
-          deliverd_orders = orders.where(status: 'delivered')
-          cancelled_orders = orders.where(status: 'cancelled')
-          refunded_orders = orders.where(status: 'refund')
           options = {}
           options[:meta] = {
             pagination: {
@@ -124,10 +125,10 @@ module BxBlockAdmin
               prev_page: orders.prev_page,
               total_pages: orders.total_pages,
               total_count: @total_count,
-              placed_orders_count: placed_orders.size,
-              deliverd_orders_count: deliverd_orders.size,
-              refunded_orders_count: refunded_orders.size,
-              cancelled_orders_count: cancelled_orders.size,
+              placed_orders_count: @placed_orders_count,
+              deliverd_orders_count: @deliverd_orders_count,
+              refunded_orders_count: @refunded_orders_count,
+              cancelled_orders_count: @cancelled_orders_count,
               current_count: orders.count,
               per_page: per_page
             }
