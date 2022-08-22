@@ -4,10 +4,12 @@ module BxBlockAdmin
       before_action :set_api_configuration, only: [:show, :update, :destroy]
       
       def index
-        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
-        current_page = params[:page].present? ? params[:page].to_i : 1
-        api_configurations = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).order(updated_at: :desc).page(current_page).per(per_page)
-        render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configurations, pagination_data(api_configurations, per_page)).serializable_hash, status: :ok
+        if shiprocket_default_credentials_available?
+          render json: shiprocket_variable_response, status: :ok
+        else
+          api_configuration = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).order(updated_at: :desc).first
+          render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configuration).serializable_hash, status: :ok
+        end
       end
 
       def create
@@ -52,6 +54,21 @@ module BxBlockAdmin
 
         def api_configuration_params
           params.permit(:configuration_type, :ship_rocket_user_email, :ship_rocket_user_password, :oauth_site_url, :base_url, :client_id, :client_secret, :logistic_api_key)
+        end
+
+        def shiprocket_default_credentials_available?
+          ENV['SHIPROCKET_USER_EMAIL'].present? && ENV['SHIPROCKET_USER_PASSWORD'].present?
+        end
+
+        def shiprocket_variable_response
+          {data:{
+              attributes:{
+                ship_rocket_user_email: ENV['SHIPROCKET_USER_EMAIL'],
+                ship_rocket_user_password: ENV['SHIPROCKET_USER_PASSWORD'],
+                shiprocket_variables: shiprocket_default_credentials_available?
+              }
+            }
+          }
         end
     end
   end

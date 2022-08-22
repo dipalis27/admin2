@@ -123,7 +123,7 @@ module BxBlockOrderManagement
        "shipping_email"=>@order.account.email,
        "shipping_phone"=>@shipping_address&.phone_number,
        "order_items"=> order_items(@order),
-       "payment_method"=>@order.source,
+       "payment_method"=>(@order.source.to_s.downcase.eql?('cod') ? 'COD' : 'Prepaid'),
        "shipping_charges"=>@order.shipping_total,
        "total_discount"=>@order.applied_discount,
        "sub_total"=>@order.sub_total,
