@@ -4,14 +4,11 @@ module BxBlockAdmin
       before_action :set_customer, only: %i(show update destroy)
 
       def index
-        per_page = params[:per_page].present? ? params[:per_page].to_i : 10
-        current_page = params[:page].present? ? params[:page].to_i : 1
-        customers = AccountBlock::Account.where.not(type: 'guest_account')
-        if params[:search].present?
-          customers = customers.where("LOWER(full_name) LIKE LOWER(:search) OR LOWER(full_phone_number) LIKE LOWER(:search) OR LOWER(email) LIKE LOWER(:search)", search: "%#{params[:search]}%")
-        end
+        per_page = filter_params[:per_page].present? ? filter_params[:per_page].to_i : 10
+        current_page = filter_params[:page].present? ? filter_params[:page].to_i : 1
+        customers = fetch_customers
 
-        customers = customers.page(current_page).per(per_page)
+        customers = customers.order(created_at: :desc).page(current_page).per(per_page)
         render json: CustomerSerializer.new(customers, pagination_data(customers, per_page)).serializable_hash, status: :ok
       end
 
@@ -69,6 +66,10 @@ module BxBlockAdmin
         )
       end
 
+      def filter_params
+        params.permit(:search, :activated, :page, :per_page)
+      end
+
       def image_params
         params.permit(:image)
       end
@@ -78,6 +79,22 @@ module BxBlockAdmin
           @customer = AccountBlock::Account.find(customer_params[:id])
         rescue
           render json: { 'errors': ['Customer not found'] }, status: :not_found
+        end
+      end
+
+      def fetch_customers
+        customers = AccountBlock::Account.where.not(type: 'guest_account')
+        if filter_params[:activated].present?
+          case filter_params[:activated]
+          when 'true'
+            customers = customers.active
+          when 'false'
+            customers = customers.inactive
+          end
+        end
+
+        if filter_params[:search].present?
+          customers = customers.where("LOWER(full_name) LIKE LOWER(:search) OR LOWER(full_phone_number) LIKE LOWER(:search) OR LOWER(email) LIKE LOWER(:search)", search: "%#{params[:search]}%")
         end
       end
     end

@@ -55,6 +55,9 @@ module AccountBlock
     after_create :track_event
     REGEX_PATTERN = /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
 
+    scope :active, -> { where(activated: true) }
+    scope :inactive, -> { where(activated: false) }
+
     # def self.new_guest
     #   new { |u| u.guest = true }
     # end
