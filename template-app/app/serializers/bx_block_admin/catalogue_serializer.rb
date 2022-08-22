@@ -78,7 +78,7 @@ module BxBlockAdmin
             height: catalogue_variant.height,
             block_qty: catalogue_variant.block_qty,
             is_default: catalogue_variant.is_default,
-            catalogue_variant_properties_attributes: catalogue_variant.catalogue_variant_properties.map { |catalogue_variant_property| { variant_id: catalogue_variant_property.variant_id, variant_property_id: catalogue_variant_property.variant_property_id } }, 
+            catalogue_variant_properties_attributes: catalogue_variant.catalogue_variant_properties.map { |catalogue_variant_property| { id: catalogue_variant_property.id, variant_id: catalogue_variant_property.variant_id, variant_property_id: catalogue_variant_property.variant_property_id } }, 
             catalogue_variant_attachments: catalogue_variant.attachments.select{ |attachment| attachment.image.attached? }.map { |attachment| attachment_hash(attachment, $hostname) }
           }
         end

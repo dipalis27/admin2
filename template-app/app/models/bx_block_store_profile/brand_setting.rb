@@ -31,7 +31,7 @@ module BxBlockStoreProfile
 
     # Validations
     validates_presence_of :address_state_id, if: :country_india?
-    validates :heading, :logo, :country, presence: true
+    validates :logo, :country, presence: true
     validates_length_of :heading, maximum: 18
     #validate :validate_phone_number
 

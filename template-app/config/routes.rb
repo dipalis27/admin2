@@ -34,6 +34,7 @@ Rails.application.routes.draw do
         collection do
           get :download_sample_csv
           post :upload_csv
+          post :bulk_delete
         end
       end
       resources :categories, only: [:index, :create, :show, :destroy] do
