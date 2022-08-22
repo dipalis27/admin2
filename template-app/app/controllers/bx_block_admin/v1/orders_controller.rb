@@ -99,7 +99,7 @@ module BxBlockAdmin
         end
 
         def order_params
-          params.permit(:status, :length, :breadth, :height, :weight)
+          params.permit(:status, :length, :breadth, :height, :weight, :package_id)
         end
 
         def delivery_address_params
