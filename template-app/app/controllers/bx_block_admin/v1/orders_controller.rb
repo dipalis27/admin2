@@ -4,6 +4,7 @@ module BxBlockAdmin
       before_action :set_order, only: [:show, :update, :update_delivery_address]
       def index
         orders = BxBlockOrderManagement::Order.not_in_cart.order(order_date: :desc)
+        @total_count = orders.size
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
           if params[:term].present?
@@ -122,7 +123,7 @@ module BxBlockAdmin
               next_page: orders.next_page,
               prev_page: orders.prev_page,
               total_pages: orders.total_pages,
-              total_count: orders.total_count,
+              total_count: @total_count,
               placed_orders_count: placed_orders.size,
               deliverd_orders_count: deliverd_orders.size,
               refunded_orders_count: refunded_orders.size,
