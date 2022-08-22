@@ -92,7 +92,7 @@ module AccountBlock
       self.full_phone_number = phone.sanitized
       self.country_code      = phone.country_code
       self.phone_number      = phone.raw_national
-      errors.add(:full_phone_number, "Invalid Phone Number for UK or India") unless self.country_code == 91 || self.country_code == 44
+      errors.add(:full_phone_number, "Invalid Phone Number for UK or India or USA") unless self.country_code == 91 || self.country_code == 44 || self.country_code == 1
       valid_phone_number
     end
 
