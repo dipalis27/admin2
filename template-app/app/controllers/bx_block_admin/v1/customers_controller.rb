@@ -96,6 +96,7 @@ module BxBlockAdmin
         if filter_params[:search].present?
           customers = customers.where("LOWER(full_name) LIKE LOWER(:search) OR LOWER(full_phone_number) LIKE LOWER(:search) OR LOWER(email) LIKE LOWER(:search)", search: "%#{params[:search]}%")
         end
+        customers
       end
     end
   end
