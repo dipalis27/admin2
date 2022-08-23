@@ -131,14 +131,14 @@ module BxBlockOrderManagement
         if product.class.name == "CatalogueVariant"
           product.catalogue.update(stock_qty: product.catalogue.stock_qty - self.quantity, block_qty: product.catalogue.block_qty.to_i - self.quantity.to_i)
         end
-        self.update_attributes(manage_placed_status: true)
+        self.update(manage_placed_status: true)
       elsif !self.manage_cancelled_status && self.order_status.present? && self.order_status.status == "cancelled"
         # block_qty = product.block_qty.to_i - self.quantity.to_i
-        product.update_attributes(stock_qty: product.stock_qty + self.quantity )
+        product.update(stock_qty: product.stock_qty + self.quantity )
         if product.class.name == "CatalogueVariant"
           product.catalogue.update(stock_qty: product.catalogue.stock_qty + self.quantity)
         end
-        self.update_attributes(manage_cancelled_status: true)
+        self.update(manage_cancelled_status: true)
       end
     end
 

@@ -1,4 +1,5 @@
 class AdminUser < ApplicationRecord
+    include UrlUtilities
     #include SessionInfo
     attr_accessor :skip_password_validation
     # Include default devise modules. Others available are:
@@ -62,7 +63,7 @@ class AdminUser < ApplicationRecord
             when 'brand_name'
                 content = content.gsub!("%{#{key}}", default_email_setting&.brand_name.to_s ) || content
             when 'brand_logo'
-              content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{$hostname + Rails.application.routes.url_helpers.rails_blob_path(default_email_setting.logo, only_path: true)}'/></div>" ) || content
+                content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{url_for(default_email_setting.logo)}'/></div>" ) || content
             when 'recipient_email'
                 content = content.gsub!("%{#{key}}", default_email_setting&.contact_us_email_copy_to.to_s ) || content
             when 'contact_name'

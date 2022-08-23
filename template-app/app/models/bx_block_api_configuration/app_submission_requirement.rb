@@ -192,13 +192,13 @@ module BxBlockApiConfiguration
     def common_feature_banner_url
       return if self.common_feature_banner.blank?
 
-      {id: self.common_feature_banner.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.common_feature_banner, only_path: true)} if $hostname.present?
+      {id: self.common_feature_banner.id, url: url_for(self.common_feature_banner)} if ENV['HOST_URL'].present?
     end
 
     def app_icon_url
       return if self.app_icon.blank?
 
-      {id: self.app_icon.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.app_icon, only_path: true)} if $hostname.present?
+      {id: self.app_icon.id, url: url_for(self.app_icon)} if ENV['HOST_URL'].present?
     end
 
     def upload_json

@@ -47,6 +47,7 @@
 #
 module BxBlockOrderManagement
   class Order < BxBlockOrderManagement::ApplicationRecord
+    include UrlUtilities
     self.table_name = :orders
     attr_accessor :is_cancelled_by_user
 
@@ -94,11 +95,11 @@ module BxBlockOrderManagement
     enum deliver_by: %i[fedex]
     before_update :set_status
     before_create :add_order_number
-    after_update    :process_notification
-    before_save :update_order_status,  if: :order_status_id_changed?
+    around_update :check_order_date
+    after_update :process_notification
+    before_save :update_order_status, :update_ship_rocket_order_status, if: :order_status_id_changed?
     after_save :send_email_to_customer, if: :saved_change_to_order_status_id?
     after_save :update_product_stock, if: :saved_change_to_status?
-    before_save :update_ship_rocket_order_status, if: :order_status_id_changed?
 
     NOTIFICATION_KEYS = {
       PLACED: 'PLACED',
@@ -195,19 +196,30 @@ module BxBlockOrderManagement
     end
 
     def total_after_shipping_charge
-      shipping_charge = ::BxBlockShippingCharge::ShippingCharge.last
-      if shipping_charge.present?
-        applied_shipping_charge = { below: shipping_charge.below.to_f, charge: shipping_charge.charge.to_f }
-        charge = applied_shipping_charge[:charge]
+      address = self.delivery_addresses.delivery_add.first
+      zipcode = BxBlockZipcode::Zipcode.find_by_code(address&.zip_code)
+      applied_shipping_charge = BxBlockShippingCharge::ShippingCharge.last
+      if zipcode.present? && zipcode.activated
+        charge = zipcode.charge
         self.shipping_charge = charge
-        unless self.total <= applied_shipping_charge[:below]
+        unless self.total <= zipcode.price_less_than
           self.shipping_discount = charge
         else
           self.shipping_discount = 0.0
         end
       else
-        self.shipping_charge = 0.0
-        self.shipping_discount = 0.0
+        if applied_shipping_charge.present?
+          default_charge = applied_shipping_charge.charge
+          self.shipping_charge = default_charge
+          unless self.total <= applied_shipping_charge.below
+            self.shipping_discount = default_charge
+          else
+            self.shipping_discount = 0.0
+          end
+        else
+          self.shipping_charge = 0.0
+          self.shipping_discount = 0.0
+        end
       end
       self.shipping_total = self.shipping_charge - self.shipping_discount
       self.shipping_net_amt = self.shipping_charge - self.shipping_discount
@@ -343,7 +355,7 @@ module BxBlockOrderManagement
             order_item.create_subscription_orders
           elsif self.cancelled?
             product.with_lock do
-              product.update_attributes(stock_qty: product.stock_qty + quantity )
+              product.update(stock_qty: product.stock_qty + quantity )
               if product.class.name == "BxBlockCatalogue::CatalogueVariant"
                 product.catalogue.update(stock_qty: product.catalogue.stock_qty + quantity)
               end
@@ -365,7 +377,7 @@ module BxBlockOrderManagement
       if json_response['status'].to_s.downcase == 'new'
         order_status_id = OrderStatus.find_by(status:"confirmed").id
       end
-      self.update_attributes(logistics_ship_rocket_enabled: true, ship_rocket_order_id: json_response['order_id'], ship_rocket_shipment_id: json_response['shipment_id'], ship_rocket_status: json_response['status'].to_s.downcase, ship_rocket_status_code: json_response['status_code'], ship_rocket_onboarding_completed_now: json_response['onboarding_completed_now'], ship_rocket_awb_code: json_response['awb_code'], ship_rocket_courier_company_id: json_response['courier_company_id'], ship_rocket_courier_name: json_response['courier_name'], order_status_id: order_status_id.present? ? order_status_id : self.order_status_id )
+      self.update(logistics_ship_rocket_enabled: true, ship_rocket_order_id: json_response['order_id'], ship_rocket_shipment_id: json_response['shipment_id'], ship_rocket_status: json_response['status'].to_s.downcase, ship_rocket_status_code: json_response['status_code'], ship_rocket_onboarding_completed_now: json_response['onboarding_completed_now'], ship_rocket_awb_code: json_response['awb_code'], ship_rocket_courier_company_id: json_response['courier_company_id'], ship_rocket_courier_name: json_response['courier_name'], order_status_id: order_status_id.present? ? order_status_id : self.order_status_id )
     end
 
     def update_ship_rocket_order_status
@@ -374,7 +386,7 @@ module BxBlockOrderManagement
         ship_rocket.authorize
         ship_rocket.cancel_order(self.id)
         if self.ship_rocket_status == 'new'
-          self.update_attributes(ship_rocket_status: 'cancelled')
+          self.update(ship_rocket_status: 'cancelled')
           if self.order_items.present?
             self.order_items.each do |order_item|
               tracking = BxBlockOrderManagement::Tracking.find_or_create_by(date: DateTime.current, status: "cancelled" )
@@ -414,12 +426,19 @@ module BxBlockOrderManagement
         when 'brand_name'
           content = content.gsub!("%{#{key}}", default_email_setting&.brand_name.to_s ) || content
         when 'brand_logo'
-          content = content.gsub!("%{#{key}}", "<div><img width='20%' src='#{$hostname + Rails.application.routes.url_helpers.rails_blob_path(default_email_setting.logo, only_path: true)}'/></div>" ) || content
+          content = content.gsub!("%{#{key}}", "<div><img width='20%' src='#{url_for(default_email_setting.logo)}'/></div>" ) || content
         when 'recipient_email'
           content = content.gsub!("%{#{key}}", default_email_setting&.contact_us_email_copy_to.to_s ) || content
         end
       end
       content
+    end
+
+    private
+
+    def check_order_date
+      self.order_date = nil if self.status == 'in_cart' || self.status == 'created'
+      yield
     end
   end
 end

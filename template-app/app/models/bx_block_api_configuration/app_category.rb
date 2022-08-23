@@ -1,5 +1,6 @@
 module BxBlockApiConfiguration
   class AppCategory < ApplicationRecord
+    include UrlUtilities
     self.table_name = :app_categories
 
     has_many_attached :app_screen_shots
@@ -15,14 +16,14 @@ module BxBlockApiConfiguration
       return nil unless self.attachments.present?
       urls = []
       self.attachments.each do |attachment|
-        image = {id: attachment.image.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(attachment.image, only_path: true)} if $hostname.present?
+        image = {id: attachment.image.id, url: url_for(attachment.image)} if ENV['HOST_URL'].present?
         urls << image[:url]
       end
       return urls
     end
 
     def feature_graphic_url
-      image = {id: self.feature_graphic.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.feature_graphic, only_path: true)} if $hostname.present? && self.feature_graphic.attached?
+      image = {id: self.feature_graphic.id, url: url_for(self.feature_graphic)} if ENV['HOST_URL'].present? && self.feature_graphic.attached?
     end
   end
 end

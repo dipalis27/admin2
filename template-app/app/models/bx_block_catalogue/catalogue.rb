@@ -86,19 +86,20 @@ module BxBlockCatalogue
     validate :check_sale_price, :validate_manufacture_date
 
     # Callbacks
-    before_save :set_stock_qty, :check_product_quantity, :set_current_availablity, :calculate_tax_amount
+    before_create :track_event
+    before_save :set_stock_qty, :check_product_quantity, :set_current_availablity,
+                :calculate_tax_amount, :update_available_price
+    before_update :update_orders
     after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
     after_save :remove_draft_products_from_cart, if: -> { self.draft? }
-    before_save :update_available_price
-    # before_save :accept_cropped_images_only
-    before_create :track_event
+    after_destroy :destroy_wishlist_items
 
     # Scopes
     scope :latest, -> { order(created_at: :desc) }
     scope :latest_ten, -> { order(created_at: :desc).limit(10) }
     scope :popular, -> { order(sold: :desc) }
     scope :recommended, -> { where(recommended: true) }
-    scope :discounted_items, -> {where(on_sale: true)}
+    scope :discounted_items, -> { where(on_sale: true) }
 
 
     def duplicate_variant
@@ -214,17 +215,15 @@ module BxBlockCatalogue
         tax = self.tax
         return unless tax.present?
         price = self.sale_price.present? ? self.sale_price : self.price
-        # unless self.tax_included?
         tax_value = (price.to_f * 100) / (100 + tax.tax_percentage.to_f)
         tax_charge = price - tax_value
         self.tax_amount = tax_charge.round(2)
         self.price_including_tax = price.to_f.round(2)
-        # else
-        #   actual_price = ((price.to_f * 100) / (tax.tax_percentage.to_f + 100)).to_f.round(2)
-        #   self.tax_amount = (price - actual_price).to_f.round(2)
-        #   self.price_including_tax = price
-        # end
       end
+    end
+
+    def destroy_wishlist_items
+      BxBlockWishlist::WishlistItem.by_catalogue_id(self.id).destroy_all
     end
 
     private
@@ -243,6 +242,11 @@ module BxBlockCatalogue
 
     def remove_draft_products_from_cart
       BxBlockOrderManagement::OrderItem.where(catalogue: self).or(BxBlockOrderManagement::OrderItem.where(catalogue_variant: self.catalogue_variants)).destroy_all
+    end
+
+    def update_orders
+      order_items = BxBlockOrderManagement::OrderItem.where(catalogue_id: self.id)
+      BxBlockOrderManagement::UpdateCartValueOnCatalogueUpdate.new(order_items).call
     end
   end
 end

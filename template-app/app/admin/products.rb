@@ -227,22 +227,22 @@ unless Products::Load.is_loaded_from_gem
         # f.input :hsn_code
         f.input :description, as: :ckeditor
         f.input :manufacture_date, as: :date_time_picker
-        f.input :length
-        f.input :breadth
-        f.input :height
+        f.input :length, label: "Length (Will be used for shipping)"
+        f.input :breadth, label: "Breadth (Will be used for shipping)"
+        f.input :height, label: "Height (Will be used for shipping)"
         f.input :availability
         f.input :stock_qty
         f.input :weight
         f.input :price, input_html: { class: 'product_price' }
         f.input :on_sale, input_html: { class: 'on_sale' }
-        f.input :sale_price, input_html: { class: 'sale_price' }
+        f.input :sale_price, label: "Discounted Price", input_html: { class: 'sale_price' }
         f.input :recommended
         f.input :block_qty
         f.input :sold
         f.input :discount, input_html: { class: 'discount', readonly: true }
         f.input :tax_id, label: 'Tax', as: :select, collection: BxBlockOrderManagement::Tax.all.map { |t| [t.tax_percentage, t.id] }, include_blank: false, :prompt => "Select Tax"
         f.input :tax_amount, input_html: { disabled: true }
-        f.input :price_including_tax, input_html: { disabled: true }
+        # f.input :price_including_tax, input_html: { disabled: true }
         f.input :status
         f.has_many :attachments, as: :attachable, heading: 'Images', allow_destroy: true,
                    new_record: 'Add Image' do |i|

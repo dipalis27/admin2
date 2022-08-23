@@ -39,6 +39,10 @@ STATES_WITH_GST_CODES.each do |state|
 end
 delhi = BxBlockOrderManagement::AddressState.find_by(name: 'DELHI')
 
+# Third party API configurations
+BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "na")
+
 # Dummy data
 unless BxBlockStoreProfile::BrandSetting.any?
   brand_setting = BxBlockStoreProfile::BrandSetting.new(
@@ -142,7 +146,7 @@ if step_2.new_record?
   step_completion = {
     "taxes": {"completion": true, "url": "/admin/taxes"},
     "shipping":{"completion": false, "url": "/admin/shipping_charges"},
-    "third_party_services":{"completion": false, "url": "/admin/api_configurations"}
+    "third_party_services":{"completion": false, "url": "/admin/partner_configurations"}
   }.to_json
   step_2.assign_attributes(title: "Set up your business", description: "Set up your payments and logistics – and then configure your mobile app.", step_completion: step_completion, onboarding: onboarding)
   step_2.image.attach(io: File.open('app/assets/images/step_2.png'), filename: 'step_2.png')

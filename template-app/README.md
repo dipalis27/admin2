@@ -1,6 +1,6 @@
 # **Ruby** | _**freefree**_ | _**238464** | _**studio_store**_
 
-## **Catalog ProjectId: 130481** | **Catalog BuildId: 16363**
+## **Catalog ProjectId: 130481** | **Catalog BuildId: 16451**
 
 ## NOTE FOR DEVELOPERS:
 Clone the code-engine branch into your working branch. The contents of the branch may get overwritten.
@@ -18,12 +18,12 @@ Code-Engine
 | FilterItems      | bx_block_filter_items<br>      | {+app/controllers/bx_block_filter_items+}<br> | {+Non-Empty+} |
 | PhoneLogin      | bx_block_login<br>      | {+app/controllers/bx_block_login+}<br> | {+Non-Empty+} |
 | Payments      | bx_block_payment_razorpay<br>bx_block_stripe_integration<br>      | {+app/controllers/bx_block_payment_razorpay+}<br>{+app/controllers/bx_block_stripe_integration+}<br> | {+Non-Empty+} |
-| Scheduling2      | bx_block_scheduling<br>      | {+app/controllers/bx_block_scheduling+}<br> | {+Non-Empty+} |
 | EmailNotifications      | bx_block_notification_settings<br>bx_block_notification<br>bx_block_email_notifications<br>      | {+app/controllers/bx_block_notification_settings+}<br>{+app/controllers/bx_block_notification+}<br>{+app/controllers/bx_block_email_notifications+}<br> | {+Non-Empty+} |
+| GoogleLogin14      | bx_block_login<br>bx_block_social_media_account<br>account_block<br>      | {+app/controllers/bx_block_login+}<br>{+app/controllers/bx_block_social_media_account+}<br>{+app/controllers/account_block+}<br> | {+Non-Empty+} |
+| Scheduling2      | bx_block_scheduling<br>      | {+app/controllers/bx_block_scheduling+}<br> | {+Non-Empty+} |
 | Share2      | bx_block_share<br>      | {+app/controllers/bx_block_share+}<br> | {+Non-Empty+} |
 | ShippingChargeCalculator      | bx_block_zipcode<br>bx_block_shipping_charge<br>      | {+app/controllers/bx_block_zipcode+}<br>{+app/controllers/bx_block_shipping_charge+}<br> | {+Non-Empty+} |
 | SignuploginModule2      | account_block<br>bx_block_login<br>bx_block_forgot_password<br>builder_json_web_token<br>bx_block_help_center<br>bx_block_settings<br>      | {+app/controllers/account_block+}<br>{+app/controllers/bx_block_login+}<br>{+app/controllers/bx_block_forgot_password+}<br>{++}<br>{+app/controllers/bx_block_help_center+}<br>{+app/controllers/bx_block_settings+}<br> | {+Non-Empty+} |
-| GoogleLogin14      | bx_block_login<br>bx_block_social_media_account<br>account_block<br>      | {+app/controllers/bx_block_login+}<br>{+app/controllers/bx_block_social_media_account+}<br>{+app/controllers/account_block+}<br> | {+Non-Empty+} |
 | PushNotifications      | bx_block_notification_settings<br>bx_block_notification<br>      | {+app/controllers/bx_block_notification_settings+}<br>{+app/controllers/bx_block_notification+}<br> | {+Non-Empty+} |
 | Sms2      | account_block<br>      | {+app/controllers/account_block+}<br> | {+Non-Empty+} |
 | OrderManagement2      | bx_block_order_management<br>      | {+app/controllers/bx_block_order_management+}<br> | {+Non-Empty+} |
