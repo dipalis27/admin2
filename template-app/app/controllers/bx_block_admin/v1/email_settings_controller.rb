@@ -1,7 +1,7 @@
 module BxBlockAdmin
   module V1
     class EmailSettingsController < ApplicationController
-      before_action :set_email_setting, only: %i( edit update show )
+      before_action :set_email_setting, only: %i( edit update show destroy )
 
       def index
         email_setting_tabs = BxBlockSettings::EmailSettingTab.all
@@ -45,6 +45,14 @@ module BxBlockAdmin
       
       def show
         render json: serialized_hash(@email_setting), status: :ok
+      end
+
+      def destroy
+        if @email_setting.destroy
+          render json: { message: "EmailSetting deleted successfully." }, status: :ok
+        else
+          render json: { errors: @email_setting.errors.full_messages }, status: :unprocessable_entity          
+        end
       end
 
       private
