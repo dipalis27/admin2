@@ -38,7 +38,7 @@ module BxBlockAdmin
           sales_tax: '%.2f' % one_day_orders.map(&:total_tax).compact.sum.round(2),
           sales_shipping: '%.2f' % one_day_orders.map(&:shipping_total).compact.sum.round(2),
           sales_discount: '%.2f' % one_day_orders.map(&:applied_discount).compact.sum.round(2),
-          cancelled: '%.2f' % cancelled_orders.compact.sum.round(2)
+          cancelled: '%.2f' % cancelled_orders.map(&:total).compact.sum.round(2)
         }
         data << day_data
       end
