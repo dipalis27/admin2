@@ -34,7 +34,6 @@ Rails.application.routes.draw do
         collection do
           get :download_sample_csv
           post :upload_csv
-          post :bulk_delete
         end
       end
       resources :categories, only: [:index, :create, :show, :destroy] do
@@ -113,6 +112,7 @@ Rails.application.routes.draw do
       end
       resources :qr_codes, except: [:edit, :new]
       resources :packages
+      post :batch_requests, to: 'batch#process_request'
     end
   end
   
