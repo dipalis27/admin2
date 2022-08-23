@@ -8,11 +8,12 @@ module BxBlockAdmin
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
         feedbacks = BxBlockCatalogue::CustomerFeedback.order(updated_at: :desc).page(current_page).per(per_page)
-        if feedbacks.present?
-          render json: CustomerFeedbackSerializer.new(feedbacks, pagination_data(feedbacks, per_page)).serializable_hash, status: :ok
+        if params[:search].present?
+          feedbacks = BxBlockCatalogue::CustomerFeedback.where("customer_name ILIKE (?) or description ILIKE (?)", "%#{params[:search]}%", "%#{params[:search]}%").page(current_page).per(per_page)
         else
-          render json: { message: "No feedbacks found"}, status: 404
+          feedbacks = BxBlockCatalogue::CustomerFeedback.all.order(updated_at: :desc).page(current_page).per(per_page)
         end
+        render json: CustomerFeedbackSerializer.new(feedbacks, pagination_data(feedbacks, per_page)).serializable_hash, status: :ok
       end
 
       def create
