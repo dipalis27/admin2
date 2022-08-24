@@ -41,7 +41,9 @@ module AccountBlock
           @account = EmailAccount.new(jsonapi_deserialize(params))
           @account.activated = true
           if @account.save
-            BxBlockEmailNotifications::UserMailer.with(host: $hostname).welcome_email(@account).deliver_now
+            if BxBlockSettings::EmailSetting.find_by(event_name: "welcome email").try(:active)
+              BxBlockEmailNotifications::UserMailer.with(host: $hostname).welcome_email(@account).deliver_now  
+            end
             render json: EmailAccountSerializer.new(@account, meta: {
               token: encode(@account.id)
             }).serializable_hash, status: :created
@@ -108,7 +110,7 @@ module AccountBlock
         render :json => {:errors => [message: 'The password is already been used, please try again with another password']},
                :status => :unprocessable_entity
       else
-        if account.update(password_update_params)
+        if account.update_attributes(password_update_params)
           # BxBlockEmailNotifications::UserMailer.with(host: $hostname).password_changed(account).deliver_now
           render json: AccountSerializer.new(account, meta: {
             message: 'Your password has been changed successfully.'
@@ -133,7 +135,7 @@ module AccountBlock
         render :json => {:errors => [message: 'The password is already been used, please try again with another password']},
                :status => :unprocessable_entity
       else
-        if account.update(password_update_params)
+        if account.update_attributes(password_update_params)
           # BxBlockEmailNotifications::UserMailer.with(host: $hostname).password_changed(account).deliver_now
           render json: AccountSerializer.new(account, meta: {
             message: 'Your password has been changed successfully.'
@@ -153,7 +155,7 @@ module AccountBlock
           {email: 'Account not found'},
         ]}, status: :unprocessable_entity
       end
-      if @account.update(account_update_param)
+      if @account.update_attributes(account_update_param)
         render json: AccountSerializer.new(@account, meta: {
           message: 'Your account has been updated successfully.'
         }).serializable_hash, status: :ok
@@ -225,8 +227,8 @@ module AccountBlock
       result
     end
 
-    def encode(id, data = {}, expiration = nil)
-      BuilderJsonWebToken.encode(id, data, expiration)
+    def encode(id)
+      BuilderJsonWebToken.encode id
     end
   end
 end

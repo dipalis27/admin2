@@ -34,7 +34,7 @@ module BxBlockFilterItems
 
       @catalogues = @catalogues.page(page_no).per(per_page)
 
-      data = BxBlockCatalogue::CatalogueSerializer.new(@catalogues, serialization_options(params[:template])).serializable_hash
+      data = BxBlockCatalogue::CatalogueSerializer.new(@catalogues, serialization_options).serializable_hash
       data[:meta] = { pagination: {
         current_page: @catalogues.current_page,
         next_page: @catalogues.next_page,
@@ -49,29 +49,8 @@ module BxBlockFilterItems
 
     private
 
-    def serialization_options(template = nil)
-      request_hash = {
-        params: {
-          host: request.protocol + request.host_with_port, user: @current_user,
-          ignore_similar_nesting: true, ignore_available_slots: true,
-          ignore_available_subscription: true, ignore_catalogue_subscriptions: true,
-          ignore_is_notify_product: true, ignore_is_subscription_available: true,
-          ignore_preferred_delivery_slot: true, ignore_product_attributes: true,
-          ignore_reviews: true, ignore_subscription_days_count: true,
-          ignore_subscription_package: true, ignore_subscription_period: true,
-          ignore_subscription_quantity: true, ignore_product_notified: true,
-          ignore_average_rating: true
-        }
-      }
-
-      if template.to_s.downcase == 'mobile'
-        request_hash[:params].merge!({
-                                       ignore_average_rating: false, ignore_cart_items: true, ignore_cart_quantity: true,
-                                       ignore_reviews: false
-                                     })
-      end
-
-      request_hash
+    def serialization_options
+      { params: { host: request.protocol + request.host_with_port, user: @current_user, ignore_similar_nesting: true } }
     end
 
     def save_recent_search

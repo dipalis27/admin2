@@ -48,7 +48,7 @@ module BxBlockRoleAndPermission
     def update_super_admin
       admin_user = AdminUser.find_by(id: params[:id])
       if admin_user.present?
-        if admin_user.update(update_super_admin_params)
+        if admin_user.update_attributes(update_super_admin_params)
           admin_user.update(login_token: generate_token)
           render json: {
               message: "Super admin updated.",

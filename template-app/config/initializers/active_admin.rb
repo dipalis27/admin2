@@ -601,7 +601,7 @@ ActiveAdmin.setup do |config|
           sb.add :label => 'Taxes', priority: 1, :url => routes.admin_taxes_path, html_options: { class: 'nested_menu taxes-nav' }
           sb.add :label => 'Zipcodes', priority: 2, :url => routes.admin_zipcodes_path, html_options: { class: 'nested_menu' }
           sb.add :label => 'Shipping charges', priority: 3, :url => routes.admin_shipping_charges_path, html_options: { class: 'nested_menu shipping_charges-nav' }
-          sb.add :label => 'Partner Configurations', priority: 4, :url => routes.admin_partner_configurations_path, html_options: { class: 'nested_menu partner_configurations-nav' }
+          sb.add :label => '3rd Party Configurations', priority: 4, :url => routes.admin_api_configurations_path, html_options: { class: 'nested_menu api_configurations-nav' }
           sb.add :label => 'App Requirement', priority: 5, :url => routes.admin_app_requirements_path, html_options: { class: 'nested_menu' }
           sb.add :label => "App Submission Requirement", priority: 6, :url => routes.admin_app_submission_requirements_path, html_options: { class: 'nested_menu' }
           sb.add :label => 'Generate App Store QR', priority: 7, :url => routes.admin_qr_codes_path, html_options: { class: 'nested_menu' }

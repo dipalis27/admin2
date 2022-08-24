@@ -21,7 +21,7 @@ module BxBlockOrderManagement
       orders = orders.page(page_no).per(per_page)
       render json: {
         data: {
-          order: OrderSerializer.new(orders, { params: { host: request.protocol + request.host_with_port, current_user: @current_user, current_account: @current_account , order: true }}),
+          order: OrderSerializer.new(orders, { params: { host: request.protocol + request.host_with_port, current_user: @current_user, current_account: @current_account , my_orders: true, order: true }}),
           meta: {
             pagination: {
               current_page: orders.current_page,
@@ -71,7 +71,7 @@ module BxBlockOrderManagement
           order.order_items.where(id:params[:item_id]).map{ |a| a.update(order_status_id: order_status_id, cancelled_at: Time.current) }
           order.update(order_status_id: order_status_id, status: 'cancelled', cancelled_at: Time.current) if order.full_order_cancelled?
         else
-          order.update!(order_status_id: order_status_id, status: "cancelled", cancellation_reason: params[:cancellation_reason])
+          order.update_attributes!(order_status_id: order_status_id, status: "cancelled", cancellation_reason: params[:cancellation_reason])
         end
         render json: { data: { message: 'Order cancelled successfully' } },
                status: :ok
@@ -119,6 +119,7 @@ module BxBlockOrderManagement
       @coupon =  BxBlockCouponCodeGenerator::CouponCode.find_by(code: params[:code])
       render(json: { message: "Invalid coupon" }, status: 400) && return if @coupon.nil?
       render(json: { message: "Can't find order" }, status: 400) && return if @order.nil?
+      return render json: { message: "Coupon limit reached!" }, status: :unprocessable_entity if coupon_code_limit_reached?
       @response = ApplyCoupon.new(@order, @coupon, params).call
       if @response.success?
         render json: {
@@ -137,7 +138,7 @@ module BxBlockOrderManagement
       render(json: { message: "Can't find order" }, status: 400) && return if @order.nil?
 
       applied_discount = @order.applied_discount
-      if @order.update!(coupon_code_id: nil, applied_discount: 0, total: (@order.total + applied_discount), sub_total: (@order.sub_total + applied_discount))
+      if @order.update_attributes!(coupon_code_id: nil, applied_discount: 0, total: (@order.total + applied_discount), sub_total: (@order.sub_total + applied_discount))
         #update_cart_total(@order)
         @order.order_items.each do |order_item|
           if order_item.catalogue_variant_id.present?
@@ -205,6 +206,11 @@ module BxBlockOrderManagement
 
     def serializable_options
       { params: { host: request.protocol + request.host_with_port } }
+    end
+
+    def coupon_code_limit_reached?
+      count = @current_user.orders.not_in_cart.joins(:coupon_code).where('coupon_codes.code = ?', @coupon.code).count
+      count >= @coupon.limit rescue false
     end
   end
 end

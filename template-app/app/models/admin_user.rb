@@ -1,5 +1,4 @@
 class AdminUser < ApplicationRecord
-    include UrlUtilities
     #include SessionInfo
     attr_accessor :skip_password_validation
     # Include default devise modules. Others available are:
@@ -76,6 +75,7 @@ class AdminUser < ApplicationRecord
     ## Callbacks
     #################
     #after_update :send_account_activated_email, if: :saved_change_to_activated?
+    before_validation :remove_empty_permissions
     before_create :create_admin_profile
 
     # def active_for_authentication?
@@ -99,7 +99,6 @@ class AdminUser < ApplicationRecord
     end
 
     def change_email_keywords(content, customer: nil, product: nil, variant: nil)
-
         default_email_setting = BxBlockSettings::DefaultEmailSetting.first
         contact_us =  BxBlockContactUs::Contact.where(account_id: customer&.id).last
         BxBlockSettings::EmailSetting::EMAIL_KEYWORDS.each do |key|
@@ -111,7 +110,9 @@ class AdminUser < ApplicationRecord
             when 'brand_name'
                 content = content.gsub!("%{#{key}}", default_email_setting&.brand_name.to_s ) || content
             when 'brand_logo'
-                content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{url_for(default_email_setting.logo)}'/></div>" ) || content
+                if default_email_setting
+                    content = content.gsub!("%{#{key}}", "<div><img height='150px' src='#{$hostname + Rails.application.routes.url_helpers.rails_blob_path(default_email_setting&.logo, only_path: true)}'/></div>" ) || content
+                end
             when 'recipient_email'
                 content = content.gsub!("%{#{key}}", default_email_setting&.contact_us_email_copy_to.to_s ) || content
             when 'contact_name'
@@ -137,6 +138,25 @@ class AdminUser < ApplicationRecord
     def create_admin_profile
         self.admin_profile = BxBlockRoleAndPermission::AdminProfile.create(name: self&.name, phone: self&.phone_number, email: self&.email) if self.admin_profile.nil?
         self.admin_profile
+    end
+
+    def valid_otp?(otp)
+        (self.otp_code == otp && Time.current <= self.otp_valid_until) rescue false
+    end
+
+    def admin_permissions
+        return ['all'] if super_admin?
+        permissions.map{|p| PERMISSION_CONVERSIONS[p]}
+    end
+
+    def validate_permissions
+        if permissions.any?{|p| !(PERMISSIONS).include?(p)}
+            errors.add(:permissions, "are invalid")
+        end
+    end
+
+    def remove_empty_permissions
+        permissions.reject!(&:empty?)
     end
 
     protected

@@ -25,7 +25,7 @@ module BxBlockOrderManagement
         discount_price = (cart_value - discount)&.round(2)
         shipping_charges = order.shipping_total.to_f
         tax_charges = order.total_tax.to_f
-        order.update!(coupon_code_id: coupon_code.id, sub_total: discount_price, total: (discount_price + shipping_charges), applied_discount: discount)
+        order.update_attributes!(coupon_code_id: coupon_code.id, sub_total: discount_price, total: (discount_price + shipping_charges), applied_discount: discount)
         order.order_items.each do |order_item|
           if order_item.catalogue_variant_id.present?
             price = order_item.catalogue_variant.sale_price.present? ? order_item.catalogue_variant.sale_price : order_item.catalogue_variant.price

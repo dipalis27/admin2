@@ -55,5 +55,6 @@ module BxBlockCart
     def order_item_params
       params.permit(:quantity, :subscription_quantity, :catalogue_id, :catalogue_variant_id, :subscription_period, :subscription_package, :preferred_delivery_slot, :subscription_discount)
     end
+
   end
 end

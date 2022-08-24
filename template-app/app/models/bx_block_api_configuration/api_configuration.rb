@@ -9,7 +9,7 @@ module BxBlockApiConfiguration
     validates :application_id, :application_token, presence: true, if: -> {configuration_type == 'bulkgate_sms'}
     validates :oauth_site_url, :base_url, :client_id, :client_secret, :logistic_api_key, presence: true, if: -> {configuration_type == '525k'}
     validates :configuration_type, uniqueness: true
-
+    validates :configuration_type, presence: true
     after_create :track_event
     after_commit :update_onboarding_step
 
