@@ -40,6 +40,7 @@ Rails.application.routes.draw do
         collection do
           get :validate_category
           get :validate_sub_category
+          post :upload_csv
         end
       end
       resources :help_centers, only: [:create, :update, :show, :index, :destroy]
