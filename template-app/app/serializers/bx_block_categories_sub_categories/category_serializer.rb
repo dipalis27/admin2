@@ -15,7 +15,7 @@ module BxBlockCategoriesSubCategories
       if object.image.attached?
           {
             id: object.image.id,
-            url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(object.image, only_path: true)
+            url: url_for(object.image)
           }
       else
         # Todo

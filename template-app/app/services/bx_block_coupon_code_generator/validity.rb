@@ -8,9 +8,11 @@ module BxBlockCouponCodeGenerator
       @order        =   BxBlockOrderManagement::Order.find(params[:cart_id])
       @cart_value   =   params[:cart_value].to_f
       @user         =   user
+      @is_release   =   params[:is_release]
     end
 
     def check_cart_total
+      return if @is_release
       if coupon_code.min_cart_value && cart_value < coupon_code.min_cart_value
         respond_error('min')
       elsif coupon_code.max_cart_value && cart_value > coupon_code.max_cart_value
@@ -25,7 +27,7 @@ module BxBlockCouponCodeGenerator
       discount_price = (cart_value - discount)&.round(2)
       shipping_charges = order.shipping_total.to_f
       tax_charges = order.total_tax.to_f
-      order.update_attributes!(coupon_code_id: coupon_code.id, total: (discount_price + shipping_charges + tax_charges), applied_discount: discount)
+      order.update!(coupon_code_id: coupon_code.id, total: (discount_price + shipping_charges + tax_charges), applied_discount: discount)
       return OpenStruct.new(success?: true, data: { coupon: coupon_code, actual_price: cart_value, discount_type: coupon_code.discount_type, cart_discount: coupon_code.discount, discount_price: discount, after_discount_price: discount_price }, msg: 'Coupon applied successfully', code: 200)
     end
 
@@ -56,10 +58,10 @@ module BxBlockCouponCodeGenerator
     end
 
     def remove_coupon
-      order.update_attributes!(coupon_code_id: nil, applied_discount: 0)
+      order.update!(coupon_code_id: nil, applied_discount: 0)
       shipping_charges = order.shipping_total.to_f
       tax_charges = order.total_tax.to_f
-      order.update_attributes!(total: (cart_value + shipping_charges + tax_charges), sub_total: order.total_price)
+      order.update!(total: (cart_value + shipping_charges + tax_charges), sub_total: order.total_price)
     end
 
   end

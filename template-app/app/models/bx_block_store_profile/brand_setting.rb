@@ -2,6 +2,7 @@ module BxBlockStoreProfile
   class BrandSetting < BxBlockStoreProfile::ApplicationRecord
     self.table_name = :brand_settings
     include BxBlockStoreProfile::Country
+    include UrlUtilities
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
 
     COLOR_PALET = [
@@ -27,13 +28,13 @@ module BxBlockStoreProfile
     # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
-    after_commit :update_defaul_email_settings
+    after_commit :update_default_email_settings
 
     # Validations
-    validates_presence_of :address_state_id, if: :country_india?
     validates :logo, :country, presence: true
-    validates_length_of :heading, maximum: 18
+    validates_length_of :heading, maximum: 50
     #validate :validate_phone_number
+    validate :validate_whatsapp_number
 
     # Enum Values
     enum country: self::COUNTRIES
@@ -44,7 +45,6 @@ module BxBlockStoreProfile
     def cropped_image=(val)
       @cropped_image = val
       return if val.blank?
-
       image_path, image_extension = store_base64_image(val)
       self.logo.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
@@ -105,14 +105,12 @@ module BxBlockStoreProfile
 
     def logo_url
       return if self.logo.blank?
-
-      {id: self.logo.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true)} if $hostname.present?
+      {id: self.logo.id, url: url_for(logo)} if ENV['HOST_URL'].present?
     end
 
     def promotion_banner_url
       return if self.promotion_banner.blank?
-
-      {id: self.promotion_banner.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.promotion_banner, only_path: true)} if $hostname.present?
+      {id: self.promotion_banner.id, url: url_for(promotion_banner)} if ENV['HOST_URL'].present?
     end
 
     def simple_response_hash
@@ -149,7 +147,8 @@ module BxBlockStoreProfile
           isFacebookLogin: self.is_facebook_login,
           isGoogleLogin: self.is_google_login,
           isAppleLogin: self.is_apple_login,
-          razorpay: {api_key: @razorpay_configuration&.api_key, secret_key: @razorpay_configuration&.api_secret_key },
+          razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
+                     account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']},
           stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key },
           logo: self.logo_url.present? ? self.logo_url[:url] : '' ,
           firebase:{
@@ -166,6 +165,22 @@ module BxBlockStoreProfile
 
     def nested_response_hash
       get_configurations
+
+      if self.whatsapp_number.present?
+        whatsapp_number = if self.country == "india"
+                            "91" + self.whatsapp_number
+                          else
+                            "44" + self.whatsapp_number
+                          end
+      end
+      whatsapp_url = if self.whatsapp_number.present? && self.whatsapp_message.present?
+                       message = self.whatsapp_message.gsub(' ', '%20')
+                       "https://wa.me/#{whatsapp_number}?text=#{message}"
+                     elsif self.whatsapp_number.present?
+                       "https://wa.me/#{whatsapp_number}"
+                     else
+                       ""
+                     end
       response = {
           buttonsColor: {
               regularButtonColor: self.common_button_color,
@@ -194,7 +209,8 @@ module BxBlockStoreProfile
           commonLogoSrc: self.logo_url.present? ? self.logo_url[:url] : '' ,
           productFilterSliderColor: self.sidebar_bg_color,
           PaymentKeys: {
-              razorpay: {api_key: @razorpay_configuration&.api_key, secret_key: @razorpay_configuration&.api_secret_key },
+            razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
+                       account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID'] },
               stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key }
           },
           NotificationKeys: {
@@ -214,6 +230,9 @@ module BxBlockStoreProfile
           TemplateSelections: {
             template_selection: self.template_selection,
             color_palet: self.get_color_palet
+          },
+          WhatsappIntegration: {
+            whatsapp_url: whatsapp_url
           }
       }
       return response
@@ -238,7 +257,7 @@ module BxBlockStoreProfile
       self.country == 'india' ? true : false
     end
 
-    def update_defaul_email_settings
+    def update_default_email_settings
       defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
       defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
       hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
@@ -276,6 +295,15 @@ module BxBlockStoreProfile
         errors.add(:phone_number, 'must be a 10 digit phone number') unless phone_number =~ /\A\d{10}\z/
       elsif country == 'uk'
         errors.add(:phone_number, 'must be a 11 digit phone number') unless phone_number =~ /\A\d{11}\z/
+      end
+    end
+
+    def validate_whatsapp_number
+      return if whatsapp_number.blank?
+      if country == 'india'
+        errors.add(:whatsapp_number, 'must be a 10 digit phone number') unless whatsapp_number =~ /\A\d{10}\z/
+      elsif country == 'uk'
+        errors.add(:whatsapp_number, 'must be a 11 digit phone number') unless whatsapp_number =~ /\A\d{11}\z/
       end
     end
   end

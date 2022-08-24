@@ -652,3 +652,75 @@ body.index .table_actions .member_link {
 .special-radio-button-image {
   margin: -1px 6px!important;
 }
+#index_table_products tbody tr td.col-actions div.table_actions a.member_link {
+  pointer-events: all;
+}
+
+#index_table_products thead tr th.col-active  {
+  text-align: center;
+}
+/* Encryption of api_secret_key */
+.pass{
+  -webkit-text-security: disc;
+  display: inline-block;
+  margin-right: 8px;
+}
+/* API Configuration status CSS */
+.status{
+  display: block;
+  align-items: center;
+  width: fit-content;
+  justify-content: center;
+  border: 1px solid;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 24px;
+  color: white;
+  padding: 0px 6px;
+  border-radius: 2px;
+}
+#clarification{
+  background:#fbac2e ;
+}
+#requested{
+  background:#546cfb;
+}
+#review{
+  background:#36b8d5;
+}
+#activated{
+  background: #4bc0a5;
+}
+#suspended{
+  background: #f25581
+}
+#no-response{
+  background: #f34836;
+}
+#pending{
+  background:#e479fb
+}
+#index_table_api_configurations tbody tr td {
+  padding: 8px 0!important;
+}
+#index_table_api_configurations tbody tr td.col-selectable {
+  padding: 8px!important;
+}
+#index_table_api_configurations tbody tr td.col-actions {
+  text-align: end;
+}
+.wa-msg-field{
+  width: 545px;
+  height: 80px;
+}
+
+#custom-tooltip {
+  display: none;
+  margin: 20px;
+  padding: 5px 12px;
+  background-color: #000000df;
+  border-radius: 4px;
+  color: #fff;
+  transition: all 1s ease-out;
+  position: absolute;
+}

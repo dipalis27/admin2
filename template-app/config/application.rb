@@ -46,5 +46,6 @@ module App
     config.session_options
     config.middleware.use Rack::MethodOverride
     config.exceptions_app = ->(env) { ExceptionController.action(:show).call(env) }
+    config.to_prepare do ActionMailer::Base.helper "application" end
   end
 end

@@ -1,6 +1,4 @@
-ENV['COUNTRY_OF_STORE'] = 'India'
-ENV['EMAIL'] = 'neetu.mogha@builder.ai'
-ENV['NAMESPACE'] = 'freefree-238464'
+ENV['NAMESPACE'] = 'adminpanelruby-726266'
 ENV['DL_APP_NAME'] = 'ecommerceapp'
 ENV['RUBY_ANALYTICS_TOKEN'] = 'ADvoiejfyI6IHGJbitMe9MGLbkPRxj6n'
-ENV['HOST_URL'] = 'freefree-238464-ruby.b238464.dev.centralindia.az.svc.builder.ai/'
+ENV['HOST_URL'] = 'adminpanelruby-726266-ruby.b726266.dev.eastus.az.svc.builder.cafe/'

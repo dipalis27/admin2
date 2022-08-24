@@ -49,7 +49,7 @@ module BxBlockOrderManagement
         shipment_service = BxBlockFedexIntegration::ShipmentService.new
         result = shipment_service.create(shipment_params)
         if result['status'] == "PROPOSED"
-          order.update_attributes!(shipment_id: result['id'], tracking_url: result['trackingURL'], tracking_number: result['waybill'])
+          order.update!(shipment_id: result['id'], tracking_url: result['trackingURL'], tracking_number: result['waybill'])
           order.confirm_order!
           update_order_item_status
           OpenStruct.new(success?: true, msg: I18n.t('messages.deliveries.success', deliver_by: "FedEx"), code: 200)
@@ -90,7 +90,7 @@ module BxBlockOrderManagement
     def update_product_attributes
       order.order_items.each do |oi|
         product = oi.catalogue
-        product.update_attributes(sold: (product.sold + oi.quantity))
+        product.update(sold: (product.sold + oi.quantity))
         status = oi.order.status
         oi.update("#{status}_at".to_sym => oi.order.send("#{status}_at"), :status => status)
       end

@@ -145,4 +145,5 @@ Rails.application.routes.draw do
     resources :quizzes
     post 'duplicate_quiz', to: 'quizzes#duplicate_quiz'
   end
+  put '/catalogues/toggle_status', to: 'bx_block_admin/catalogues#toggle_status'
 end

@@ -20,6 +20,7 @@ module BxBlockCatalogue
   class CatalogueVariantSerializer < BuilderBase::BaseSerializer
     attributes :id, :catalogue_id, :price, :stock_qty, :on_sale, :sale_price, :discount_price,
                :length, :breadth, :height, :is_default, :created_at, :updated_at,:tax_amount,:price_including_tax
+
     attribute :catalogue_variant_properties do |object|
       if object.catalogue_variant_properties.present?
         BxBlockCatalogue::CatalogueVariantPropertySerializer.new(object.catalogue_variant_properties).serializable_hash[:data]
@@ -35,7 +36,7 @@ module BxBlockCatalogue
     end
 
     attribute :actual_price_including_tax do |object|
-      object&.price.present? && object.tax.present? ? (object.price.to_f + ((object.price.to_f * object.tax.tax_percentage.to_f)/100).to_f).round : 0
+      object.price
     end
 
     attribute :cart_quantity do |object, params|

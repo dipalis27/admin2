@@ -71,7 +71,7 @@ module BxBlockOrderManagement
           order.order_items.where(id:params[:item_id]).map{ |a| a.update(order_status_id: order_status_id, cancelled_at: Time.current) }
           order.update(order_status_id: order_status_id, status: 'cancelled', cancelled_at: Time.current) if order.full_order_cancelled?
         else
-          order.update_attributes!(order_status_id: order_status_id, status: "cancelled", cancellation_reason: params[:cancellation_reason])
+          order.update!(order_status_id: order_status_id, status: "cancelled", cancellation_reason: params[:cancellation_reason])
         end
         render json: { data: { message: 'Order cancelled successfully' } },
                status: :ok
@@ -138,7 +138,7 @@ module BxBlockOrderManagement
       render(json: { message: "Can't find order" }, status: 400) && return if @order.nil?
 
       applied_discount = @order.applied_discount
-      if @order.update_attributes!(coupon_code_id: nil, applied_discount: 0, total: (@order.total + applied_discount), sub_total: (@order.sub_total + applied_discount))
+      if @order.update!(coupon_code_id: nil, applied_discount: 0, total: (@order.total + applied_discount), sub_total: (@order.sub_total + applied_discount))
         #update_cart_total(@order)
         @order.order_items.each do |order_item|
           if order_item.catalogue_variant_id.present?

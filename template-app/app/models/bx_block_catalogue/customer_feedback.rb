@@ -3,7 +3,6 @@ module BxBlockCatalogue
     self.table_name = :customer_feedbacks
 
     VALID_IMAGE_FORMATS = %w(png jpg jpeg)
-
     belongs_to :catalogue, optional: true
     default_scope {order('position ASC')}
 
@@ -11,9 +10,6 @@ module BxBlockCatalogue
     validates_uniqueness_of :position
 
     has_one_attached :image
-
-    # validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg']
-
     after_create :track_event
 
     def track_event

@@ -42,7 +42,6 @@ module BxBlockCategoriesSubCategories
     def cropped_image=(val)
       @cropped_image = val
       return if val.blank?
-
       image_path, image_extension = store_base64_image(val)
       self.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
