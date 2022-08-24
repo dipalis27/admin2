@@ -40,7 +40,7 @@ class AdminUser < ApplicationRecord
 
     })
     PERMISSION_CONVERSIONS = HashWithIndifferentAccess.new({
-        'BxBlockCatalogue::Catalogue': 'catalogue',
+        'BxBlockCatalogue::Catalogue': 'product',
         'BxBlockCategoriesSubCategories::Category': 'category',
         'BxBlockOrderManagement::Order': 'order',
         'BxBlockCatalogue::Brand': 'brand',
