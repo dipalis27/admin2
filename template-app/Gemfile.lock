@@ -1,16 +1,8 @@
-GIT
-  remote: https://github.com/faker-ruby/faker.git
-  revision: 2333f9ee4a4e1d8329e19f9e4b07e927648add7c
-  branch: master
-  specs:
-    faker (2.21.0)
-      i18n (>= 1.8.11, < 2)
-
 GEM
   remote: https://rubygems.org/
   remote: https://gem.fury.io/engineerai/
   specs:
-    aasm (5.2.0)
+    aasm (5.3.0)
       concurrent-ruby (~> 1.0)
     ace-rails-ap (4.4)
     actioncable (6.0.3.6)
@@ -56,8 +48,6 @@ GEM
       cancancan (>= 1.15.0)
       railties (>= 5.0.0)
     active_material (1.5.2)
-    active_storage_base64 (1.1.0)
-      rails (~> 6.0)
     active_storage_validations (0.9.8)
       activejob (>= 5.2.0)
       activemodel (>= 5.2.0)
@@ -107,8 +97,8 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2, >= 2.2.2)
-    addressable (2.8.0)
-      public_suffix (>= 2.0.2, < 5.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     aes_key_wrap (1.1.0)
     analytics-ruby (2.4.0)
     anyway_config (2.3.0)
@@ -121,20 +111,20 @@ GEM
       font-awesome-sass (~> 5.0)
       jquery-rails
     aws-eventstream (1.2.0)
-    aws-partitions (1.603.0)
-    aws-sdk-core (3.131.2)
+    aws-partitions (1.621.0)
+    aws-sdk-core (3.134.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.525.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.57.0)
+    aws-sdk-kms (1.58.0)
       aws-sdk-core (~> 3, >= 3.127.0)
       aws-sigv4 (~> 1.1)
     aws-sdk-s3 (1.114.0)
       aws-sdk-core (~> 3, >= 3.127.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.4)
-    aws-sigv4 (1.5.0)
+    aws-sigv4 (1.5.1)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.18)
     bindata (2.4.10)
@@ -143,13 +133,11 @@ GEM
       fast_jsonapi
       jsonapi.rb
       rails (= 6.0.3.6)
-    bx_block_cors (0.0.1)
+    bx_block_cors (0.0.2)
       builder_base
     byebug (11.1.3)
     cancancan (3.4.0)
     chunky_png (1.4.0)
-    city-state (0.1.0)
-      rubyzip (>= 1.1)
     ckeditor (4.2.4)
       cocaine
       orm_adapter (~> 0.5.0)
@@ -162,34 +150,22 @@ GEM
       i18n_data (~> 0.16.0)
       sixarm_ruby_unaccent (~> 1.1)
     crass (1.0.6)
-    database_cleaner (2.0.1)
-      database_cleaner-active_record (~> 2.0.0)
-    database_cleaner-active_record (2.0.1)
-      activerecord (>= 5.a)
-      database_cleaner-core (~> 2.0.0)
-    database_cleaner-core (2.0.1)
     devise (4.8.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    diff-lcs (1.5.0)
-    dotenv (2.7.6)
-    dotenv-rails (2.7.6)
-      dotenv (= 2.7.6)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
       railties (>= 3.2)
     dry-initializer (3.0.4)
-    erubi (1.10.0)
-    factory_bot (6.2.1)
-      activesupport (>= 5.0.0)
-    factory_bot_rails (6.2.0)
-      factory_bot (~> 6.2.0)
-      railties (>= 5.0.0)
-    faraday (2.3.0)
-      faraday-net_http (~> 2.0)
+    erubi (1.11.0)
+    faraday (2.5.2)
+      faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
-    faraday-net_http (2.0.3)
+    faraday-net_http (3.0.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     fcm (1.0.8)
@@ -224,7 +200,7 @@ GEM
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     humanize (2.5.1)
-    i18n (1.10.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     i18n_data (0.16.0)
       simple_po_parser (~> 1.1)
@@ -242,10 +218,11 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.6.2)
-    json-jwt (1.13.0)
+    json-jwt (1.15.3)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
+      httpclient
     jsonapi-serializer (2.2.0)
       activesupport (>= 4.2)
     jsonapi.rb (2.0.0)
@@ -277,15 +254,13 @@ GEM
     mime-types-data (3.2022.0105)
     mini_magick (4.11.0)
     mini_mime (1.1.2)
-    minitest (5.16.2)
+    minitest (5.16.3)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     nio4r (2.5.8)
-    nokogiri (1.13.6-x86_64-darwin)
+    nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
-    nokogiri (1.13.6-x86_64-linux)
-      racc (~> 1.4)
-    oauth2 (2.0.5)
+    oauth2 (2.0.7)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
       multi_xml (~> 0.5)
@@ -294,10 +269,10 @@ GEM
       version_gem (~> 1.1)
     orm_adapter (0.5.0)
     os (1.1.4)
-    pg (1.4.1)
-    phonelib (0.7.0)
+    pg (1.4.3)
+    phonelib (0.7.1)
     prometheus-client (2.1.0)
-    public_suffix (4.0.7)
+    public_suffix (5.0.0)
     puma (4.3.12)
       nio4r (~> 2.0)
     racc (1.6.0)
@@ -341,37 +316,19 @@ GEM
       hashie (>= 3.4)
     razorpay (3.0.0)
       httparty (~> 0.14)
-    redis (4.7.1)
+    redis (4.8.0)
     require_all (3.0.0)
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
-    rqrcode (2.1.1)
+    rqrcode (2.1.2)
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
     rqrcode_core (1.2.0)
-    rspec-core (3.11.0)
-      rspec-support (~> 3.11.0)
-    rspec-expectations (3.11.0)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.11.0)
-    rspec-mocks (3.11.1)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.11.0)
-    rspec-rails (4.0.2)
-      actionpack (>= 4.2)
-      activesupport (>= 4.2)
-      railties (>= 4.2)
-      rspec-core (~> 3.10)
-      rspec-expectations (~> 3.10)
-      rspec-mocks (~> 3.10)
-      rspec-support (~> 3.10)
-    rspec-support (3.11.0)
-    ruby-next-core (0.15.1)
+    ruby-next-core (0.15.2)
     ruby-vips (2.1.4)
       ffi (~> 1.12)
     ruby2_keywords (0.0.5)
-    rubyzip (2.3.2)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -381,8 +338,6 @@ GEM
       sprockets-rails
       tilt
     select2-rails (4.0.13)
-    shoulda-matchers (5.1.0)
-      activesupport (>= 5.2.0)
     sidekiq (6.1.3)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -407,40 +362,40 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stripe (6.5.0)
-    studio_store_ecommerce_account (0.0.18)
+    stripe (7.1.0)
+    studio_store_ecommerce_account (0.0.20)
       bcrypt
       builder_base
       countries
       phonelib
       studio_store_ecommerce_json_web_token
       wisper
-    studio_store_ecommerce_admin (0.0.76)
+    studio_store_ecommerce_admin (0.0.86)
       builder_base
       devise
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_api_configuration (0.0.11)
+    studio_store_ecommerce_api_configuration (0.0.15)
       builder_base
       chunky_png
       oauth2
       rqrcode
-    studio_store_ecommerce_banner (0.0.10)
+    studio_store_ecommerce_banner (0.0.11)
       builder_base
-    studio_store_ecommerce_cart (0.0.11)
+    studio_store_ecommerce_cart (0.0.12)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_catalogue (0.0.30)
+    studio_store_ecommerce_catalogue (0.0.32)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_categories_sub_categories
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
       studio_store_ecommerce_store_profile
-    studio_store_ecommerce_categories_sub_categories (0.0.10)
+    studio_store_ecommerce_categories_sub_categories (0.0.13)
       active_storage_validations
       builder_base
       image_processing
@@ -453,7 +408,7 @@ GEM
       studio_store_ecommerce_login
     studio_store_ecommerce_cors (0.0.4)
       builder_base
-    studio_store_ecommerce_coupon_code_generator (0.0.5)
+    studio_store_ecommerce_coupon_code_generator (0.0.6)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
@@ -468,9 +423,9 @@ GEM
       studio_store_ecommerce_settings
     studio_store_ecommerce_fedex_integration (0.0.2)
       builder_base
-    studio_store_ecommerce_file_upload (0.0.8)
+    studio_store_ecommerce_file_upload (0.0.11)
       builder_base
-    studio_store_ecommerce_filter_items (0.0.7)
+    studio_store_ecommerce_filter_items (0.0.9)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_catalogue
@@ -481,7 +436,7 @@ GEM
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_help_center (0.0.6)
+    studio_store_ecommerce_help_center (0.0.7)
       builder_base
     studio_store_ecommerce_interactive_faqs (0.0.2)
       builder_base
@@ -493,7 +448,7 @@ GEM
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
-    studio_store_ecommerce_notification (0.0.7)
+    studio_store_ecommerce_notification (0.0.8)
       builder_base
       fcm
       studio_store_ecommerce_account
@@ -504,11 +459,11 @@ GEM
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_order_management (0.0.30)
+    studio_store_ecommerce_order_management (0.0.31)
       aasm
       builder_base
       studio_store_ecommerce_catalogue
-    studio_store_ecommerce_payment_razorpay (0.0.6)
+    studio_store_ecommerce_payment_razorpay (0.0.8)
       builder_base
       razorpay
     studio_store_ecommerce_profile (0.0.3)
@@ -516,7 +471,7 @@ GEM
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_role_and_permission (0.0.8)
+    studio_store_ecommerce_role_and_permission (0.0.9)
       builder_base
       cancancan
     studio_store_ecommerce_scheduling (0.0.4)
@@ -551,16 +506,16 @@ GEM
       studio_store_ecommerce_catalogue
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_store_profile (0.0.27)
+    studio_store_ecommerce_store_profile (0.0.34)
       builder_base
-    studio_store_ecommerce_stripe_integration (0.0.7)
+    studio_store_ecommerce_stripe_integration (0.0.8)
       builder_base
       stripe
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
       studio_store_ecommerce_order_management
-    studio_store_ecommerce_wishlist (0.0.8)
+    studio_store_ecommerce_wishlist (0.0.9)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_catalogue
@@ -573,8 +528,8 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     thor (1.2.1)
     thread_safe (0.3.6)
-    tilt (2.0.10)
-    tzinfo (1.2.9)
+    tilt (2.0.11)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     version_gem (1.1.0)
     warden (1.2.9)
@@ -616,13 +571,11 @@ GEM
     zeitwerk (2.6.0)
 
 PLATFORMS
-  x86_64-darwin-19
   x86_64-linux
 
 DEPENDENCIES
   active_admin_datetimepicker
   active_admin_role
-  active_storage_base64
   activeadmin (= 2.9.0)
   activeadmin-searchable_select
   activeadmin_addons (~> 1.8.2)
@@ -634,12 +587,8 @@ DEPENDENCIES
   builder_base (= 0.0.47)
   bx_block_cors
   byebug
-  city-state
   ckeditor (~> 4.2.2)
-  database_cleaner
   dotenv-rails
-  factory_bot_rails
-  faker!
   haml
   humanize
   json-jwt
@@ -647,37 +596,35 @@ DEPENDENCIES
   puma (~> 4.1)
   rack-cors
   rails (~> 6.0.3, >= 6.0.3.6)
-  rspec-rails (~> 4.0.1)
   sassc-rails
-  shoulda-matchers
   sidekiq (~> 6.1.0)
   sidekiq_alive
-  studio_store_ecommerce_account (= 0.0.18)
-  studio_store_ecommerce_admin (= 0.0.76)
-  studio_store_ecommerce_api_configuration (= 0.0.11)
-  studio_store_ecommerce_banner (= 0.0.10)
-  studio_store_ecommerce_cart (= 0.0.11)
-  studio_store_ecommerce_catalogue (= 0.0.30)
-  studio_store_ecommerce_categories_sub_categories (= 0.0.10)
+  studio_store_ecommerce_account (= 0.0.20)
+  studio_store_ecommerce_admin (= 0.0.86)
+  studio_store_ecommerce_api_configuration (= 0.0.15)
+  studio_store_ecommerce_banner (= 0.0.11)
+  studio_store_ecommerce_cart (= 0.0.12)
+  studio_store_ecommerce_catalogue (= 0.0.32)
+  studio_store_ecommerce_categories_sub_categories (= 0.0.13)
   studio_store_ecommerce_contact_us (= 0.0.6)
   studio_store_ecommerce_cors (= 0.0.4)
-  studio_store_ecommerce_coupon_code_generator (= 0.0.5)
+  studio_store_ecommerce_coupon_code_generator (= 0.0.6)
   studio_store_ecommerce_dashboard (= 0.0.5)
   studio_store_ecommerce_email_notifications (= 0.0.12)
   studio_store_ecommerce_fedex_integration (= 0.0.2)
-  studio_store_ecommerce_file_upload (= 0.0.8)
-  studio_store_ecommerce_filter_items (= 0.0.7)
+  studio_store_ecommerce_file_upload (= 0.0.11)
+  studio_store_ecommerce_filter_items (= 0.0.9)
   studio_store_ecommerce_forgot_password (= 0.0.6)
-  studio_store_ecommerce_help_center (= 0.0.6)
+  studio_store_ecommerce_help_center (= 0.0.7)
   studio_store_ecommerce_interactive_faqs (= 0.0.2)
   studio_store_ecommerce_json_web_token (= 0.0.2)
   studio_store_ecommerce_login (= 0.0.6)
-  studio_store_ecommerce_notification (= 0.0.7)
+  studio_store_ecommerce_notification (= 0.0.8)
   studio_store_ecommerce_notification_settings (= 0.0.1)
-  studio_store_ecommerce_order_management (= 0.0.30)
-  studio_store_ecommerce_payment_razorpay (= 0.0.6)
+  studio_store_ecommerce_order_management (= 0.0.31)
+  studio_store_ecommerce_payment_razorpay (= 0.0.8)
   studio_store_ecommerce_profile (= 0.0.3)
-  studio_store_ecommerce_role_and_permission (= 0.0.8)
+  studio_store_ecommerce_role_and_permission (= 0.0.9)
   studio_store_ecommerce_scheduling (= 0.0.4)
   studio_store_ecommerce_search (= 0.0.6)
   studio_store_ecommerce_settings (= 0.0.16)
@@ -685,9 +632,9 @@ DEPENDENCIES
   studio_store_ecommerce_shipping_charge (= 0.0.5)
   studio_store_ecommerce_social_media_account (= 0.0.2)
   studio_store_ecommerce_sorting (= 0.0.1)
-  studio_store_ecommerce_store_profile (= 0.0.27)
-  studio_store_ecommerce_stripe_integration (= 0.0.7)
-  studio_store_ecommerce_wishlist (= 0.0.8)
+  studio_store_ecommerce_store_profile (= 0.0.34)
+  studio_store_ecommerce_stripe_integration (= 0.0.8)
+  studio_store_ecommerce_wishlist (= 0.0.9)
   studio_store_ecommerce_zipcode (= 0.0.3)
   tzinfo-data
   wicked_pdf

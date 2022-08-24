@@ -49,7 +49,7 @@ module AccountBlock
     attribute :image_url do |object|
       if object.image.attached?
         if Rails.env.production?
-          object.image.service_url
+          url_for(object.image)
         else
           Rails.application.routes.url_helpers.rails_blob_path(object.image, only_path: true)
         end

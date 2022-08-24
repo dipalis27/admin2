@@ -1,4 +1,3 @@
-<% host_url = Rails.env.production? ? $hostname : 'http://localhost:3000' %>
 <tr>
   <td style="border: 1px solid #ccc">
     <table width="100%" cellpadding="0" cellspacing="0" style="padding: 0 0 16px 0;">
@@ -23,8 +22,9 @@
         <% catalogue_variant = order_item&.catalogue_variant %>
         <tr>
           <td valign="center" style="width: 33.333%;padding:16px;">
-            <%#= catalogue.present? ? (catalogue.attachments&.first&.present? ? image_tag(host_url +  Rails.application.routes.url_helpers.rails_blob_path(catalogue.attachments&.first&.image, only_path: true), width: "50", height:"50") : content_tag(:span, 'no image yet')) : '' %>
-            <%= order_item.catalogue_variant.present? ? (order_item.catalogue_variant.attachments&.first&.present? ? image_tag(host_url +  Rails.application.routes.url_helpers.rails_blob_path(order_item.catalogue_variant.attachments&.first&.image, only_path: true), width: "50", height:"50") : content_tag(:span, 'no image yet')) : (catalogue.attachments.first&.present? ? image_tag(host_url +  Rails.application.routes.url_helpers.rails_blob_path(catalogue.attachments&.first&.image, only_path: true), width: "50", height:"50") : content_tag(:span, 'no image yet')) %>
+            <%#= catalogue.present? ? (catalogue.attachments&.first&.present? ? image_tag(url_for(catalogue.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) : '' %>
+            <%= order_item.catalogue_variant.present? ? (order_item.catalogue_variant.attachments&.first&.present? ? image_tag(url_for(order_item.catalogue_variant.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) : (catalogue.attachments.first&.present? ? image_tag(url_for(catalogue.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) %>
+          </td>
           </td>
 
           <td style="width: 33.333%;padding:16px;">

@@ -129,9 +129,7 @@ module BxBlockCatalogue
         message = "#{self&.catalogue&.name} is now available in stock."
         user_ids.each do |user_id|
           user = AccountBlock::Account.find_by(id: user_id)
-          if BxBlockSettings::EmailSetting.find_by(event_name: 'product stock notification').try(:active)
-            CatalogueVariantMailer.with(host: $hostname).product_stock_notification(self, user).deliver_now if user.present? && user.email.present?  
-          end
+          CatalogueVariantMailer.with(host: $hostname).product_stock_notification(self, user).deliver_now if user.present? && user.email.present?
           BxBlockNotification::SendNotification.new("", message, 'PRODUCT IS BACK', user , {catalogue_id: self&.catalogue&.id, notification_key: 'PRODUCT_IS_IN_STOCK'}).call if user.present? && user.email.present?
         end
         self.product_notifies.destroy_all

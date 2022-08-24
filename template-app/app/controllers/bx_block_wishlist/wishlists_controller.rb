@@ -30,7 +30,11 @@ module BxBlockWishlist
           message: "",
           data:
           {
-            wishlist: WishlistSerializer.new(@current_user.wishlist, { params: { user: @current_user} }),
+            wishlist: WishlistSerializer.new(@current_user.wishlist, {
+              params: {
+                user: @current_user, page: params[:page], per_page: params[:per_page]
+              }
+            }),
           }
         }, status: 200
       end
@@ -43,7 +47,14 @@ module BxBlockWishlist
         render json: {
           success: true,
           message: "The item has been removed from the wishlist",
-          data: {},
+          data:
+            {
+              wishlist: WishlistSerializer.new(@current_user.wishlist, {
+                params: {
+                  user: @current_user, page: params[:page], per_page: params[:per_page]
+                }
+              }),
+            },
           token: [],
           meta: [],
           error: [],

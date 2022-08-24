@@ -10,20 +10,5 @@ module BxBlockCatalogue
     # Validations
     validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true
 
-    def self.validate_and_save(images)
-      response = {}
-      BxBlockCatalogue::BulkImage.transaction do
-        images.each do |image|
-          BxBlockCatalogue::BulkImage.new(image: image).save!
-        end
-        response[:success] = true
-        response[:message] = 'Images uploaded successfully.'
-      rescue StandardError => e
-        response[:success] = false
-        response[:message] = e.message
-        raise ActiveRecord::Rollback
-      end
-      response
-    end
   end
 end

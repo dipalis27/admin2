@@ -28,7 +28,7 @@ module BxBlockCart
             subscription_package = params[:subscription_package].present? ? params[:subscription_package] : order_item.subscription_package
             subscription_discount = params[:subscription_discount].present? ? params[:subscription_discount] : order_item.subscription_discount
             preferred_delivery_slot = params[:preferred_delivery_slot].present? ? params[:preferred_delivery_slot] : order_item.preferred_delivery_slot
-            order_item.update_attributes(subscription_quantity: quantity, subscription_period: subscription_period, subscription_package: subscription_package, subscription_discount: subscription_discount, preferred_delivery_slot: preferred_delivery_slot)
+            order_item.update(subscription_quantity: quantity, subscription_period: subscription_period, subscription_package: subscription_package, subscription_discount: subscription_discount, preferred_delivery_slot: preferred_delivery_slot)
           else
             order_item.update(quantity: quantity)
           end
