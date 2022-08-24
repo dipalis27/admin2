@@ -1,6 +1,6 @@
 module BxBlockAdmin
   class ApplicationMailer < BuilderBase::ApplicationMailer
-    default from: 'from@example.com'
+    default from: 'admin@store.builder.ai'
     layout 'mailer'
   end
 end

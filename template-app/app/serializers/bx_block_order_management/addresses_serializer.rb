@@ -10,10 +10,16 @@ module BxBlockOrderManagement
       :zip_code,
       :phone_number,
       :latitude,
+      :longitude,
+      :address_for,
       :is_default,
+      :address_type,
       :city,
       :state,
       :country,
+      :landmark,
+      :created_at,
+      :updated_at,
       :account,
       :address_state_id
     ]

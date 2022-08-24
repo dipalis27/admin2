@@ -31,11 +31,10 @@ module BxBlockCategoriesSubCategories
 
     def index
       serializer = if params[:sub_category_id].present?
-                     categories = SubCategory.find(params[:sub_category_id]).categories.latest.page(params[:page]).per(params[:per_page])
+                     categories = SubCategory.find(params[:sub_category_id]).categories.latest
                      CategorySerializer.new(categories)
                    else
-                     categories = Category.all.latest.enabled.page(params[:page]).per(params[:per_page])
-                     CategorySerializer.new(categories, serialization_options)
+                     CategorySerializer.new(Category.all.latest.enabled, serialization_options)
                    end
 
       render json: serializer, status: :ok

@@ -36,11 +36,11 @@ module BxBlockOrderManagement
     end
 
     def update_order
+      order.update_attributes!(order_date: Time.current,
+                              is_gift: is_gift,
+                              source: @source,
+                              schedule_time: schedule_time)
       order.place_order!
-      order.update!(order_date: Time.current,
-                    is_gift: is_gift == true,
-                    source: @source,
-                    schedule_time: schedule_time)
     end
 
     def product_not_available?

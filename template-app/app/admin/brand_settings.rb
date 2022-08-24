@@ -21,7 +21,7 @@ unless BrandSettings::Load.is_loaded_from_gem
   ActiveAdmin.register BxBlockStoreProfile::BrandSetting, as: 'Brand Setting' do
     menu false
 
-    permit_params :heading, :country, :sub_heading, :description, :header_color, :common_button_color, :button_hover_color, :logo, :promotion_banner, :description_font_color, :phone_number, :copyright_message, :fb_link, :instagram_link, :twitter_link, :youtube_link, :footer_message, :google_app, :app_store, :app_icon, :login_icon, :bottom_tab_icon, :profile_screen_icon, :cart_and_notification_icon, :currency_type, :brand_text_color, :active_tab_color, :inactive_tab_color, :active_text_color, :inactive_text_color, :button_hover_text_color, :border_color, :sidebar_bg_color, :copyright_message, :wishlist_icon_color, :wishlist_btn_text_color, :order_detail_btn_color, :api_key, :auth_domain, :database_url, :project_id, :storage_bucket, :messaging_sender_id, :app_id, :measurement_id, :is_facebook_login, :is_google_login, :is_apple_login, :primary_color, :address, :gst_number, :cropped_image, :highlight_primary_color, :highlight_secondary_color, :address_state_id,:template_selection, :color_palet, :whatsapp_number,:whatsapp_message, :is_whatsapp
+    permit_params :heading, :country, :sub_heading, :description, :header_color, :common_button_color, :button_hover_color, :logo, :promotion_banner, :description_font_color, :phone_number, :copyright_message, :fb_link, :instagram_link, :twitter_link, :youtube_link, :footer_message, :google_app, :app_store, :app_icon, :login_icon, :bottom_tab_icon, :profile_screen_icon, :cart_and_notification_icon, :currency_type, :brand_text_color, :active_tab_color, :inactive_tab_color, :active_text_color, :inactive_text_color, :button_hover_text_color, :border_color, :sidebar_bg_color, :copyright_message, :wishlist_icon_color, :wishlist_btn_text_color, :order_detail_btn_color, :api_key, :auth_domain, :database_url, :project_id, :storage_bucket, :messaging_sender_id, :app_id, :measurement_id, :is_facebook_login, :is_google_login, :is_apple_login, :primary_color, :address, :gst_number, :cropped_image, :highlight_primary_color, :highlight_secondary_color, :address_state_id, :template_selection, :color_palet
 
     actions :all, :except =>[:destroy]
 
@@ -112,12 +112,16 @@ unless BrandSettings::Load.is_loaded_from_gem
           f.input :is_google_login,label: "Is Google Login <span class='tooltip'><i class='fas fa-info-circle info-icon'><span class='tooltiptext'>Do you want to allow users to login with their Google account?</span></i></span>".html_safe
           f.input :is_apple_login, label: "Is Apple Login <span class='tooltip'><i class='fas fa-info-circle info-icon'><span class='tooltiptext'>Do you want to allow users to login with their Apple account?</span></i></span>".html_safe
         end
-        f.inputs 'Whatsapp Integration' do
-          # f.input :is_whatsapp, label: "Whatsapp Integration ",:input_html => { :class => "tooltiptext" },:as => :radio,
-          #  :collection => {"Yes" => true, "No" => false}
-          f.input :whatsapp_number,label: "Whatsapp Number <span class='tooltip'><i class='fas fa-info-circle info-icon'><span class='tooltiptext'>Add 10 digit what's app number where you want to receive messages</span></i></span>".html_safe
-          f.input :whatsapp_message, label:"Welcome Message <span class='tooltip'><i class='fas fa-info-circle info-icon'><span class='tooltiptext'>Add pre-filled message that will automatically appear in the text field of a chat.
-          </span></i></span>".html_safe, :input_html => { :class=> "wa-msg-field", :type => 'number', min: 0 }
+        # f.inputs "Button Color" do
+        #   f.input :active_text_color, label: 'Regular text color'
+        #   f.input :common_button_color, label: 'Button background color',:hint => image_tag("/assets/common-button-color.jpg")
+        #   f.input :brand_text_color, label: 'Button text color',:hint => image_tag("/assets/common-button-text-color.jpg")
+        #   f.input :button_hover_color, label: 'Button hover color (for web)',:hint => image_tag("/assets/button-hover-color.jpg")
+        # end
+        f.inputs "Other Colors(App)" do
+          f.input :primary_color
+          # f.input :highlight_primary_color
+          # f.input :highlight_secondary_color
         end
         # f.inputs "Button Color" do
         #   f.input :active_text_color, label: 'Regular text color'

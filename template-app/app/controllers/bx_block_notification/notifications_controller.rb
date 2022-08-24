@@ -63,7 +63,7 @@ module BxBlockNotification
     def read_notification
       notification = Notification.find_by(id: params[:notification_id])
       if notification.present?
-        notification.update(is_read: true)
+        notification.update_attributes(is_read: true)
         render json: {
           success: true,
           data:

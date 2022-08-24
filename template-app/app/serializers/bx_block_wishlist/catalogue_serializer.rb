@@ -35,7 +35,7 @@ module BxBlockWishlist
                :on_sale, :sale_price, :discount
 
     attribute :actual_price_including_tax do |object|
-      object.price
+      object.price.present? && object.tax.present? ? (object.price.to_f + ((object.price.to_f * object.tax.tax_percentage.to_f)/100).to_f).round : 0
     end
 
     attribute :wishlisted do |object, params|

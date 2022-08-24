@@ -15,8 +15,8 @@ module BxBlockCategoriesSubCategories
 
     has_one_attached :image
 
-    validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true, if: -> { Rails.env != 'test' && self.from_csv != true }
-    validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true, if: -> { Rails.env != 'test' && self.from_csv != true }
+    # validate :validate_image, if: -> { Rails.env != 'test' && self.from_csv != true }
 
     # has_one :catalogue, class_name: 'BxBlockCatalogue::Catalogue'
 
@@ -25,7 +25,8 @@ module BxBlockCategoriesSubCategories
 
     accepts_nested_attributes_for :sub_categories, allow_destroy:  true
 
-    validates :name, presence: true, uniqueness: true
+    validates_presence_of :name
+    validates_uniqueness_of :name, :message => '%{value} has already been taken'
 
     scope :latest, -> { order(created_at: :desc) }
 
@@ -42,13 +43,8 @@ module BxBlockCategoriesSubCategories
       @cropped_image = val
       return if val.blank?
 
-      decoded_data = val.split(",")[1]
-      image_extention = val.split(',').first.gsub("\;base64", "").gsub("data:image/", '') rescue 'png'
-      image_path="tmp/cropped_image." + image_extention
-      File.open(image_path, 'wb') do |f|
-        f.write(Base64.decode64(decoded_data))
-      end
-      self.image.attach(io: File.open(image_path),filename: image_path.split('/')[1])
+      image_path, image_extension = store_base64_image(val)
+      self.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
     end
 

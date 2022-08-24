@@ -10,8 +10,7 @@ function cropImage(inputId) {
   $("#replaceCroppedImage").on("click", function () {
     var cropper = $("#croppableImage")[$("#croppableImage").length - 1].cropper;
     if (cropper != undefined && cropper != null) {
-      var imageFormat = cropper.url.split(":")[1].split(";")[0];
-      var croppedBase64 = cropper.getCroppedCanvas(imageFormat.match(/.(jpg|jpeg)$/i)? {fillColor: '#ffffff'} : "").toDataURL(cropper.url.split(":")[1].split(";")[0]);
+      var croppedBase64 = cropper.getCroppedCanvas().toDataURL("image/png");
       var attachmentId =
         $("#" + inputFileButtonId).attr("cropped-image-temp-store-id") 
       $(attachmentId).val(croppedBase64);
@@ -141,7 +140,7 @@ function initCropper() {
     setTimeout(function () {
       const image = $("#croppableImage")[$("#croppableImage").length - 1];
       new Cropper(image, {
-        aspectRatio: e.currentTarget.id=== 'brandSettingLogo'? NaN :1/1,
+        aspectRatio: 1 / 1,
         crop(event) {},
         zoomable: true,
       });

@@ -1,42 +1,52 @@
 module BxBlockStoreProfile
   class BrandSetting < BxBlockStoreProfile::ApplicationRecord
-    include UrlUtilities
     self.table_name = :brand_settings
-    has_one_attached :logo
-    has_one_attached :promotion_banner
-
+    include BxBlockStoreProfile::Country
     attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
 
+    COLOR_PALET = [
+      "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
+      "{themeName: 'Navy',primaryColor:'#011638',secondaryColor:'#FE5F55'}",
+      "{themeName: 'Bonsai',primaryColor:'#4A6C6F',secondaryColor:'#7FB069'}",
+      "{themeName: 'Forest',primaryColor:'#0B3C49',secondaryColor:'#BE7C4D'}",
+      "{themeName: 'Wood',primaryColor:'#6F1A07',secondaryColor:'#AF9164'}",
+      "{themeName: 'Wine',primaryColor:'#731963',secondaryColor:'#C6878F'}",
+      "{themeName: 'Glitter',primaryColor:'#642CA9',secondaryColor:'#FF36AB'}"
+    ]
+    
+    # Associations
+    has_one_base64_attached :logo
+    has_one_attached :promotion_banner
     has_one_attached :web_json_file
     has_one_attached :mobile_json_file
+    has_one_base64_attached :favicon_logo
+    belongs_to :store_country, class_name: "BxBlockOrderManagement::Country", foreign_key: "country_id", optional: true
+    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
+    belongs_to :city, class_name: "BxBlockOrderManagement::City", foreign_key: "city_id", optional: true
 
+    # Callbacks
     after_commit :upload_json
     after_commit :update_onboarding_step
+    after_commit :update_defaul_email_settings
+
     # Validations
+    validates_presence_of :address_state_id, if: :country_india?
     validates :logo, :country, presence: true
     validates_length_of :heading, maximum: 18
     #validate :validate_phone_number
-    belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState"
 
-    validates_presence_of :address_state_id, if: :country_india?
-    validates :logo, :country, presence: true
-    validates_length_of :heading, maximum: 50
-    validate :validate_phone_number
-    validate :validate_whatsapp_number
+    # Enum Values
+    enum country: self::COUNTRIES
+    enum template_selection: ['Minimal', 'Prime', 'Bold', 'Ultra', 'Essence']
 
-    enum country: ['india', 'uk']
+    before_save :assign_country_and_currency, if: :country_id_changed?
 
     def cropped_image=(val)
       @cropped_image = val
       return if val.blank?
 
-      decoded_data = val.split(",")[1]
-      image_extention = val.split(',').first.gsub("\;base64", "").gsub("data:image/", '') rescue 'png'
-      image_path="tmp/cropped_image." + image_extention
-      File.open(image_path, 'wb') do |f|
-        f.write(Base64.decode64(decoded_data))
-      end
-      self.logo.attach(io: File.open(image_path),filename: image_path.split('/')[1])
+      image_path, image_extension = store_base64_image(val)
+      self.logo.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
     end
 
@@ -96,13 +106,13 @@ module BxBlockStoreProfile
     def logo_url
       return if self.logo.blank?
 
-      {id: self.logo.id, url: url_for(logo)} if ENV['HOST_URL'].present?
+      {id: self.logo.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true)} if $hostname.present?
     end
 
     def promotion_banner_url
       return if self.promotion_banner.blank?
 
-      {id: self.promotion_banner.id, url: url_for(promotion_banner)} if ENV['HOST_URL'].present?
+      {id: self.promotion_banner.id, url: $hostname + Rails.application.routes.url_helpers.rails_blob_url(self.promotion_banner, only_path: true)} if $hostname.present?
     end
 
     def simple_response_hash
@@ -139,8 +149,7 @@ module BxBlockStoreProfile
           isFacebookLogin: self.is_facebook_login,
           isGoogleLogin: self.is_google_login,
           isAppleLogin: self.is_apple_login,
-          razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
-                     account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']},
+          razorpay: {api_key: @razorpay_configuration&.api_key, secret_key: @razorpay_configuration&.api_secret_key },
           stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key },
           logo: self.logo_url.present? ? self.logo_url[:url] : '' ,
           firebase:{
@@ -157,22 +166,6 @@ module BxBlockStoreProfile
 
     def nested_response_hash
       get_configurations
-
-      if self.whatsapp_number.present?
-        whatsapp_number = if self.country == "india"
-                            "91" + self.whatsapp_number
-                          else
-                            "44" + self.whatsapp_number
-                          end
-      end
-      whatsapp_url = if self.whatsapp_number.present? && self.whatsapp_message.present?
-                       message = self.whatsapp_message.gsub(' ', '%20')
-                       "https://wa.me/#{whatsapp_number}?text=#{message}"
-                     elsif self.whatsapp_number.present?
-                       "https://wa.me/#{whatsapp_number}"
-                     else
-                       ""
-                     end
       response = {
           buttonsColor: {
               regularButtonColor: self.common_button_color,
@@ -201,8 +194,7 @@ module BxBlockStoreProfile
           commonLogoSrc: self.logo_url.present? ? self.logo_url[:url] : '' ,
           productFilterSliderColor: self.sidebar_bg_color,
           PaymentKeys: {
-            razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
-                       account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID'] },
+              razorpay: {api_key: @razorpay_configuration&.api_key, secret_key: @razorpay_configuration&.api_secret_key },
               stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key }
           },
           NotificationKeys: {
@@ -221,13 +213,18 @@ module BxBlockStoreProfile
           },
           TemplateSelections: {
             template_selection: self.template_selection,
-            color_palet: self.color_palet
-          },
-          WhatsappIntegration: {
-            whatsapp_url: whatsapp_url
+            color_palet: self.get_color_palet
           }
       }
       return response
+    end
+
+    def get_color_palet
+      begin
+        JSON.parse(self.color_palet.to_s)
+      rescue
+        self.color_palet
+      end
     end
 
     def get_configurations
@@ -241,11 +238,36 @@ module BxBlockStoreProfile
       self.country == 'india' ? true : false
     end
 
+    def update_defaul_email_settings
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
+      hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
+      logo_url = hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true) if self.logo.attached?
+      begin
+        downloaded_image = open(logo_url)
+        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
+        blob = ActiveStorage::Attachment.find_by(record_id: 20, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
+        extension = blob.content_type.split("/").last
+        defaul_email_setting.logo.attach(io: downloaded_image, filename: "logo"+extension)
+      rescue Exception => error
+        Rails.logger.info "============== Error: #{error.message}=============="
+      end
+    end
+
     private
 
     def update_onboarding_step
       step_update_service = BxBlockAdmin::UpdateStepCompletion.new('branding', self.class.to_s)
       step_update_service.call
+    end
+
+    def assign_country_and_currency
+      selected_country = self.store_country
+      if selected_country.present?
+        code = selected_country.code
+        self.country = (code == 'in' ? 'india' : (code == 'gb' ? 'uk' : code))
+        self.currency_type = selected_country.currency&.symbol
+      end
     end
 
     def validate_phone_number
@@ -254,15 +276,6 @@ module BxBlockStoreProfile
         errors.add(:phone_number, 'must be a 10 digit phone number') unless phone_number =~ /\A\d{10}\z/
       elsif country == 'uk'
         errors.add(:phone_number, 'must be a 11 digit phone number') unless phone_number =~ /\A\d{11}\z/
-      end
-    end
-
-    def validate_whatsapp_number
-      return if whatsapp_number.blank?
-      if country == 'india'
-        errors.add(:whatsapp_number, 'must be a 10 digit phone number') unless whatsapp_number =~ /\A\d{10}\z/
-      elsif country == 'uk'
-        errors.add(:whatsapp_number, 'must be a 11 digit phone number') unless whatsapp_number =~ /\A\d{11}\z/
       end
     end
   end

@@ -56,7 +56,7 @@ module BxBlockOrderManagement
     def status_update
       @order = BxBlockOrderManagement::Order.find_by(ship_rocket_order_id: params[:order_id])
       if @order.present?
-        @order.update(ship_rocket_status: params[:current_status].to_s.downcase)
+        @order.update_attributes(ship_rocket_status: params[:current_status].to_s.downcase)
         if @order.order_items.present?
           @order.order_items.each do |order_item|
             tracking = BxBlockOrderManagement::Tracking.find_or_create_by(date: DateTime.current, status: params[:current_status].to_s.downcase)

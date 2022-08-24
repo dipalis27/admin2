@@ -85,9 +85,9 @@ module BxBlockCatalogue
       render(json: { message: "No catalogue found" }, status: 200) && return if !(catalogues.any?)
       render json: {
         data: {
-          catalogue: CatalogueSerializer.new(catalogues, serialization_options(params[:template])),
+          catalogue: CatalogueSerializer.new(catalogues, serialization_options),
           recommended_products: params[:recommended].present? ?
-                                  CatalogueSerializer.new(recommended_catalogues, serialization_options(params[:template])) : [],
+                                  CatalogueSerializer.new(recommended_catalogues, serialization_options) : [],
           available_variants: available_variants
         },
         meta: {
@@ -210,16 +210,14 @@ module BxBlockCatalogue
     end
 
     def catalogue_params
-      params.permit(
-        :brand_id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height,
-        :stock_qty, :availability, :weight, :price, :recommended, :on_sale, :sale_price, :discount,
-        catalogue_variants_attributes: [
-          :id, :price, :stock_qty, :on_sale, :sale_price, :discount_price, :length, :breadth,
-          :height, :_destroy, catalogue_variant_properties_attributes: [
-          :id, :variant_id, :variant_property_id, :_destroy
-        ]
-        ]
-      )
+      params.permit(:brand_id,
+                    :name, :sku, :description, :manufacture_date, :length,
+                    :breadth, :height, :stock_qty, :availability, :weight,
+                    :price, :recommended, :on_sale, :sale_price, :discount,
+                    catalogue_variants_attributes: [:id, :price, :stock_qty, :on_sale, :sale_price,
+                                                    :discount_price, :length, :breadth, :height, :_destroy, catalogue_variant_properties_attributes: [:id, :variant_id, :variant_property_id, :_destroy],])
+
+
     end
 
     def update_tags
@@ -276,56 +274,10 @@ module BxBlockCatalogue
       end
     end
 
-    def serialization_options(template = nil)
+    def serialization_options
       request_hash = { params: { host: request.protocol + request.host_with_port, user: @current_user, cart: @cart,can_review: @can_review, catalogue_id: @catalogue&.id } }
 
-      brand_setting = BxBlockStoreProfile::BrandSetting.first
-
-      if params[:action] == 'index'
-        request_hash[:params].merge!({
-                                       ignore_similar_nesting: true, ignore_available_slots: true,
-                                       ignore_available_subscription: true, ignore_catalogue_subscriptions: true,
-                                       ignore_is_notify_product: true, ignore_is_subscription_available: true,
-                                       ignore_preferred_delivery_slot: true, ignore_product_attributes: true,
-                                       ignore_reviews: true, ignore_subscription_days_count: true,
-                                       ignore_subscription_package: true, ignore_subscription_period: true,
-                                       ignore_subscription_quantity: true, ignore_product_notified: true,
-                                       ignore_average_rating: true, ignore_variants_in_cart: true
-                                     })
-
-        case template.to_s.downcase
-        when 'prime'
-          request_hash[:params].merge!({
-                                         ignore_actual_price_including_tax: true, ignore_cart_items: true,
-                                         ignore_cart_quantity: true
-                                       })
-        when 'essence'
-          request_hash[:params].merge!({
-                                         ignore_cart_items: true, ignore_cart_quantity: true
-                                       })
-        when 'bold'
-          request_hash[:params].merge!({ ignore_wishlisted: true })
-        when 'ultra'
-          request_hash[:params].merge!({
-                                         ignore_cart_items: true, ignore_cart_quantity: true
-                                       })
-        when 'mobile'
-          request_hash[:params].merge!({
-                                         ignore_preferred_delivery_slot: true, ignore_average_rating: false,
-                                         ignore_reviews: false
-                                       })
-        end
-      elsif params[:action] == 'show'
-        request_hash[:params].merge!({
-                                       ignore_product_notified: true, ignore_variants_in_cart: true
-                                     })
-        if template.to_s.downcase == 'mobile'
-          request_hash[:params].merge!({
-                                         ignore_product_notified: false, ignore_preferred_delivery_slot: true,
-                                         ignore_subscription_days_count: true, ignore_variants_in_cart: false
-                                       })
-        end
-      end
+      request_hash[:params][:ignore_similar_nesting] = true if params[:action] == 'index'
       request_hash
     end
   end

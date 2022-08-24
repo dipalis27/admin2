@@ -17,7 +17,7 @@
   <tr>
     <td style="padding: 0 0 10px 0; width: 100%; border: none;">
       <div style="width: 100%;">
-        <img src= "<%= url_for(brand_setting.logo) %>" width='170px' />
+        <img src= "<%= host_url +  Rails.application.routes.url_helpers.rails_blob_path(brand_setting.logo, only_path: true) %>" width='170px' />
       </div>
     </td>
   </tr>

@@ -7,6 +7,21 @@ module BxBlockFilterItems
       case attr_name
       when :price
         "price_including_tax >= #{value[:from]} AND price_including_tax <= #{value[:to]}"
+      when :category_id
+        ids = [*value].join(',').split(",")
+        subcat_ids =  BxBlockCategoriesSubCategories::SubCategory.where(
+          category_id: ids
+        ).pluck(:id)
+        product_ids = BxBlockCategoriesSubCategories::CataloguesSubCategory.where(
+          sub_category_id: subcat_ids
+        ).pluck(:catalogue_id).uniq
+        product_ids.empty? ? "1 = 0" : "id IN (#{product_ids.join(",")})"
+      when :sub_category_id
+        ids = [*value].join(',').split(",")
+        product_ids = BxBlockCategoriesSubCategories::CataloguesSubCategory.where(
+          sub_category_id: ids
+        ).pluck(:catalogue_id).uniq
+        product_ids.empty? ? "1 = 0" : "id IN (#{product_ids.join(",")})"
       when :brand_id, :id
         ids = [*value].join(',')
         ids.empty? ? "1 = 0" : "#{attr_name} IN (#{ids})"
@@ -46,18 +61,6 @@ module BxBlockFilterItems
           ""
         end
       end
-    end
-
-    def query_string_for_categories_sub_categories(category_ids, sub_category_ids)
-      ignore_cat_ids = BxBlockCategoriesSubCategories::SubCategory.where(id: sub_category_ids).pluck(:category_id)
-      ignore_cat_ids.map!(&:to_s)
-      subcat_ids =  (BxBlockCategoriesSubCategories::SubCategory.where(
-        category_id: (category_ids - ignore_cat_ids)
-      ).pluck(:id) + sub_category_ids).uniq
-      product_ids = BxBlockCategoriesSubCategories::CataloguesSubCategory.where(
-        sub_category_id: subcat_ids
-      ).pluck(:catalogue_id).uniq
-      product_ids.empty? ? "1 = 0" : "id IN (#{product_ids.join(",")})"
     end
   end
 end

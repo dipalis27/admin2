@@ -1,6 +1,7 @@
 module BxBlockBanner
   class Banner < BxBlockBanner::ApplicationRecord
     self.table_name = :banners
+    extend BxBlockAdmin::ModelUtilities
 
     ATTACHMENT_SIZE = {
       web_banner: {
@@ -36,14 +37,14 @@ module BxBlockBanner
         banners = BxBlockBanner::Banner.where("banner_position > ? AND web_banner = ?", banner_position, true)
         if banners.present?
           banners.map do |banner|
-            banner.update(banner_position: banner.banner_position - 1)
+            banner.update_attributes(banner_position: banner.banner_position - 1)
           end
         end
       else
         banners = BxBlockBanner::Banner.where(web_banner: false)
         if banners.present?
           banners.map do |banner|
-            banner.update(banner_position: banner.banner_position - 1) if banner.banner_position > banner_position
+            banner.update_attributes(banner_position: banner.banner_position - 1) if banner.banner_position > banner_position
           end
         end
       end

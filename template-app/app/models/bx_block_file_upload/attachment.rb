@@ -17,13 +17,8 @@ module BxBlockFileUpload
       @cropped_image = val
       return if val.blank?
 
-      decoded_data = val.split(",")[1]
-      image_extention = val.split(',').first.gsub("\;base64", "").gsub("data:image/", '') rescue 'png'
-      image_path="tmp/cropped_image." + image_extention
-      File.open(image_path, 'wb') do |f|
-        f.write(Base64.decode64(decoded_data))
-      end
-      self.image.attach(io: File.open(image_path),filename: image_path.split('/')[1])
+      image_path, image_extension = store_base64_image(val)
+      self.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
       File.delete(image_path) if File.exist?(image_path)
     end
 

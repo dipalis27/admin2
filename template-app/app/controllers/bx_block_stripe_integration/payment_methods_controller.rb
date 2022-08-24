@@ -12,7 +12,7 @@ module BxBlockStripeIntegration
         AccountBlock::EmailAccount.create_stripe_customers(current_user)
         payment_intent = create_payment_intent(amount, params['data']['payment_token'] )
         if payment_intent
-          order.update(stripe_payment_method_id: payment_intent['payment_method'])
+          order.update_attributes(stripe_payment_method_id: payment_intent['payment_method'])
           render json: {
             message: 'Payment initiated successfull.',
             data: {client_secret: payment_intent['client_secret']}, status: :ok}
@@ -37,9 +37,9 @@ module BxBlockStripeIntegration
           Rails.logger.error ">>>>>>>>>>>>>>>>>Order Placed #{order.placed?}>>>>>>>>>>>>"
           order.place_order! unless order.placed?
           Rails.logger.error ">>>>>>>>>>>>>>>>>Order Placed #{order.placed?}>>>>>>>>>>>>"
-          order.update(order_status_id: order_status_id, placed_at: Time.current) unless order.placed?
+          order.update_attributes(order_status_id: order_status_id, placed_at: Time.current) unless order.placed?
           order_status_id =  BxBlockOrderManagement::OrderStatus.find_by(status:"confirmed").id
-          order.update(source: "Stripe", order_status_id: order_status_id, confirmed_at: Time.current, placed_at: Time.current, order_date: Time.current) unless order.confirmed?
+          order.update_attributes(source: "Stripe", order_status_id: order_status_id, confirmed_at: Time.current, placed_at: Time.current, order_date: Time.current) unless order.confirmed?
           proccess_after_payment(order) if  @logistics_configuration = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: '525k').present?
           render json: {data: {message: 'Payment successfull.',order: order}, status: :ok}
         else
@@ -90,7 +90,7 @@ module BxBlockStripeIntegration
       shipment_service = BxBlockFedexIntegration::ShipmentService.new
       result = shipment_service.create(shipment_params)
       if result['status'] == "PROPOSED"
-        order.update!(shipment_id: result['id'], tracking_url: result['trackingURL'], tracking_number: result['waybill'])
+        order.update_attributes!(shipment_id: result['id'], tracking_url: result['trackingURL'], tracking_number: result['waybill'])
         OpenStruct.new(success?: true, msg: I18n.t('messages.deliveries.success', deliver_by: "FedEx"), code: 200)
       else
         error = I18n.t('messages.deliveries.failed') +  "Error from #{order.deliver_by} "

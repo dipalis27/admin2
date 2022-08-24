@@ -28,164 +28,122 @@
 #
 module BxBlockCatalogue
   class CatalogueSerializer < BuilderBase::BaseSerializer
-    attributes :name, :description, :on_sale, :discount, :sku, :price_including_tax, :height,
-               :availability
+    attributes :name, :description, :manufacture_date,
+               :block_qty, :price, :on_sale, :sale_price, :discount,
+               :recommended, :sku, :length, :breadth,:tax_amount,:price_including_tax,
+               :height, :weight,
+               :brand, :tags, :reviews
 
-    attribute :stock_qty do |object, params|
+    attribute :current_availibility, &:availability
+
+    attribute :default_variant do |object|
+      object.catalogue_variants.find_by(is_default: true) || object.catalogue_variants.first
+    end
+
+    attribute :stock_qty do |object|
       object.catalogue_variants.present? ? object.catalogue_variants.sum(:stock_qty) : object.stock_qty.to_i
     end
 
-    attribute :default_variant do |object, params|
-      variant = object.catalogue_variants.find_by(is_default: true) || object.catalogue_variants.first
-      DefaultCatalogueVariantSerializer.new(variant)
-    end
-
-    attribute :actual_price_including_tax do |object, params|
-      if params[:ignore_actual_price_including_tax]
-        nil
-      else
-        object.price
-      end
+    attribute :actual_price_including_tax do |object|
+      object.price.present? && object.tax.present? ? (object.price.to_f + ((object.price.to_f * object.tax.tax_percentage.to_f)/100).to_f).round : 0
     end
 
     attribute :cart_quantity do |object, params|
-      if params[:ignore_cart_quantity]
-        nil
-      else
-        if params[:user].present? && params[:user]&.orders&.present?
-          current_user = params[:user]
-          order = current_user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object&.id, subscription_quantity: nil).last  if order.present?
-          if order_item.present?
-            cart_quantity = order_item.quantity
-          else
-            cart_quantity =  nil
-          end
+      if params[:user].present? && params[:user]&.orders&.present?
+        current_user = params[:user]
+        order = current_user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object&.id, subscription_quantity: nil).last  if order.present?
+        if order_item.present?
+          cart_quantity = order_item.quantity
         else
-          cart_quantity = nil
+          cart_quantity =  nil
         end
-        cart_quantity
+      else
+        cart_quantity = nil
       end
+      cart_quantity
     end
 
     attribute :subscription_quantity do |object, params|
-      if params[:ignore_subscription_quantity]
-        nil
-      else
-        user = params[:user]
-        if user.present? && user.orders.present?
-          order = user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
-          order_item.subscription_quantity if order_item.present?
-        end
+      user = params[:user]
+      if user.present? && user.orders.present?
+        order = user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
+        order_item.subscription_quantity if order_item.present?
       end
     end
 
     attribute :subscription_package do |object, params|
-      if params[:ignore_subscription_package]
-        nil
-      else
-        user = params[:user]
-        if user.present? && user.orders.present?
-          order = user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last  if order.present?
-          order_item.subscription_package if order_item.present?
-        end
+      user = params[:user]
+      if user.present? && user.orders.present?
+        order = user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last  if order.present?
+        order_item.subscription_package if order_item.present?
       end
     end
 
     attribute :subscription_period do |object, params|
-      if params[:ignore_subscription_period]
-        nil
-      else
-        user = params[:user]
-        if user.present? && user.orders.present?
-          order = user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
-          order_item.subscription_period if order_item.present?
-        end
+      user = params[:user]
+      if user.present? && user.orders.present?
+        order = user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
+        order_item.subscription_period if order_item.present?
       end
     end
 
     attribute :subscription_days_count do |object, params|
-      if params[:ignore_subscription_days_count]
-        nil
-      else
-        user = params[:user]
-        if user.present? && user.orders.present?
-          order = user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
-          if order_item.present?
-            item_count = ((Date.tomorrow + order_item.subscription_period.to_i.months) - Date.tomorrow).to_i
-            if order_item.subscription_package.to_s.downcase == 'daily'
-              order_item_quantity = item_count * order_item.subscription_quantity
-            elsif order_item.subscription_package.to_s.downcase == 'weekly'
-              order_item_quantity = (item_count / 7 ) * order_item.subscription_quantity
-            elsif order_item.subscription_package.to_s.downcase == 'monthly'
-              order_item_quantity = order_item.subscription_period.to_i * order_item.subscription_quantity
-            end
+      user = params[:user]
+      if user.present? && user.orders.present?
+        order = user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object.id).where.not(subscription_quantity: nil).last if order.present?
+        if order_item.present?
+          item_count = ((Date.tomorrow + order_item.subscription_period.to_i.months) - Date.tomorrow).to_i
+          if order_item.subscription_package.to_s.downcase == 'daily'
+            order_item_quantity = item_count * order_item.subscription_quantity
+          elsif order_item.subscription_package.to_s.downcase == 'weekly'
+            order_item_quantity = (item_count / 7 ) * order_item.subscription_quantity
+          elsif order_item.subscription_package.to_s.downcase == 'monthly'
+            order_item_quantity = order_item.subscription_period.to_i * order_item.subscription_quantity
           end
         end
       end
     end
 
     attribute :preferred_delivery_slot do |object, params|
-      if params[:ignore_preferred_delivery_slot]
-        nil
-      else
-        user = params[:user]
-        if user.present? && user.orders.present?
-          order = user.orders.where(status: 'in_cart').last
-          order_item = order.order_items.where(catalogue_id: object.id).where.not(preferred_delivery_slot: nil).last if order.present?
-          order_item.preferred_delivery_slot if order_item.present?
-        end
+      user = params[:user]
+      if user.present? && user.orders.present?
+        order = user.orders.where(status: 'in_cart').last
+        order_item = order.order_items.where(catalogue_id: object.id).where.not(preferred_delivery_slot: nil).last if order.present?
+        order_item.preferred_delivery_slot if order_item.present?
       end
     end
 
     attribute :wishlisted do |object, params|
-      if params[:ignore_wishlisted]
-        nil
-      else
-        current_account = params[:user]
-        BxBlockWishlist::WishlistItem.where(catalogue_id: object.id).joins(:wishlist).where(wishlists: { account_id: current_account&.id.to_i }).any?
-      end
+      current_account = params[:user]
+      BxBlockWishlist::WishlistItem.where(catalogue_id: object.id).joins(:wishlist).where(wishlists: { account_id: current_account&.id.to_i }).any?
     end
 
     attribute :product_notified do |object, params|
-      if params[:ignore_product_notified]
-        nil
-      else
-        current_account = params[:user]
-        BxBlockCatalogue::ProductNotify.where(
-          catalogue_variant_id: object.catalogue_variants.pluck(:id), account_id: current_account&.id.to_i
-        ).any?
-      end
+      current_account = params[:user]
+      BxBlockCatalogue::ProductNotify.where(
+        catalogue_variant_id: object.catalogue_variants.pluck(:id), account_id: current_account&.id.to_i
+      ).any?
     end
 
     attribute :cart_items do |object, params|
-      if params[:ignore_cart_items]
-        []
+      if (user = params[:user]).nil?
+        nil
       else
-        if (user = params[:user]).nil?
-          nil
-        else
-          result = {}
-          user.orders.order_in_cart.last&.order_items&.each do |order_item|
-            next unless order_item.catalogue_variant_id.in?(object.catalogue_variant_ids)
-            result[order_item.catalogue_variant_id] = order_item.quantity
-          end
-          result
+        result = {}
+        user.orders.order_in_cart.last&.order_items&.each do |order_item|
+          next unless order_item.catalogue_variant_id.in?(object.catalogue_variant_ids)
+          result[order_item.catalogue_variant_id] = order_item.quantity
         end
+        result
       end
     end
 
-    attribute :average_rating do |object, params|
-      if params[:ignore_average_rating]
-        nil
-      else
-        object.average_rating
-      end
-    end
+    attribute :average_rating, &:average_rating
 
     attribute :images do |object, params|
       host = params[:host] || ''
@@ -194,22 +152,32 @@ module BxBlockCatalogue
       end
     end
 
-    attribute :product_attributes do |object, params|
-      if params[:ignore_product_attributes]
-        {}
-      else
-        if object.catalogue_variants.present?
-          p_variants = object.catalogue_variants
-          _hash = {}
-          Variant.all.each do |variant|
-            _hash["#{variant.name}"] = p_variants.map{|pv| pv.catalogue_variant_properties.where(variant_id: variant.id).map{|pvp| {name: pvp.variant_property.name, variant_property_id: pvp.variant_property_id}}}.flatten.uniq
-          end
-          _hash
+    attribute :product_attributes do |object|
+      if object.catalogue_variants.present?
+        p_variants = object.catalogue_variants
+        _hash = {}
+        Variant.all.each do |variant|
+          _hash["#{variant.name}"] = p_variants.map{|pv| pv.catalogue_variant_properties.where(variant_id: variant.id).map{|pvp| {name: pvp.variant_property.name, variant_property_id: pvp.variant_property_id}}}.flatten.uniq
         end
+        _hash
       end
     end
 
-    attribute :deep_link do |object|
+    attribute :availability do |object|
+      if object.catalogue_variants.present?
+        p_variants = object.catalogue_variants
+        _hash = []
+        BxBlockCatalogue::Catalogue.active.where(id: object.id, availability: "in_stock").map do |catalogue|
+          Variant.all.each do |variant|
+            _hash << {
+              variant_attributes: p_variants.map{|pv| pv.catalogue_variant_properties.where(variant_id: variant.id).map{|pvp| {variant_id: variant.id, variant_name: variant.name, variant_property_name: pvp.variant_property.name, variant_property_id: pvp.variant_property_id}}}.flatten.uniq }
+          end
+        end
+        _hash
+      end
+    end
+
+    attribute :deep_link do |object, params|
       "https://#{ENV['HOST_URL']}/share/share/dl?catalogue_id=#{object.id}"
     end
 
@@ -218,6 +186,20 @@ module BxBlockCatalogue
         object.catalogue_variants, { params: params }
       )
       serializer.serializable_hash[:data]
+    end
+
+    attribute :variants_in_cart do |object, params|
+      variants_id_in_cart = params[:cart]&.order_items&.pluck(:catalogue_variant_id) || []
+      variants_id = object&.catalogue_variants&.pluck(:id) || []
+      variants_id_in_cart & variants_id
+    end
+
+    attributes :can_review do |object, params|
+      if params[:can_review].present? && params[:catalogue_id].present? && params[:catalogue_id] == object.id
+        params[:can_review]
+      else
+        false
+      end
     end
 
     attribute :similar_products do |object, params|
@@ -235,78 +217,55 @@ module BxBlockCatalogue
       end
     end
 
+    attribute :category do |object, params|
+      options = {}
+      if object.sub_categories.present?
+        a = object.sub_categories.pluck(:category_id).uniq
+        categories = BxBlockCategoriesSubCategories::Category.where(id: a)
+        categories.map{ |cat|
+          BxBlockCategoriesSubCategories::CategorySerializer.new(cat).serializable_hash
+        }
+      end
+    end
+
     attribute :reviews do |object, params|
-      if params[:ignore_reviews]
-        []
-      else
-        serializer = BxBlockCatalogue::ReviewSerializer.new(object.reviews.where(is_published: true).order(created_at: :desc), { params: params })
-        serializer.serializable_hash[:data]
-      end
+      serializer = BxBlockCatalogue::ReviewSerializer.new(object.reviews.where(is_published: true).order(created_at: :desc), { params: params })
+      serializer.serializable_hash[:data]
     end
 
-    attribute :catalogue_subscriptions do |object, params|
-      if params[:ignore_catalogue_subscriptions]
-        []
-      else
-        BxBlockCatalogue::CatalogueSubscriptionSerializer.new(object.catalogue_subscriptions).serializable_hash[:data]
-      end
+    attribute :catalogue_subscriptions do |object|
+      BxBlockCatalogue::CatalogueSubscriptionSerializer.new(object.catalogue_subscriptions).serializable_hash[:data]
     end
 
-    attribute :is_subscription_available do |object, params|
-      if params[:ignore_is_subscription_available]
-        nil
-      else
-        object.catalogue_subscriptions.present? ? true : false
-      end
+    attribute :is_subscription_available do |object|
+      object.catalogue_subscriptions.present? ? true : false
     end
 
-    attribute :available_subscription do |object, params|
-      if params[:ignore_available_subscription]
-        {}
-      else
-        _hash = {}
-        object.catalogue_subscriptions.all.each do |subscription|
-          _hash["#{subscription.subscription_package}"] = object.catalogue_subscriptions.where(subscription_package: subscription.subscription_package).map(&:subscription_period)
-        end
-        _hash
+    attribute :available_subscription do |object|
+      _hash = {}
+      object.catalogue_subscriptions.all.each do |subscription|
+        _hash["#{subscription.subscription_package}"] = object.catalogue_subscriptions.where(subscription_package: subscription.subscription_package).map(&:subscription_period)
       end
+      _hash
     end
 
-    attribute :available_slots do |object, params|
-      if params[:ignore_available_slots]
-        {}
-      else
-        morning_slots = object.catalogue_subscriptions.map{|ps| JSON.parse(ps.morning_slot).map{|s| s.to_s.gsub('_', ' ')}}.uniq.first
-        evening_slots = object.catalogue_subscriptions.map{|ps| JSON.parse(ps.evening_slot).map{|s| s.to_s.gsub('_', ' ')}}.uniq.first
-        slots = {}
-        slots["morning_slots"] = morning_slots
-        slots["evening_slots"] = evening_slots
-        slots
-      end
+    attribute :available_slots do |object|
+      morning_slots = object.catalogue_subscriptions.map{|ps| JSON.parse(ps.morning_slot).map{|s| s.to_s.gsub('_', ' ')}}.uniq.first
+      evening_slots = object.catalogue_subscriptions.map{|ps| JSON.parse(ps.evening_slot).map{|s| s.to_s.gsub('_', ' ')}}.uniq.first
+      slots = {}
+      slots["morning_slots"] = morning_slots
+      slots["evening_slots"] = evening_slots
+      slots
     end
 
     attribute :is_notify_product do |object, params|
-      if params[:ignore_is_notify_product]
-        nil
-      else
-        if params[:user].present?
-          user = params[:user]
-          if user.product_notifies.present? && user.product_notifies.map(&:catalogue_id).include?(object.id)
-            true
-          else
-            false
-          end
+      if params[:user].present?
+        user = params[:user]
+        if user.product_notifies.present? && user.product_notifies.map(&:catalogue_id).include?(object.id)
+          true
+        else
+          false
         end
-      end
-    end
-
-    attribute :variants_in_cart do |object, params|
-      if params[:ignore_variants_in_cart]
-        nil
-      else
-        variants_id_in_cart = params[:cart]&.order_items&.pluck(:catalogue_variant_id) || []
-        variants_id = object&.catalogue_variants&.pluck(:id) || []
-        variants_id_in_cart & variants_id
       end
     end
   end
