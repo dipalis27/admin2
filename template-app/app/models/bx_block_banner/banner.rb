@@ -64,6 +64,8 @@ module BxBlockBanner
             end
             if sub_banner[:image].present?
               attachment = banner.attachments.new(position: sub_banner[:position], url: sub_banner[:url]) if sub_banner[:id].blank?
+              attachment = banner.attachments.find(sub_banner[:id]) if sub_banner[:id].present?
+              attachment.url = sub_banner[:url]
               image_path, image_extension = store_base64_image(sub_banner[:image])
               attachment.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
               File.delete(image_path) if File.exist?(image_path)
