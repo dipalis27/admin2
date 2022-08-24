@@ -47,9 +47,9 @@ module BxBlockCatalogue
     has_and_belongs_to_many :sub_categories,
                             class_name: 'BxBlockCategoriesSubCategories::SubCategory',
                             join_table: 'catalogues_sub_categories', foreign_key: 'catalogue_id'
-    has_many :order_items, class_name: "BxBlockOrderManagement::OrderItem", dependent: :destroy
+    has_many :order_items, class_name: "BxBlockOrderManagement::OrderItem"
     has_many :orders,
-             class_name: "BxBlockOrderManagement::Order", through: :order_items, dependent: :destroy
+             class_name: "BxBlockOrderManagement::Order", through: :order_items
 
     has_many :reviews, dependent: :destroy
     has_many :catalogue_variants,

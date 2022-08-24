@@ -39,7 +39,11 @@ module BxBlockAdmin
       end
 
       def destroy
-        if @catalogue.destroy
+        order_item_exist = @catalogue.order_items.present?
+        if order_item_exist
+          @catalogue.update_column('status', 'draft')
+          render json: { message: "You can't delete this product because few orders are associated with this product. The product's status has been changed to Draft.", success: true}, status: :ok
+        elsif @catalogue.destroy
           render json: { message: "Product deleted successfully.", success: true}, status: :ok
         else
           render json: { errors: @catalogue.errors.full_messages }, status: :unprocessable_entity
