@@ -200,7 +200,7 @@ module BxBlockCart
 
     def release_products
       if @order.present?
-        @order.update_attributes(is_blocked: nil, is_availability_checked: false)
+        @order.update(is_blocked: nil, is_availability_checked: false)
         @order.order_items.each do |order_item|
           quantity = order_item.quantity.to_i
           subscription_quantity = order_item.subscription_quantity.to_i

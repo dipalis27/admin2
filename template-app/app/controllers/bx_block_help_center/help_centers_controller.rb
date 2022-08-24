@@ -16,7 +16,7 @@ module BxBlockHelpCenter
       feedbacks = feedbacks
       _feedbacks = []
       feedbacks.each do |feedback|
-        full_image_url = $hostname + Rails.application.routes.url_helpers.rails_blob_path(feedback.image, only_path: true) if feedback.image.present?
+        full_image_url = url_for(feedback.image) if feedback.image.present?
         _feedbacks << feedback.attributes.merge({profile_image: full_image_url})
       end
       render json: {

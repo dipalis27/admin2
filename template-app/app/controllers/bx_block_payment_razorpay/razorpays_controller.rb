@@ -15,12 +15,22 @@ module BxBlockPaymentRazorpay
       if order.present?
         amount = (order.total.to_f * 100).to_i
         receipt = Digest::MD5.hexdigest(order.order_number.to_s)
+        account_id = ENV['RAZORPAY_PARTNER_ACCOUNT_ID']
+        razorpay_order = if ENV['RAZORPAY_PARTNER_ACCOUNT_ID'].present?
+                           BxBlockPaymentRazorpay::Payment.create(amount, 'INR', receipt, account_id)
+                         else
+                           BxBlockPaymentRazorpay::Payment.create(amount, 'INR', receipt)
+                         end
 
-        razorpay_order = BxBlockPaymentRazorpay::Payment.create(amount, 'INR', receipt)
-        if razorpay_order.status == 'created'
+        if razorpay_order[:success] == false
+          render json: {
+            success: false,
+            message: razorpay_order[:message]
+          }, status: (razorpay_order[:http_status] || 200) and return
+        elsif razorpay_order[:data].status == 'created'
           # order.order_transactions.create!(
           #   account_id: @current_user.id,
-          #   razorpay_order_id: razorpay_order.id,
+          #   razorpay_order_id: razorpay_order[:data].id,
           #   payment_id: nil,
           #   razorpay_signature: nil,
           #   status: "pending_capture",
@@ -35,14 +45,14 @@ module BxBlockPaymentRazorpay
           #   callback_method: 'get'
           # )
 
-          order.update_attributes(razorpay_order_id: razorpay_order.id, order_date:Time.current.utc, source:'card')
+          order.update(razorpay_order_id: razorpay_order[:data].id, order_date:Time.current.utc, source:'card')
 
           render json: {
             success: true,
             data:
               {
                 order: BxBlockOrderManagement::OrderSerializer.new(order).serializable_hash,
-                order_number: razorpay_order.id
+                order_number: razorpay_order[:data].id
                   }
           }, status: 200
         end
@@ -92,10 +102,10 @@ module BxBlockPaymentRazorpay
         )
         order_status_id =  BxBlockOrderManagement::OrderStatus.find_by(status:"placed").id
         order.place_order! unless order.placed?
-        order.update_attributes(order_status_id: order_status_id, placed_at: Time.current) unless order.placed?
+        order.update(order_status_id: order_status_id, placed_at: Time.current) unless order.placed?
 
         order_status_id =  BxBlockOrderManagement::OrderStatus.find_by(status:"confirmed").id
-        order.update_attributes(source: "Razorpay", order_status_id: order_status_id, confirmed_at: Time.current, placed_at: Time.current, order_date: Time.current) unless order.confirmed?
+        order.update(source: "Razorpay", order_status_id: order_status_id, confirmed_at: Time.current, placed_at: Time.current, order_date: Time.current) unless order.confirmed?
         render json: { success: verify_result, data: { order: order } }, status: :ok
       else
         render json: { error: { message: 'Somethig went wrong' } },

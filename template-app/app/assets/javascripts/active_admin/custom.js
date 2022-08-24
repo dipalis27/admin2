@@ -47,6 +47,7 @@ jQuery(function () {
   });
 
   function addCountryCodeSpan(countryCode) {
+    // For phone_number
     var numberInput = document.getElementById("brand_setting_phone_number");
     var html = numberInput.outerHTML;
     var number = numberInput.value;
@@ -58,6 +59,39 @@ jQuery(function () {
       html +
       "</div>";
     document.getElementById("brand_setting_phone_number").value = number;
+
+    // For whatsapp_number
+    var numInput = document.getElementById("brand_setting_whatsapp_number");
+    var html = numInput.outerHTML;
+    var number = numInput.value;
+    $("#brand_setting_whatsapp_number_input div.brand-setting-customer-no").remove();
+    numInput.outerHTML =
+      "<div class='brand-setting-customer-no'><span>" +
+      countryCode +
+      "</span>" +
+      html +
+      "</div>";
+    var a = "<div class='brand-setting-customer-no'><span>" +
+      countryCode +
+      "</span>" +
+      html +
+      "</div>";
+
+    if(document.getElementById("brand_setting_whatsapp_number")){
+      document.getElementById("brand_setting_whatsapp_number").value = number;
+    } else {
+      if($("#brand_setting_whatsapp_number_input p.inline-errors").length > 0){
+        const error = $("#brand_setting_whatsapp_number_input p.inline-errors").text();
+        $("#brand_setting_whatsapp_number_input p.inline-errors").remove();
+        $("#brand_setting_whatsapp_number_input").append(a)
+        $("#brand_setting_whatsapp_number_input").append(`<p class="inline-errors">${error}</p>`)
+      } else {
+        $("#brand_setting_whatsapp_number_input").append(a)
+      }
+
+    }
+
+    // $("#brand_setting_whatsapp_number_input label").append("<span class='tooltip'><i class='fas fa-info-circle info-icon'><span class='tooltiptext'>Add 10 digit what's app number where you want to receive messages</span></i></span>")
   }
 
   $(".hint_web_banner_image").change(function () {
@@ -563,7 +597,7 @@ $(document).on("click", ".onboarding-third_party_services", function (event) {
   trackAnalytics('3rd_party_configuration_accessed', 'Dashboard')
 });
 
-$(document).on("click", ".api_configurations-nav", function (event) {
+$(document).on("click", ".partner_configurations-nav", function (event) {
   trackAnalytics('3rd_party_configuration_accessed', 'Navigation Panel')
 });
 
@@ -685,14 +719,10 @@ $(document).ready(function (){
 $(document).on("click", ".catalogue-active-span", function (event) {
   var id = this.getAttribute('data-id');
   var switchElem = document.getElementById('catalogue-active-switch-' + id)
-  var handleStatus = !switchElem.checked ? 'active' : 'draft';
   $.ajax({
-    type: "PATCH",
-    url: '/admin/products/'+id+'/toggle_status',
-    data : { 'catalogue': { 'status': handleStatus } },
-    headers: {
-      'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-    },
+    type: "PUT",
+    url: '/catalogues/toggle_status',
+    data : { 'id': id, 'active': !switchElem.checked },
     success: function(response){
       var elemId = 'catalogue-active-switch-' + response.id
       document.getElementById(elemId).checked = response.active
@@ -704,3 +734,54 @@ $(document).on("click", ".catalogue-active-span", function (event) {
     }
   });
 });
+
+function copyText() {
+  /* Get the div field */
+  var copyTextDiv = document.getElementById("3rdpartyapikey11");
+  document.getElementById("custom-tooltip").style.display = "inline";
+  navigator.clipboard.writeText(copyTextDiv.innerHTML);
+  setTimeout( function() {
+    document.getElementById("custom-tooltip").style.display = "none";
+  }, 1000)
+}
+
+
+$(document).ready(function () {
+  if($("#index_table_partner_configurations").length !== 0){
+    const rows = $("#index_table_partner_configurations tbody tr td.col-partner")
+    let rowElementName = null;
+    rows.each(function(index) {
+      if('Razorpay' === $(this).text()){
+        rowElementName = $(this).parent().attr("id")
+      }
+    });
+    $(`#${rowElementName} td.col-password div`).addClass("pass")
+    // $(`#${rowElementName} td.col-password div`).append(`&nbsp;&nbsp;<span onclick="window.open('https://intercom.help/engineerai/en/articles/6258382-razorpay-help-guide','_blank')" style="cursor:pointer;color:#4bacfe;font-size:14px;font-style:italic">(info)</span>`)
+    if(rowElementName && $("#3rdpartyapikey").data("api")){
+
+      $(`#${rowElementName} td.col-actions div.table_actions a.member_link`).css("display","none")
+      $(`#${rowElementName} td.col-actions div.table_actions`).append(`<a style="margin-left:38px;" class="view_link member_link" target="_blank" title="View Dashboard" href="https://dashboard.razorpay.com/signin?screen=sign_in">View Dashboard</a>`)
+    }
+
+
+    const rowsforpassword = $("#index_table_partner_configurations tbody tr td.col-partner")
+    let rowpasswordElementName = null;
+    rowsforpassword.each(function(index) {
+      if('Shiprocket' === $(this).text()){
+        rowpasswordElementName = $(this).parent().attr("id")
+        if($(`#${rowpasswordElementName} td.col-password div`).text().trim().toLowerCase() === "na"){
+          $(`#${rowpasswordElementName} td.col-password div`).removeClass("pass")
+        }
+      }
+      if('Razorpay' === $(this).text()){
+        rowpasswordElementName = $(this).parent().attr("id")
+        if(!$(`#${rowpasswordElementName} td.col-password div`).data("api")){
+          $(`#${rowpasswordElementName} td.col-password div`).removeClass("pass")
+          $(`#${rowpasswordElementName} td.col-password i`).css("display","none")
+        }
+      }
+    });
+
+  }
+
+})

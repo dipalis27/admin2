@@ -23,7 +23,6 @@ module AccountBlock
 
     include Wisper::Publisher
     has_one_attached :image
-
     has_many :contacts, class_name: "BxBlockContactUs::Contact", dependent: :nullify
     has_many :orders, class_name: "BxBlockOrderManagement::Order", dependent: :destroy
     has_many :order_items, through: :orders, class_name: "BxBlockOrderManagement::OrderItem"
@@ -41,11 +40,12 @@ module AccountBlock
 
     accepts_nested_attributes_for :delivery_addresses, :allow_destroy => true
     has_secure_password validations: false
+    after_create :delete_guest_user
 
     # has_many :attachments, -> {where record_type: 'AccountBlock::Account'}, class_name: "ActiveStorage::Attachment", dependent: :destroy, foreign_key: :record_id
     # -> { where a
     validates :full_name, presence: true
-    validates :email, uniqueness: true, presence: true
+    validates :email, uniqueness: true#, presence: true
     validates_presence_of :password, on: :create, if: -> { self.guest != true }
     # validates :user_name, presence: true, uniqueness: true
     # validates :password_digest, presence: true, uniqueness: true
@@ -86,6 +86,11 @@ module AccountBlock
     end
 
     private
+
+    def delete_guest_user
+      UpdateUserData.new({ uuid: uuid }, self).call if !guest && uuid.present?
+      Account.where(guest: true).where('created_at <=  ?', Time.now - 24.hours).destroy_all # need to check on time
+    end
 
     def parse_full_phone_number
       phone = Phonelib.parse(full_phone_number)

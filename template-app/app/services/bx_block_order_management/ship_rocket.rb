@@ -96,7 +96,7 @@ module BxBlockOrderManagement
       @delivery_address = delivery_addresses.where(address_for: 'shipping').last&.delivery_address
       @delivery_address = delivery_addresses.where(address_for: 'billing_and_shipping').last&.delivery_address if @delivery_address.blank?
       @shipping_address = delivery_addresses.where(address_for: 'billing').present? ? delivery_addresses.where(address_for: 'billing').last&.delivery_address : delivery_addresses.where(address_for: 'billing_and_shipping').last&.delivery_address
-      @shipping_address = @delivery_address if @shipping_address.blank?
+
       {"order_id"=>@order.id.to_s,
        "order_date"=>@order.created_at.strftime('%Y-%m-%d %I:%M'),
        "pickup_location"=>@pickup_location,

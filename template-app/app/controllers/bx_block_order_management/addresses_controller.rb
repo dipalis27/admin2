@@ -1,7 +1,7 @@
 module BxBlockOrderManagement
   class AddressesController < ApplicationController
     before_action :get_user, only: [:index, :create, :show, :destroy, :update, :get_address_states]
-    #before_action :check_country, only: [:get_address_states]
+    before_action :check_country, only: [:get_address_states]
     before_action :fetch_address, only: [:show, :destroy, :update]
     before_action :is_guest, only: %i[index, create, show, destroy, update]
 
@@ -65,14 +65,9 @@ module BxBlockOrderManagement
     end
 
     def get_address_states
-      brand_setting = BxBlockStoreProfile::BrandSetting.first
-      if brand_setting.store_country.present?
-        address_states = brand_setting.store_country.address_states.order('name ASC')
-        render json: AddressStatesSerializer.new(address_states).serializable_hash,
-               status: :ok
-      else
-        render(json: { message: "No state found." }, status: 400)
-      end       
+      address_states = BxBlockOrderManagement::AddressState.all.order('name ASC')
+      render json: AddressStatesSerializer.new(address_states).serializable_hash,
+             status: :ok
     end
 
     private

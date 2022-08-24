@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get '422', to: 'application#server_error'
   get '404', to: 'application#page_not_found'
   get '/onboarding/dismiss', to: 'bx_block_admin/onboarding#dismiss'
+  put '/catalogues/toggle_status', to: 'bx_block_admin/catalogues#toggle_status'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
   namespace :bx_block_admin, path: 'admin' do
