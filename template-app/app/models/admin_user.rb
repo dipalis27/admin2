@@ -29,8 +29,8 @@ class AdminUser < ApplicationRecord
         'bx_block_admin/v1/categories': 'BxBlockCategoriesSubCategories::Category', #valid route needed
         'bx_block_admin/v1/order_reports': 'BxBlockOrderManagement::Order',
         'bx_block_admin/v1/orders': 'BxBlockOrderManagement::Order',
-        'bx_block_admin/v1/brand': 'BxBlockCatalogue::Brand', #valid route needed
-        'bx_block_admin/v1/coupon': 'BxBlockCouponCodeGenerator::CouponCode', #valid route needed
+        'bx_block_admin/v1/brands': 'BxBlockCatalogue::Brand', #valid route needed
+        'bx_block_admin/v1/coupon_codes': 'BxBlockCouponCodeGenerator::CouponCode', #valid route needed
         'bx_block_admin/v1/tag': 'BxBlockCatalogue::Tag', #valid route needed
         'bx_block_admin/v1/customers': 'AccountBlock::Account',
         'bx_block_admin/v1/brand_settings': 'BxBlockStoreProfile::BrandSetting',
