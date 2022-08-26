@@ -63,11 +63,11 @@ module BxBlockAdmin
       private
 
       def admin_user_params
-        params.permit(:email, :phone_number, :name, :password, :password_confirmation)
+        params.permit(:email, :country_code, :phone_number, :name, :password, :password_confirmation)
       end
 
       def sub_admin_params
-        params.permit(:id, :email, :phone_number, :name, :password, :password_confirmation, permissions: [])
+        params.permit(:id, :email, :country_code, :phone_number, :name, :password, :password_confirmation, permissions: [])
       end
 
       def validate_password
