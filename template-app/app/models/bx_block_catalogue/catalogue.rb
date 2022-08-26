@@ -143,7 +143,7 @@ module BxBlockCatalogue
     end
 
     def has_images
-      errors.add(:base, 'must add at least one image') if self.attachments.blank? && Rails.env != 'test'
+      errors.add(:base, 'must add at least one image / make product inactive') if self.attachments.blank? && Rails.env != 'test'
     end
 
     def has_remained_any_image_on_update
