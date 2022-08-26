@@ -1,6 +1,6 @@
 module BxBlockAdmin
   class CustomerSerializer < BuilderBase::BaseSerializer
-    attributes :id, :full_name, :email, :activated, :full_phone_number
+    attributes :id, :full_name, :email, :activated, :full_phone_number, :country_code, :phone_number
 
     attribute :delivery_addresses do |object|
       DeliveryAddressSerializer.new(object.delivery_addresses).serializable_hash
