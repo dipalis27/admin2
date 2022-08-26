@@ -43,7 +43,7 @@ module BxBlockOrderManagement
           end
           return OpenStruct.new(success?: true, data: {}, msg: 'Address added successfully', code: 200)
         else
-          return OpenStruct.new(success?: false, data: nil, msg: "Ooops, Sorry it seems like your address doesn't cover store's delivery area. Try again with valid address", code: 404)
+          return OpenStruct.new(success?: false, data: nil, msg: delivery_address.errors.any? ? delivery_address.errors.full_messages.to_sentence : "Ooops, Sorry it seems like your address doesn't cover store's delivery area. Try again with valid address", code: 404)
         end
       else
         return OpenStruct.new(success?: false, data: nil, msg: "Ooops, Sorry it seems like you didn't provide the delivery address.", code: 404)
