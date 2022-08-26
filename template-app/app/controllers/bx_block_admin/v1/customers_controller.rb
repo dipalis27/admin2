@@ -8,7 +8,7 @@ module BxBlockAdmin
         current_page = filter_params[:page].present? ? filter_params[:page].to_i : 1
         customers = fetch_customers
 
-        customers = customers.order(created_at: :desc).page(current_page).per(per_page)
+        customers = customers.order(updated_at: :desc).page(current_page).per(per_page)
         render json: CustomerSerializer.new(customers, pagination_data(customers, per_page)).serializable_hash, status: :ok
       end
 
