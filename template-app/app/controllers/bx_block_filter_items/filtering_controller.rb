@@ -72,7 +72,6 @@ module BxBlockFilterItems
       end
 
       request_hash
->>>>>>> Initial commit by CDE with Catalog BuildId:18645 on 2022/08/24 12:49:39 [skip ci]
     end
 
     def save_recent_search
