@@ -37,7 +37,7 @@ unless ShippingCharge::Load.is_loaded_from_gem
       link_to 'Zipcodes', admin_zipcodes_path
     end unless config.action_items.map(&:name).include?(:zipcodes)
 
-    permit_params :below, :charge
+    permit_params :below, :charge, :free_shipping
 
     index :download_links => false do
       column "Less Than", :below
@@ -52,6 +52,7 @@ unless ShippingCharge::Load.is_loaded_from_gem
 
     form do |f|
       f.inputs 'Shipping Charge' do
+        f.input :free_shipping
         f.input :below, label: 'Less Than', hint: self.object.below.present? ? "above #{self.object.below} delivery charges will be free" : "above this amount delivery charges will be free"
         f.input :charge
         actions

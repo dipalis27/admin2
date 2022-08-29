@@ -8,7 +8,8 @@ module BxBlockAdmin
       @onboarding = BxBlockAdmin::Onboarding.first
       @api_configuration_payment = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['stripe', 'razorpay']).first
       @api_configuration_shipping = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).first
-      @tax = BxBlockOrderManagement::Tax.first 
+      @tax = BxBlockOrderManagement::Tax.first
+      @banner = BxBlockBanner::Banner.first 
     end
 
     def call
@@ -25,7 +26,7 @@ module BxBlockAdmin
        {title: 'Theme', description: 'Select a colour theme and homepage template',completion_status: (@brand_setting&.color_palet.present? && @brand_setting&.template_selection.present?)},
        {title: 'Header', description: 'Add your logo and a few other basics', completion_status: (@brand_setting&.heading.present? && @brand_setting&.logo.present?)},
        {title: 'Footer', description: 'Add a customer care phone number and social links', completion_status: @brand_setting&.phone_number.present?},
-       {title: 'Banners', description: 'Upload desktop and mobile banner assets to your homepage', completion_status: false}
+       {title: 'Banners', description: 'Upload desktop and mobile banner assets to your homepage', completion_status: @banner.present? }
       ]
     end
 
@@ -34,7 +35,7 @@ module BxBlockAdmin
        {
           title: 'Products',
           description: 'Add your products, variants and categories',
-          completion_status: (@product.present? && @category.present? && @variant.present?)
+          completion_status: (@catalogue.present? && @category.present? && @variant.present?)
         }
       ]
     end
@@ -67,7 +68,7 @@ module BxBlockAdmin
     def percent_completion
       begin
         total_steps, steps_completed = @onboarding&.task_info
-        (steps_completed.to_f/total_steps.to_f)*100
+        ((steps_completed.to_f/total_steps.to_f)*100).to_i
       rescue
         100
       end
