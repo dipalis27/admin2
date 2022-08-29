@@ -57,7 +57,7 @@ module BxBlockAdmin
     end
 
     def set_attachment(category, attachment_params)
-      return category if attachment_params[:image].nil?
+      return category if attachment_params[:id].blank? && attachment_params[:image].nil?
       if attachment_params[:id].present?
         attachment = category.attachments.find_by(id: attachment_params[:id])
         return category if attachment.nil?
@@ -71,7 +71,7 @@ module BxBlockAdmin
       else
         attachment = category.attachments.build
         attachment = attach_image(attachment, attachment_params[:image], 'image')
-        return category    
+        return category
       end
     end
 
