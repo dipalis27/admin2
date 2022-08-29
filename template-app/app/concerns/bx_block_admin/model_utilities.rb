@@ -11,7 +11,7 @@ module BxBlockAdmin
     def store_base64_image(base64)
       image_extension = base64.split(',').first.gsub("\;base64", "").gsub("data:image/", '') rescue 'png'
       decoded_data = base64.gsub!("data:image/#{image_extension};base64,", "")
-      image_path="tmp/temp_image.#{image_extension}"
+      image_path="tmp/temp_image_#{Faker::Number.unique.number(digits: 4)}.#{image_extension}"
       File.open(image_path, 'wb') do |f|
         f.write(Base64.decode64(decoded_data))
       end
