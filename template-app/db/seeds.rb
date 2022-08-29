@@ -190,7 +190,7 @@ step_2 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 2)
 if step_2.new_record?
   step_completion = {
     "taxes": {"completion": true, "url": "/admin/taxes"},
-    "shipping":{"completion": false, "url": "/admin/shipping_charges"},
+    "shipping":{"completion": true, "url": "/admin/shipping_charges"},
     "third_party_services":{"completion": false, "url": "/admin/partner_configurations"}
   }.to_json
   step_2.assign_attributes(title: "Set up your business", description: "Set up your payments and logistics – and then configure your mobile app.", step_completion: step_completion, onboarding: onboarding)
@@ -202,12 +202,25 @@ step_3 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 3)
 if step_3.new_record?
   step_completion = {
     "variants": {"completion": false, "url": "/admin/variants"},
-    "brands": {"completion": false, "url": "/admin/brands"},
+    "brands": {"completion": true, "url": "/admin/brands"},
     "categories": {"completion": false, "url": "/admin/categories"}
   }.to_json
   step_3.assign_attributes(title: "Add your products", description: "Finally, tell us the categories, brands, colours and sizes of your products – to create your inventory.", step_completion: step_completion, onboarding: onboarding)
   step_3.image.attach(io: File.open('app/assets/images/step_3.png'), filename: 'step_3.png')
   step_3.save if step_3.image.attached?
+end
+
+step_4 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 4)
+if step_4.new_record?
+  step_completion = {
+    "store_details": {"completion": true, "url": "/admin/brand_settings"},
+    "taxes": {"completion": true, "url": "/admin/taxes"},
+    "shipping": {"completion": true, "url": "/admin/api_configurations"},
+    "payment": {"completion": true, "url": "/admin/api_configurations"},
+  }.to_json
+  step_4.assign_attributes(title: "Set up your business", description: "Finally, setup your stored details, taxes, shipping and payment", step_completion: step_completion, onboarding: onboarding)
+  step_4.image.attach(io: File.open('app/assets/images/step_1.png'), filename: 'step_2.png')
+  step_4.save if step_4.image.attached?
 end
 
 # Tax amount update

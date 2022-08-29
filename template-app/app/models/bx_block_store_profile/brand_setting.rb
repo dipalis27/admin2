@@ -258,16 +258,16 @@ module BxBlockStoreProfile
     end
 
     def update_default_email_settings
-      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first_or_initialize(brand_name: self.heading)
       defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
       hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
       logo_url = hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true) if self.logo.attached?
       begin
         downloaded_image = open(logo_url)
-        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
-        blob = ActiveStorage::Attachment.find_by(record_id: 20, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
+        blob = ActiveStorage::Attachment.find_by(record_id: self.id, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
         extension = blob.content_type.split("/").last
         defaul_email_setting.logo.attach(io: downloaded_image, filename: "logo"+extension)
+        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
       rescue Exception => error
         Rails.logger.info "============== Error: #{error.message}=============="
       end

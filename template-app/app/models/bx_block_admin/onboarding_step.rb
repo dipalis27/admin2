@@ -8,10 +8,10 @@ module BxBlockAdmin
     has_one_attached :image
     belongs_to :onboarding
 
-    STEPS = %w[brands email app_banner web_banner taxes shipping third_party_services variants branding categories]
+    STEPS = %w[brands email app_banner web_banner taxes shipping third_party_services variants branding categories store_details shipping payment]
 
     validates_presence_of :title, :description, :step_completion
-    validates :step, presence: true, uniqueness: true, numericality: { only_integer: true, greater_than: 0, less_than: 4 }
+    validates :step, presence: true, uniqueness: true, numericality: { only_integer: true, greater_than: 0, less_than: 5 }
     validates :image, content_type: ['image/png', 'image/jpg', 'image/jpeg'], attached: true
     validate :valid_step_completion, :validate_image
 
@@ -21,7 +21,7 @@ module BxBlockAdmin
         sub_steps.each do |key, value|
           return false unless value["completion"]
         end
-        if step == 3
+        if step == 4
           step_1 = OnboardingStep.step_number(1)
           if step_1.present?
             begin
