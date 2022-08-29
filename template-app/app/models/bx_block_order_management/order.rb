@@ -112,6 +112,8 @@ module BxBlockOrderManagement
     before_save :update_ship_rocket_order_status, if: :order_status_id_changed?
     after_save :upload_invoice_to_s3, if: :saved_change_to_status?
     around_update :check_order_date
+    before_save :update_package_details
+
     NOTIFICATION_KEYS = {
       PLACED: 'PLACED',
       CANCELLED: 'CANCELLED',
@@ -561,6 +563,15 @@ module BxBlockOrderManagement
        self.is_subscribed,
        self.stripe_payment_method_id
        ]
+    end
+
+    def update_package_details
+      if self.package_id_changed?
+        package = self.package
+        self.length = package.length
+        self.breadth = package.breadth
+        self.height = package.height
+      end
     end
 
     private
