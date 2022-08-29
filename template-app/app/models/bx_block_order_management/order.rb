@@ -569,7 +569,7 @@ module BxBlockOrderManagement
       if self.package_id_changed?
         package = self.package
         self.length = package.length
-        self.breadth = package.breadth
+        self.breadth = package.width
         self.height = package.height
       end
     end

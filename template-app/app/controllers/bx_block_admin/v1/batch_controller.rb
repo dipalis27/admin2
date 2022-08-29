@@ -46,6 +46,10 @@ module BxBlockAdmin
               process_delete_action(BxBlockNotification::PushNotification)
             when "customer_feedback"
               process_delete_action(BxBlockCatalogue::CustomerFeedback)
+            when "catalogue_images"
+              process_delete_action(BxBlockCatalogue::BulkImage)
+            when "sub_admins"
+              process_delete_action(AdminUser.sub_admin)
             else
               render json: { errors: ["Invalid resource for batch to process."] }, status: :unprocessable_entity
           end
