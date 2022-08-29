@@ -1,6 +1,6 @@
 module BxBlockAdmin
   class OrderSerializer < BuilderBase::BaseSerializer
-    attributes :id, :order_number, :status, :total, :sub_total, :total_tax, :shipping_charge, :applied_discount, :ship_rocket_order_id
+    attributes :id, :order_number, :status, :total, :sub_total, :total_tax, :shipping_charge, :applied_discount, :ship_rocket_order_id, :weight
 
     attribute :order_date do |object|
       object.order_date.strftime("%b %d %Y, %I:%M %p") rescue ''
