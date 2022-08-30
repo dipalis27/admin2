@@ -178,7 +178,6 @@ if step_1.new_record?
   step_completion = {
     "branding": {"completion": false, "url": "/admin/brand_settings"},
     "email": {"completion": false, "url": "/admin/email_settings"},
-    "app_banner": {"completion": false, "url": "/admin/app_banners"},
     "web_banner": {"completion": false, "url": "/admin/web_banners"}
   }.to_json
   step_1.assign_attributes(title: "Create your store", description: "First up, branding – add your logo, choose your colour palette and create banners.", step_completion: step_completion, onboarding: onboarding)
