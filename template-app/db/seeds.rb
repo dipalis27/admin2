@@ -1,14 +1,14 @@
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 unless AdminUser.find_by_email('admin@example.com')
-  AdminUser.create(email: 'admin@example.com', password: 'Builder@54321', password_confirmation: 'Builder@54321', activated: true, role: 'super_admin')
+  AdminUser.create(name: "Admin User", email: 'admin@example.com', password: 'Builder@54321', password_confirmation: 'Builder@54321', activated: true, role: 'super_admin')
   BxBlockRoleAndPermission::AdminProfile.create(name: 'admin', phone: '1234567890', email: 'admin@example.com', admin_user_id: AdminUser.find_by_email('admin@example.com').id ) if AdminUser.find_by_email('admin@example.com').admin_profile.blank?
 end
 
 if ENV['EMAIL'].present?
   unless AdminUser.find_by_email(ENV['EMAIL'])
     email = ENV['EMAIL'].present? ? ENV['EMAIL']  : 'admin2@example.com'
-    AdminUser.create(email: email, password: 'Builder@54321', password_confirmation: 'Builder@54321', activated: true, role: 'super_admin')
+    AdminUser.create(name: "Admin User", email: email, password: 'Builder@54321', password_confirmation: 'Builder@54321', activated: true, role: 'super_admin')
     BxBlockRoleAndPermission::AdminProfile.create(name: 'admin', phone: '1234567890', email: email, admin_user_id: AdminUser.find_by_email(email).id ) if AdminUser.find_by_email(email).admin_profile.blank?
   end
 end
@@ -92,8 +92,9 @@ unless BxBlockStoreProfile::BrandSetting.any?
   brand_setting = BxBlockStoreProfile::BrandSetting.new(
     heading: 'Your store', common_button_color: '#364f6b', button_hover_color: '#5e7289',
     brand_text_color: '#ffffff', active_text_color: '#ffffff', country: 'india', currency_type: 'INR',
-    is_facebook_login: false, is_google_login: false, is_apple_login: false, primary_color: '#000000',
-    highlight_primary_color: '#3FC1CB', highlight_secondary_color: '#FC5185', address_state: delhi
+    is_facebook_login: false, is_google_login: false, is_apple_login: false, primary_color: '#364F6B',
+    highlight_primary_color: '#3FC1CB', highlight_secondary_color: '#FC5185', address_state: delhi,
+    color_palet: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", secondary_color: '#3FC1CB'
   )
   brand_setting.logo.attach(io: File.open(Rails.root.join("app", "assets", "images", "Logo.png")), filename: "Logo.jpg")
 
@@ -177,7 +178,6 @@ if step_1.new_record?
   step_completion = {
     "branding": {"completion": false, "url": "/admin/brand_settings"},
     "email": {"completion": false, "url": "/admin/email_settings"},
-    "app_banner": {"completion": false, "url": "/admin/app_banners"},
     "web_banner": {"completion": false, "url": "/admin/web_banners"}
   }.to_json
   step_1.assign_attributes(title: "Create your store", description: "First up, branding – add your logo, choose your colour palette and create banners.", step_completion: step_completion, onboarding: onboarding)
