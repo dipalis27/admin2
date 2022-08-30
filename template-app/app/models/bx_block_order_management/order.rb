@@ -110,8 +110,8 @@ module BxBlockOrderManagement
     after_save :send_email_to_customer, if: :saved_change_to_order_status_id?
     after_save :update_product_stock, if: :saved_change_to_status?
     before_save :update_ship_rocket_order_status, if: :order_status_id_changed?
-    after_save :upload_invoice_to_s3, if: :saved_change_to_status?
     around_update :check_order_date
+    
     NOTIFICATION_KEYS = {
       PLACED: 'PLACED',
       CANCELLED: 'CANCELLED',

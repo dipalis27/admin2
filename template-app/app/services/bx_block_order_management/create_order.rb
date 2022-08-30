@@ -41,6 +41,7 @@ module BxBlockOrderManagement
                     is_gift: is_gift == true,
                     source: @source,
                     schedule_time: schedule_time)
+      order.upload_invoice_to_s3
     end
 
     def product_not_available?

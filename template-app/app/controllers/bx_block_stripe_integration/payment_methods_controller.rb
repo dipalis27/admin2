@@ -13,6 +13,7 @@ module BxBlockStripeIntegration
         payment_intent = create_payment_intent(amount, params['data']['payment_token'] )
         if payment_intent
           order.update(stripe_payment_method_id: payment_intent['payment_method'])
+          order.upload_invoice_to_s3
           render json: {
             message: 'Payment initiated successfull.',
             data: {client_secret: payment_intent['client_secret']}, status: :ok}
