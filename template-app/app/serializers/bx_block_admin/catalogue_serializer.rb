@@ -30,12 +30,13 @@
 #  status               :integer
 #  tax_amount           :decimal
 #  price_including_tax  :decimal
+#  trending             :boolean          default => false
 
 module BxBlockAdmin
   class CatalogueSerializer < BuilderBase::BaseSerializer
     extend AttachmentHelper
 
-    attributes :id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax, :tax_id, :brand_id
+    attributes :id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax, :tax_id, :brand_id, :trending
     
     attribute :tags do |object|
       object.tags.select(:id, :name)
