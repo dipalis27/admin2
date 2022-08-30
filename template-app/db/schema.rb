@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_27_131954) do
+ActiveRecord::Schema.define(version: 2022_08_30_083009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -420,6 +420,7 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
     t.decimal "tax_amount"
     t.decimal "price_including_tax"
     t.bigint "tax_id"
+    t.boolean "trending", default: false
     t.index ["brand_id"], name: "index_catalogues_on_brand_id"
     t.index ["status"], name: "index_catalogues_on_status"
     t.index ["tax_id"], name: "index_catalogues_on_tax_id"
