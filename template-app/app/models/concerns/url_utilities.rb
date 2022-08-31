@@ -2,7 +2,7 @@ module UrlUtilities
   extend ActiveSupport::Concern
 
   def url_for(file)
-    base_url + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
+    base_url + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true) if file.present?
   end
 
   def base_url
