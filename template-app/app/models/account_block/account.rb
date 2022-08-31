@@ -40,7 +40,6 @@ module AccountBlock
 
     accepts_nested_attributes_for :delivery_addresses, :allow_destroy => true
     has_secure_password validations: false
-    after_create :delete_guest_user
 
     # has_many :attachments, -> {where record_type: 'AccountBlock::Account'}, class_name: "ActiveStorage::Attachment", dependent: :destroy, foreign_key: :record_id
     # -> { where a
@@ -51,7 +50,9 @@ module AccountBlock
 
     before_validation :parse_full_phone_number, if: -> {self.guest != true && self.full_phone_number.present? }
 
-    after_create :track_event
+    after_create :track_event, :delete_guest_user
+    before_destroy :remove_wishlists
+
     REGEX_PATTERN = /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
 
     scope :active, -> { where(activated: true) }
@@ -113,6 +114,10 @@ module AccountBlock
       else
         !user.present? || user&.new_record? || (!user&.new_record? && (user.social_auths&.pluck(:provider).include? data[:provider])) || (Account.exists?(user.id) && user.social_auths.present? && (user.social_auths&.pluck(:provider).exclude? data[:provider]))
       end
+    end
+
+    def remove_wishlists
+      BxBlockWishlist::Wishlist.where(account_id: id).destroy_all
     end
   end
 end
