@@ -22,7 +22,8 @@ class AdminUser < ApplicationRecord
         ['brand setting', 'BxBlockStoreProfile::BrandSetting'],
         ['tax', 'BxBlockOrderManagement::Tax'],
         ['variant', 'BxBlockCatalogue::Variant'],
-        ['email setting', 'BxBlockSettings::EmailSetting']
+        ['email setting', 'BxBlockSettings::EmailSetting'],
+        ['package', ' BxBlockOrderManagement::Package']
     ]
     # Add routes inside this as per permissions to give access to sub admin
     PERMISSION_ROUTES = HashWithIndifferentAccess.new({
@@ -37,8 +38,8 @@ class AdminUser < ApplicationRecord
         'bx_block_admin/v1/brand_settings': 'BxBlockStoreProfile::BrandSetting',
         'bx_block_admin/v1/taxes': 'BxBlockOrderManagement::Tax',
         'bx_block_admin/v1/variants': 'BxBlockCatalogue::Variant',
-        'bx_block_admin/v1/email_settings': 'BxBlockSettings::EmailSetting'
-
+        'bx_block_admin/v1/email_settings': 'BxBlockSettings::EmailSetting',
+        'bx_block_admin/v1/packages': ' BxBlockOrderManagement::Package'
     })
     PERMISSION_CONVERSIONS = HashWithIndifferentAccess.new({
         'BxBlockCatalogue::Catalogue': 'product',
@@ -51,13 +52,14 @@ class AdminUser < ApplicationRecord
         'BxBlockStoreProfile::BrandSetting': 'brand setting',
         'BxBlockOrderManagement::Tax': 'tax',
         'BxBlockCatalogue::Variant': 'variant',
-        'BxBlockSettings::EmailSetting': 'email setting'
+        'BxBlockSettings::EmailSetting': 'email setting',
+        'BxBlockOrderManagement::Package': 'package'
     })
     PERMISSIONS = [
         'BxBlockCatalogue::Catalogue', 'BxBlockCategoriesSubCategories::Category',
         'BxBlockOrderManagement::Order', 'BxBlockCatalogue::Brand',
         'BxBlockCouponCodeGenerator::CouponCode', 'BxBlockCatalogue::Tag',
-        'AccountBlock::Account', 'BxBlockStoreProfile::BrandSetting', 'BxBlockOrderManagement::Tax', 'BxBlockCatalogue::Variant', 'BxBlockSettings::EmailSetting'
+        'AccountBlock::Account', 'BxBlockStoreProfile::BrandSetting', 'BxBlockOrderManagement::Tax', 'BxBlockCatalogue::Variant', 'BxBlockSettings::EmailSetting', 'BxBlockOrderManagement::Package'
     ]
 
     #################

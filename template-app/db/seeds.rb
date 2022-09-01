@@ -94,7 +94,8 @@ unless BxBlockStoreProfile::BrandSetting.any?
     brand_text_color: '#ffffff', active_text_color: '#ffffff', country: 'india', currency_type: 'INR',
     is_facebook_login: false, is_google_login: false, is_apple_login: false, primary_color: '#364F6B',
     highlight_primary_color: '#3FC1CB', highlight_secondary_color: '#FC5185', address_state: delhi,
-    color_palet: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", secondary_color: '#3FC1CB'
+    color_palet: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", secondary_color: '#3FC1CB',
+    navigation_item1: "Shop", navigation_item2: "New Arrivals"
   )
   brand_setting.logo.attach(io: File.open(Rails.root.join("app", "assets", "images", "Logo.png")), filename: "Logo.jpg")
 
