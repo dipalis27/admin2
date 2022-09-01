@@ -119,6 +119,8 @@ module BxBlockStoreProfile
         attributes: {
           heading: self.heading,
           sub_heading: self.sub_heading,
+          navigation_item1: self.navigation_item1,
+          navigation_item2: self.navigation_item2,
           phone_number: self.phone_number,
           fb_link: self.fb_link,
           instagram_link: self.instagram_link,
@@ -220,7 +222,7 @@ module BxBlockStoreProfile
           },
           productCarousel: ['Top Picks','On Sale','Recommended Products'],
           ExtraFields: {is_facebook_login: self.is_facebook_login, is_google_login: self.is_google_login, is_apple_login: self.is_apple_login ,country: self.country, country_code: self.country == "uk" ? 44 : 91 ,
-                        currency_type: self.currency_type, heading: self.heading, sub_heading: self.sub_heading },
+                        currency_type: self.currency_type, heading: self.heading, sub_heading: self.sub_heading, navigation_item1: self.navigation_item1, navigation_item2: self.navigation_item2},
           ShippingKeys: {
             logistics: {
               oauth_site_url: @logistics_configuration&.oauth_site_url , base_url: @logistics_configuration&.base_url, client_id: @logistics_configuration&.client_id ,client_secret: @logistics_configuration&.client_id ,logistic_api_key: @logistics_configuration&.client_id
