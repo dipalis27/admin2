@@ -12,7 +12,7 @@ module BxBlockAdmin
     EXCEPTION_ROUTES = [
       'bx_block_admin/v1/admin_users#show', 'bx_block_admin/v1/admin_users#update',
       'bx_block_admin/v1/onboarding#index', 'bx_block_admin/v1/forgot_passwords#reset_password',
-      'bx_block_admin/v1/admin_users#permissions'
+      'bx_block_admin/v1/admin_users#permissions', 'bx_block_admin/v1/batch#process_request'
     ]
 
     def pagination_data(data, per_page)
