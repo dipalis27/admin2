@@ -118,9 +118,7 @@ unless BxBlockStoreProfile::BrandSetting.any?
       when 1
         banner_image_count = 1
       when 2,3
-        banner_image_count = 3
-      when 4
-        banner_image_count = 2
+        banner_image_count = 1
       end
 
       banner = BxBlockBanner::Banner.find_or_initialize_by(web_banner: true, banner_position: i)
