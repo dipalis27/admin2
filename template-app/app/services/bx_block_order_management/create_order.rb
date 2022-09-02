@@ -41,6 +41,7 @@ module BxBlockOrderManagement
                     is_gift: is_gift == true,
                     source: @source,
                     schedule_time: schedule_time)
+      BxBlockOrderManagement::GenerateInvoiceJob.perform_later(order.id)
     end
 
     def product_not_available?

@@ -119,6 +119,8 @@ module BxBlockStoreProfile
         attributes: {
           heading: self.heading,
           sub_heading: self.sub_heading,
+          navigation_item1: self.navigation_item1,
+          navigation_item2: self.navigation_item2,
           phone_number: self.phone_number,
           fb_link: self.fb_link,
           instagram_link: self.instagram_link,
@@ -220,7 +222,7 @@ module BxBlockStoreProfile
           },
           productCarousel: ['Top Picks','On Sale','Recommended Products'],
           ExtraFields: {is_facebook_login: self.is_facebook_login, is_google_login: self.is_google_login, is_apple_login: self.is_apple_login ,country: self.country, country_code: self.country == "uk" ? 44 : 91 ,
-                        currency_type: self.currency_type, heading: self.heading, sub_heading: self.sub_heading },
+                        currency_type: self.currency_type, heading: self.heading, sub_heading: self.sub_heading, navigation_item1: self.navigation_item1, navigation_item2: self.navigation_item2},
           ShippingKeys: {
             logistics: {
               oauth_site_url: @logistics_configuration&.oauth_site_url , base_url: @logistics_configuration&.base_url, client_id: @logistics_configuration&.client_id ,client_secret: @logistics_configuration&.client_id ,logistic_api_key: @logistics_configuration&.client_id
@@ -258,16 +260,16 @@ module BxBlockStoreProfile
     end
 
     def update_default_email_settings
-      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first
+      defaul_email_setting = BxBlockSettings::DefaultEmailSetting.first_or_initialize(brand_name: self.heading)
       defaul_email_setting = BxBlockSettings::DefaultEmailSetting.new if defaul_email_setting.blank?
       hostname = Rails.env.eql?('development') ? 'http://localhost:3000' : "https://#{ENV['HOST_URL']}"
       logo_url = hostname + Rails.application.routes.url_helpers.rails_blob_url(self.logo, only_path: true) if self.logo.attached?
       begin
         downloaded_image = open(logo_url)
-        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
-        blob = ActiveStorage::Attachment.find_by(record_id: 20, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
+        blob = ActiveStorage::Attachment.find_by(record_id: self.id, record_type: "BxBlockStoreProfile::BrandSetting", name: 'logo').blob
         extension = blob.content_type.split("/").last
         defaul_email_setting.logo.attach(io: downloaded_image, filename: "logo"+extension)
+        defaul_email_setting.update(brand_name: self.heading, recipient_email: self.order_email_copy, contact_us_email_copy_to: self.contact_us_email_copy)
       rescue Exception => error
         Rails.logger.info "============== Error: #{error.message}=============="
       end

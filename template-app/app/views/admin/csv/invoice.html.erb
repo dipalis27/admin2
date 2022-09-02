@@ -8,6 +8,13 @@
 <% @shipping_address = delivery_addresses.where(address_for: 'shipping').last&.delivery_address %>
 <% @shipping_address = delivery_addresses.where(address_for: 'billing_and_shipping').last&.delivery_address if @shipping_address.blank? %>
 <% is_in_same_state = brand_setting.country.to_s.downcase == 'india' && (@shipping_address&.address_state&.gst_code == brand_setting&.address_state&.gst_code) %>
+<% if delivery_addresses.first&.address_for.to_s.downcase == 'billing_and_shipping' %>
+  <% @billing_address = @order.delivery_addresses.first %>
+  <% @shipping_address = @order.delivery_addresses.first %>
+<% else %>
+  <% @billing_address = @order.delivery_addresses.where(address_for: 'billing').first %>
+  <% @shipping_address = @order.delivery_addresses.where(address_for: 'shipping').first %>
+<% end %>
 <html>
 <head>
   <meta charset="utf-8">
@@ -193,7 +200,7 @@
     <tr>
       <th><span contenteditable>Payment Method</span></th>
       <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
-        <%= @order&.source %>
+        <%= @order.source %>
       </td>
     </tr>
   </table>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_27_131954) do
+ActiveRecord::Schema.define(version: 2022_08_26_093657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -96,19 +96,13 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
-    t.string "variation_digest", null: false
-    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
-  end
-
   create_table "address_states", force: :cascade do |t|
     t.string "name"
     t.string "gst_code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "code"
     t.integer "country_id"
+    t.string "code"
     t.index ["country_id"], name: "index_address_states_on_country_id"
   end
 
@@ -319,19 +313,19 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
     t.integer "template_selection", default: 0
     t.jsonb "color_palet", default: "{}"
     t.integer "address_state_id"
-    t.string "whatsapp_number"
-    t.text "whatsapp_message"
     t.string "navigation_item1"
     t.string "navigation_item2"
     t.boolean "is_whatsapp_integration", default: false
     t.string "zipcode"
     t.integer "country_id"
     t.integer "currency_id"
-    t.string "area_code"
-    t.integer "city_id"
-    t.string "address_line_2"
     t.string "order_email_copy"
     t.string "contact_us_email_copy"
+    t.string "area_code"
+    t.string "whatsapp_number"
+    t.integer "city_id"
+    t.string "whatsapp_message"
+    t.string "address_line_2"
   end
 
   create_table "brands", force: :cascade do |t|
@@ -421,7 +415,6 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
     t.decimal "price_including_tax"
     t.bigint "tax_id"
     t.index ["brand_id"], name: "index_catalogues_on_brand_id"
-    t.index ["status"], name: "index_catalogues_on_status"
     t.index ["tax_id"], name: "index_catalogues_on_tax_id"
   end
 
@@ -683,12 +676,12 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
     t.bigint "modulee_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "youtube_url"
+    t.string "text"
     t.string "title"
     t.string "content"
     t.boolean "make_this_a_prerequisite", default: false
     t.boolean "enable_discussion_for_this_lesson", default: false
-    t.string "youtube_url"
-    t.string "text"
     t.boolean "status"
     t.index ["modulee_id"], name: "index_lessons_on_modulee_id"
   end
@@ -1129,7 +1122,6 @@ ActiveRecord::Schema.define(version: 2022_08_27_131954) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "assignments", "modulees"
   add_foreign_key "catalogue_variant_properties", "catalogue_variants"
   add_foreign_key "catalogue_variant_properties", "catalogues"

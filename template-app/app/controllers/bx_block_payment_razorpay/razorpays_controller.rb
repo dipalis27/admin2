@@ -106,6 +106,7 @@ module BxBlockPaymentRazorpay
 
         order_status_id =  BxBlockOrderManagement::OrderStatus.find_by(status:"confirmed").id
         order.update(source: "Razorpay", order_status_id: order_status_id, confirmed_at: Time.current, placed_at: Time.current, order_date: Time.current) unless order.confirmed?
+        BxBlockOrderManagement::GenerateInvoiceJob.perform_later(order.id)
         render json: { success: verify_result, data: { order: order } }, status: :ok
       else
         render json: { error: { message: 'Somethig went wrong' } },

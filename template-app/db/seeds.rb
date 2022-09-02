@@ -94,7 +94,8 @@ unless BxBlockStoreProfile::BrandSetting.any?
     brand_text_color: '#ffffff', active_text_color: '#ffffff', country: 'india', currency_type: 'INR',
     is_facebook_login: false, is_google_login: false, is_apple_login: false, primary_color: '#364F6B',
     highlight_primary_color: '#3FC1CB', highlight_secondary_color: '#FC5185', address_state: delhi,
-    color_palet: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", secondary_color: '#3FC1CB'
+    color_palet: "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", secondary_color: '#3FC1CB',
+    navigation_item1: "Shop", navigation_item2: "New Arrivals"
   )
   brand_setting.logo.attach(io: File.open(Rails.root.join("app", "assets", "images", "Logo.png")), filename: "Logo.jpg")
 
@@ -178,7 +179,6 @@ if step_1.new_record?
   step_completion = {
     "branding": {"completion": false, "url": "/admin/brand_settings"},
     "email": {"completion": false, "url": "/admin/email_settings"},
-    "app_banner": {"completion": false, "url": "/admin/app_banners"},
     "web_banner": {"completion": false, "url": "/admin/web_banners"}
   }.to_json
   step_1.assign_attributes(title: "Create your store", description: "First up, branding – add your logo, choose your colour palette and create banners.", step_completion: step_completion, onboarding: onboarding)
@@ -190,7 +190,7 @@ step_2 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 2)
 if step_2.new_record?
   step_completion = {
     "taxes": {"completion": true, "url": "/admin/taxes"},
-    "shipping":{"completion": false, "url": "/admin/shipping_charges"},
+    "shipping":{"completion": true, "url": "/admin/shipping_charges"},
     "third_party_services":{"completion": false, "url": "/admin/partner_configurations"}
   }.to_json
   step_2.assign_attributes(title: "Set up your business", description: "Set up your payments and logistics – and then configure your mobile app.", step_completion: step_completion, onboarding: onboarding)
@@ -202,12 +202,25 @@ step_3 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 3)
 if step_3.new_record?
   step_completion = {
     "variants": {"completion": false, "url": "/admin/variants"},
-    "brands": {"completion": false, "url": "/admin/brands"},
+    "brands": {"completion": true, "url": "/admin/brands"},
     "categories": {"completion": false, "url": "/admin/categories"}
   }.to_json
   step_3.assign_attributes(title: "Add your products", description: "Finally, tell us the categories, brands, colours and sizes of your products – to create your inventory.", step_completion: step_completion, onboarding: onboarding)
   step_3.image.attach(io: File.open('app/assets/images/step_3.png'), filename: 'step_3.png')
   step_3.save if step_3.image.attached?
+end
+
+step_4 = BxBlockAdmin::OnboardingStep.find_or_initialize_by(step: 4)
+if step_4.new_record?
+  step_completion = {
+    "store_details": {"completion": true, "url": "/admin/brand_settings"},
+    "taxes": {"completion": true, "url": "/admin/taxes"},
+    "shipping": {"completion": true, "url": "/admin/api_configurations"},
+    "payment": {"completion": true, "url": "/admin/api_configurations"},
+  }.to_json
+  step_4.assign_attributes(title: "Set up your business", description: "Finally, setup your stored details, taxes, shipping and payment", step_completion: step_completion, onboarding: onboarding)
+  step_4.image.attach(io: File.open('app/assets/images/step_1.png'), filename: 'step_2.png')
+  step_4.save if step_4.image.attached?
 end
 
 # Tax amount update

@@ -13,6 +13,7 @@ module BxBlockStripeIntegration
         payment_intent = create_payment_intent(amount, params['data']['payment_token'] )
         if payment_intent
           order.update(stripe_payment_method_id: payment_intent['payment_method'])
+          BxBlockOrderManagement::GenerateInvoiceJob.perform_later(order.id)
           render json: {
             message: 'Payment initiated successfull.',
             data: {client_secret: payment_intent['client_secret']}, status: :ok}
