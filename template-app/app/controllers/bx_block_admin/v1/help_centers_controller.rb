@@ -11,7 +11,7 @@ module BxBlockAdmin
         if @static_page.present?
           render json: @static_page, status: :ok
         else
-          render json: { message: "No static pages found"}, status: 404
+          render json: { message: "No static pages found"}, status: 200
         end
       end
 
