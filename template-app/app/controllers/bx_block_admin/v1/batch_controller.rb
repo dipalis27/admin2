@@ -50,6 +50,8 @@ module BxBlockAdmin
               process_delete_action(BxBlockCatalogue::BulkImage)
             when "sub_admins"
               process_delete_action(AdminUser.sub_admin)
+            when "interactive_faqs"
+              process_delete_action(BxBlockInteractiveFaqs::InteractiveFaqs)
             else
               render json: { errors: ["Invalid resource for batch to process."] }, status: :unprocessable_entity
           end
