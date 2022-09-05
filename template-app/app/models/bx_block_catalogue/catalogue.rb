@@ -319,7 +319,7 @@ module BxBlockCatalogue
     end
 
     def remove_draft_products_from_cart
-      BxBlockOrderManagement::OrderItem.where(catalogue: self).or(BxBlockOrderManagement::OrderItem.where(catalogue_variant: self.catalogue_variants)).destroy_all
+      (BxBlockOrderManagement::OrderItem.joins(:order).where("orders.status IN (?)",['in_cart', 'created']).where(catalogue: self)).or(BxBlockOrderManagement::OrderItem.joins(:order).where("orders.status IN (?)",['in_cart', 'created']).where(catalogue_variant: self.catalogue_variants)).destroy_all
     end
 
     def update_orders
