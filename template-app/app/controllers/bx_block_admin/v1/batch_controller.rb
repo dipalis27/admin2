@@ -85,6 +85,13 @@ module BxBlockAdmin
               else
                 return true
               end
+            when "BxBlockCatalogue::Catalogue"
+              if obj.orders.exists?
+                @message = "You can't delete this product because few orders are associated with this product."
+                return false
+              else
+                return true
+              end
             else
               return true
           end
