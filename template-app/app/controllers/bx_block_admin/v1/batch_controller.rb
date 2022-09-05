@@ -62,15 +62,38 @@ module BxBlockAdmin
             objects = resource_class.find(@batch.ids)
             result = []
             objects.each do |each_object|
-              if each_object.destroy
+              if can_destroy?(each_object)
+                each_object.destroy
                 result << { status: 200, id: each_object.id }
               else
-                result << { status: 422, id: each_object.id }
+                result << { id: each_object.id, errors: [@message], status: 422 }
               end
             end
-            render json: { message: "Deleted successfully.", result: result }, status: :ok  
+            notice_message = @message.present? ? "Couldn't perform on all." : "Deleted successfully."
+            render json: { message: notice_message, result: result }, status: :ok  
           rescue => exception
             render json: { errors: [exception.message] }, status: :not_found
+          end
+        end
+
+        def can_destroy?(obj)
+          case obj.class.name
+            when "BxBlockCatalogue::Brand"
+              if obj.catalogues.exists?
+                @message = "Products are assoicated with brand. Unable to delete."
+                return false
+              else
+                return true
+              end
+            when "BxBlockCatalogue::Catalogue"
+              if obj.orders.exists?
+                @message = "You can't delete this product because few orders are associated with this product."
+                return false
+              else
+                return true
+              end
+            else
+              return true
           end
         end
 

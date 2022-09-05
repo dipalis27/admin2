@@ -15,6 +15,9 @@ module BxBlockCatalogue
     after_create :track_event
     after_commit :update_onboarding_step
 
+    ## Associations
+    has_many :catalogues
+
     def track_event
       Analytics.track(user_id: ENV["HOST_URL"].split("-")[1],event: 'New brands Created')
     end
