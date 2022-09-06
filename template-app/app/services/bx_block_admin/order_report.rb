@@ -51,7 +51,7 @@ module BxBlockAdmin
         monthly_order(filters,range)
       elsif filters[:duration].to_s.downcase == 'lifetime'
         start_date = BxBlockStoreProfile::BrandSetting.first.created_at.to_date
-        end_date = Date.today
+        end_date = Date.today.end_of_day
         range = start_date..end_date
         monthly_order(filters,range)
       elsif filters[:duration].to_s.downcase == 'today'
@@ -90,7 +90,7 @@ module BxBlockAdmin
     def time_range(filters)
       duration = filters[:duration]
       if [3,6,9,12].include?(filters[:duration].to_i)
-        ((Date.today - (duration.to_i - 1).months))..(Date.today)
+        ((Date.today - (duration.to_i - 1).months))..(Date.today.end_of_day)
       end
     end
 
@@ -117,7 +117,7 @@ module BxBlockAdmin
 
     def response_formatter(filters, total_sales, range, orders_count, accounts_count)
       total_sales_values = total_sales.values.sum.to_f
-      avg_order_value = '%.2f' % (total_sales_values / range.size) rescue 0.0
+      avg_order_value = '%.2f' % (total_sales_values / (orders_count > 0 ? orders_count : 1)) rescue 0.0
       total_sales_values = '%.2f' % total_sales_values
       {
         filters: {duration: filters[:duration]}, 
