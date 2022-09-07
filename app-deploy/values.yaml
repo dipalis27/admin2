@@ -24,6 +24,7 @@ appExtConfig:
   SMTP_USERNAME: "WE4CX23WXDSU33WDOAAEWAK6JU"
   SMTP_PORT: "587"
   SMTP_ADDRESS: "smtp.develmail.com"
+  BUILD_CARD_ID: "735228"
 
 image:
   repository:  gitlab.builder.ai:5000/template-app
