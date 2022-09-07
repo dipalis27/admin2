@@ -42,8 +42,8 @@ module BxBlockAdmin
           render json: {
             data:{
               attributes:{
-                api_key: ENV['RAZORPAY_KEY'],
-                api_secret_key: ENV['RAZORPAY_SECRET'],
+                user_name: ENV['USER_NAME'],
+                api_secret_key: '-',
                 razorpay_account_id: ENV['RAZORPAY_ACCOUNT_ID'],
                 razorpay_variables: (ENV['RAZORPAY_KEY'] && ENV['RAZORPAY_SECRET']).present?
               }
