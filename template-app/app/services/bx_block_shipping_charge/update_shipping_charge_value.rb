@@ -61,7 +61,9 @@ module BxBlockShippingCharge
         end
         @is_success = false
       end
-      order.shipping_total = order.shipping_charge - order.shipping_discount
+      shipping_total = order.shipping_charge - order.shipping_discount
+      order.shipping_total = shipping_total
+      order.shipping_charge = 0.0 if shipping_total.to_f == 0.0
       order.shipping_net_amt = order.shipping_charge - order.shipping_discount
       order.total = order.total + order.shipping_total
     end
