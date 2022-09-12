@@ -4,9 +4,10 @@ module BxBlockAdmin
 
     class PaymentsController < ApplicationController
       before_action :set_api, only:[:show, :update]
-      before_action :check_api_configuration, only: :index
+
       def index
-        api = @brand.country == "india"? BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay"): BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe")
+        brand =  BxBlockStoreProfile::BrandSetting.last
+        api = brand.country == "india"? BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay"): BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe")
 
         if api.present?
           render json: PaymentSerializer.new(api).serializable_hash, success: :ok
@@ -69,17 +70,6 @@ module BxBlockAdmin
           render json: {"errors": "API configuration not found"}, status: 404
         end
       end
-
-      def check_api_configuration
-        @brand =  BxBlockStoreProfile::BrandSetting.last
-        
-        if @brand.country == "india" && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay").present?
-          BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
-        elsif @brand.country == "uk" && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe").present?
-          BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "stripe", api_key: "n/a", api_secret_key: "n/a")
-        end
-      end
-      
     end
   end
 end

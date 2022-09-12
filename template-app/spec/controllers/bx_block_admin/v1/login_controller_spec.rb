@@ -54,5 +54,11 @@ RSpec.describe BxBlockAdmin::V1::LoginsController, type: :controller do
       expect(JSON.parse(response.body)).to eq(expectation)
       expect(response).to have_http_status(:unprocessable_entity)
     end
+
+    it 'return 200 success and will passed if build_card_id key is present' do
+      post :create, params: { 'email': @admin_user.email, 'password': "correctPass" }
+      expect(JSON.parse(response.body).keys.include?('build_card_id')).to eq(true)
+      expect(response).to have_http_status(:ok)
+    end
   end
 end

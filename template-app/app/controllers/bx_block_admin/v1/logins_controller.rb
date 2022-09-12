@@ -10,6 +10,7 @@ module BxBlockAdmin
         if @admin_user.valid_password?(admin_user_params[:password])
           render json: {
             token: BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id),
+            build_card_id: ENV['BUILD_CARD_ID'],
             admin_user: AdminUserSerializer.new(@admin_user).serializable_hash
           }, status: :ok
         else

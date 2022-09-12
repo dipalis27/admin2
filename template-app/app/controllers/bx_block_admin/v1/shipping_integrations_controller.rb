@@ -2,9 +2,10 @@ module BxBlockAdmin
   module V1
     class ShippingIntegrationsController < ApplicationController
       before_action :set_api_configuration, only: [:show, :update, :destroy]
-      before_action :check_shipping_configuration, only: :index
       
       def index
+        @brand =  BxBlockStoreProfile::BrandSetting.last
+
         if @brand.country == "india"
           if shiprocket_default_credentials_available?
             render json: shiprocket_variable_response, status: :ok
@@ -60,16 +61,6 @@ module BxBlockAdmin
 
         def api_configuration_params
           params.permit(:configuration_type, :ship_rocket_user_email, :ship_rocket_user_password, :oauth_site_url, :base_url, :client_id, :client_secret, :logistic_api_key)
-        end
-
-        def check_shipping_configuration
-          @brand =  BxBlockStoreProfile::BrandSetting.last
-
-          if @brand.country == "india" && (!BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "shiprocket").present? || !shiprocket_default_credentials_available?)
-            BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "n/a")
-          elsif  @brand.country == "uk" && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "525k").present?
-            BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "525k", oauth_site_url: "n/a", base_url: "n/a", client_id: "n/a", client_secret: "n/a", logistic_api_key: "n/a")
-          end
         end
 
         def shiprocket_default_credentials_available?
