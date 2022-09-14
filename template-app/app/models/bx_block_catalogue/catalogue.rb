@@ -92,6 +92,7 @@ module BxBlockCatalogue
     before_update :update_orders
     after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
     after_save :remove_draft_products_from_cart, if: -> { self.draft? }
+    after_save :destroy_wishlist_items, if: -> { self.draft? }
     after_destroy :destroy_wishlist_items
 
     # Scopes
