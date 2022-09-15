@@ -17,6 +17,7 @@
           Placed on <%= order.placed_at&.in_time_zone(ENV['TIME_ZONE'])&.strftime("%a, #{order.placed_at&.in_time_zone(ENV['TIME_ZONE'])&.day&.ordinalize} %B %Y - %I:%M %p") %>
         </td>
       </tr>
+      <% currency = BxBlockStoreProfile::BrandSetting.last.currency_type%>
       <% order_items.each do |order_item| %>
         <% catalogue = order_item.catalogue %>
         <% catalogue_variant = order_item&.catalogue_variant %>
@@ -79,7 +80,7 @@
           </td>
           <td valign="top" align="right" style="width: 33.333%;padding:16px;">
               <span style="font-size:14px;font-weight:600;text-transform:capitalize;color: #4d4d4d;">
-              <%= order_item.total_price %>
+              <%=currency%> <%= order_item.total_price %>
             </span>
           </td>
         </tr>
@@ -91,7 +92,7 @@
       </tr>
       <tr>
         <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Subtotal: </th>
-        <td width="100" align="right" style="padding: 5px"><%= order.sub_total.to_f %></td>
+        <td width="100" align="right" style="padding: 5px"><%=currency%> <%= order.sub_total.to_f %></td>
       </tr>
       <tr>
         <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Shipping & Handling: </th>
@@ -101,13 +102,15 @@
         <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Tax:</th>
         <td width="100" align="right" style="padding: 5px"><%= order&.total_tax.to_f %></td>
       </tr>
-      <tr>
-        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Discount(15% off Registered Customer):</th>
-        <td width="100" align="right" style="padding: 5px">-<%= order&.applied_discount.to_f %></td>
-      </tr>
-      <tr>
+      <% if order&.coupon_code %>
+        <tr>
+          <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Discount Applied (<%= order&.applied_discount.to_f %>):</th>
+          <td width="100" align="right" style="padding: 5px">-<%=currency%><%=order&.applied_discount.to_f %></td>
+        </tr>
+      <% end %>
+        <tr>
         <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Grand Total:</th>
-        <td width="100" align="right" style="padding: 5px"><%= order&.total.to_f %></td>
+        <td width="100" align="right" style="padding: 5px"><%=currency%><%= order&.total.to_f %></td>
       </tr>
       <tr>
         <td style="font-size: 14px;padding: 10px;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc">

@@ -7,7 +7,7 @@ module BxBlockAdmin
 
       def index
         brand =  BxBlockStoreProfile::BrandSetting.last
-        api = brand.country == "india"? BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay"): BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe")
+        api = brand.country == "india"? BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay") : BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe")
 
         if api.present?
           render json: PaymentSerializer.new(api).serializable_hash, success: :ok
