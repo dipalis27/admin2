@@ -4,10 +4,17 @@ module BxBlockAdmin
       before_action :set_api_configuration, only: [:show, :update, :destroy]
       
       def index
-        if shiprocket_default_credentials_available?
-          render json: shiprocket_variable_response, status: :ok
+        @brand =  BxBlockStoreProfile::BrandSetting.last
+
+        if @brand.country == "india"
+          if shiprocket_default_credentials_available?
+            render json: shiprocket_variable_response, status: :ok
+          else
+            api_configuration = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type:'shiprocket')
+            render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configuration).serializable_hash, status: :ok
+          end
         else
-          api_configuration = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: ['shiprocket', '525k']).order(updated_at: :desc).first
+          api_configuration = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type:'525k')
           render json: BxBlockAdmin::ApiConfigurationSerializer.new(api_configuration).serializable_hash, status: :ok
         end
       end

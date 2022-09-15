@@ -29,6 +29,8 @@ module BxBlockStoreProfile
     after_commit :upload_json
     after_commit :update_onboarding_step
     after_commit :update_default_email_settings
+    after_commit :check_api_configuration, if: :saved_change_to_country?
+    after_commit :check_shipping_configuration, if: :saved_change_to_country?
 
     # Validations
     validates :logo, :country, presence: true
@@ -257,6 +259,26 @@ module BxBlockStoreProfile
 
     def country_india?
       self.country == 'india' ? true : false
+    end
+
+    def country_uk?
+      self.country == 'uk' ? true : false
+    end
+
+    def check_api_configuration
+      if self.country_india? && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+      elsif self.country_uk? && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "stripe", api_key: "n/a", api_secret_key: "n/a")
+      end
+    end
+
+    def check_shipping_configuration
+      if self.country_india?  && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "shiprocket").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "n/a")
+      elsif  self.country_uk?  && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "525k").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "525k", oauth_site_url: "n/a", base_url: "n/a", client_id: "n/a", client_secret: "n/a", logistic_api_key: "n/a")
+      end
     end
 
     def update_default_email_settings

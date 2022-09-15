@@ -167,6 +167,14 @@ unless BxBlockStoreProfile::BrandSetting.any?
       end
     end
   end
+  # Third party API configurations
+  if brand_setting.country == 'india'
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "na")
+  else
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "stripe", api_key: "n/a", api_secret_key: "n/a")
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "525k", oauth_site_url: "n/a", base_url: "n/a", client_id: "n/a", client_secret: "n/a", logistic_api_key: "n/a")
+  end
 end
 
 # Onboarding data
@@ -235,10 +243,6 @@ BxBlockCatalogue::Catalogue.active.each do |catalogue|
     end
   end
 end
-
-# Third party API configurations
-BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
-BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "na")
 
 customer_facing_email = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Customer facing emails")
 admin_emails = BxBlockSettings::EmailSettingTab.find_or_create_by(name: "Admin emails")
