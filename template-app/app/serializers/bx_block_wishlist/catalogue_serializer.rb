@@ -32,7 +32,7 @@ module BxBlockWishlist
                :name, :sku, :description, :manufacture_date,
                :length, :breadth, :height, :stock_qty,
                :availability, :weight, :price, :price_including_tax, :recommended,
-               :on_sale, :sale_price, :discount
+               :on_sale, :sale_price, :discount, :status
 
     attribute :actual_price_including_tax do |object|
       object.price

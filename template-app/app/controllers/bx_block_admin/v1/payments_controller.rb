@@ -6,12 +6,13 @@ module BxBlockAdmin
       before_action :set_api, only:[:show, :update]
 
       def index
-        @apis = BxBlockApiConfiguration::ApiConfiguration.all
-        
-        if @apis.present?
-          render json: PaymentSerializer.new(@apis).serializable_hash, success: :ok
+        brand =  BxBlockStoreProfile::BrandSetting.last
+        api = brand.country == "india"? BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay") : BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe")
+
+        if api.present?
+          render json: PaymentSerializer.new(api).serializable_hash, success: :ok
         else
-          render(json:{error:"No API configurations found"}, status: 404)
+          render json:{error:"No API configurations found"}, status: 200
         end
       end
 
@@ -43,7 +44,8 @@ module BxBlockAdmin
             data:{
               attributes:{
                 api_key: ENV['RAZORPAY_KEY'],
-                api_secret_key: ENV['RAZORPAY_SECRET'],
+                user_name: ENV['USER_NAME'],
+                api_secret_key: '-',
                 razorpay_account_id: ENV['RAZORPAY_ACCOUNT_ID'],
                 razorpay_variables: (ENV['RAZORPAY_KEY'] && ENV['RAZORPAY_SECRET']).present?
               }

@@ -36,7 +36,7 @@ module BxBlockAdmin
   class CatalogueSerializer < BuilderBase::BaseSerializer
     extend AttachmentHelper
 
-    attributes :id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax, :tax_id, :brand_id
+    attributes :id, :name, :sku, :description, :manufacture_date, :length, :breadth, :height, :availability, :stock_qty, :weight, :price, :recommended, :on_sale, :sale_price, :discount, :block_qty, :sold, :available_price, :status, :tax_amount, :price_including_tax, :tax_id, :brand_id, :meta_title, :meta_description
     
     attribute :tags do |object|
       object.tags.select(:id, :name)
