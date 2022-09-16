@@ -52,6 +52,7 @@ module BxBlockBanner
 
     def self.validate_and_save(banners)
       response = {}
+      tmp_images_path = []
       BxBlockBanner::Banner.transaction do
         banners.each do |banner_data|
           banner =  self.find_by_id(banner_data[:id])
@@ -65,13 +66,18 @@ module BxBlockBanner
             if sub_banner[:image].present?
               attachment = banner.attachments.new(position: sub_banner[:position], url: sub_banner[:url]) if sub_banner[:id].blank?
               attachment = banner.attachments.find(sub_banner[:id]) if sub_banner[:id].present?
-              attachment.url = sub_banner[:url]
-              image_path, image_extension = store_base64_image(sub_banner[:image])
-              attachment.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
-              File.delete(image_path) if File.exist?(image_path)
+              attachment.update_column('url', sub_banner[:url]) if !(attachment.new_record?)
+              if sub_banner[:image].include?('data:image')
+                image_path, image_extension = store_base64_image(sub_banner[:image])
+                attachment.image.attach(io: File.open(image_path), filename: "cropped_image.#{image_extension}")
+                tmp_images_path << image_path
+              end
             end
           end
           banner.save!
+          tmp_images_path.each do |img_path|
+            File.delete(img_path) if File.exist?(img_path)
+          end
         end
         response[:success] = true
       rescue StandardError => e
