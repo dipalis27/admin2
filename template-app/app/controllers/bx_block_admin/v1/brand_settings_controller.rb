@@ -43,7 +43,11 @@ module BxBlockAdmin
             @brand_setting.logo.attach(data: params[:logo]) if params[:logo].present?
             @brand_setting.favicon_logo.attach(data: params[:favicon_logo]) if params[:favicon_logo].present?
             response = BxBlockBanner::Banner.validate_and_save(params[:banners]) if params[:banners].present?
-            return render json: BrandSettingSerializer.new(@brand_setting), status: :ok
+            if response[:success]
+              return render json: BrandSettingSerializer.new(@brand_setting), status: :ok
+            else
+              return render json: { errors: [response[:message]] }, status: :unprocessable_entity
+            end
           else
             return render json: { errors: [@brand_setting.errors.full_messages.to_sentence] }, status: :unprocessable_entity
           end

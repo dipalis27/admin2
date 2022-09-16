@@ -66,6 +66,10 @@ module BxBlockOrderManagement
       object.total.round(2)
     end
 
+    attribute :items_total do |object|
+      object.items_total
+    end
+
     attributes *[
       :status,
       :applied_discount,

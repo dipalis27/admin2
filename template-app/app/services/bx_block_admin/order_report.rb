@@ -59,7 +59,7 @@ module BxBlockAdmin
         hourly_sales = {}
         range.map{|hour| hourly_sales[hour.to_s.to_sym] = [0] }
         orders = @orders.where(order_date: Date.today.beginning_of_day..Date.today.end_of_day)
-        accounts_count = AccountBlock::Account.where(created_at: Date.today.beginning_of_day..Date.today.end_of_day).count
+        accounts_count = sign_up_count(Date.today.beginning_of_day..Date.today.end_of_day)
         orders.each do |order|
           hour = order.order_date.strftime("%H")
           hourly_sales[hour.to_sym].present? ? (hourly_sales[hour.to_sym] << order.total ) : (hourly_sales[hour.to_sym] = ([] << order.total))
@@ -74,7 +74,7 @@ module BxBlockAdmin
         daily_sales = {}
         range.to_a.map{|day| daily_sales[day.strftime("%d").to_s.to_sym] = [0] }
         orders = @orders.where(order_date: range)
-        accounts_count = AccountBlock::Account.where(created_at: range).count
+        accounts_count = sign_up_count(range)
         orders.each do |order|
           day = order.order_date.strftime("%d")
           daily_sales[day.to_s.to_sym].present? ? (daily_sales[day.to_s.to_sym] << order.total ) : (daily_sales[day.to_s.to_sym] = ([] << order.total))
@@ -104,7 +104,7 @@ module BxBlockAdmin
       range.to_a.map{|day| months << month_year(day) if !(months.include?(month_year(day)))}
       months.map{|month| total_sales[month.to_sym]= 0}
       orders = @orders.where(order_date: range).group_by{|order| order.order_date.beginning_of_month}
-      accounts_count = AccountBlock::Account.where(created_at: range).count
+      accounts_count = sign_up_count(range)
       orders_count = 0
       orders.keys.each do |month|
         month_orders = orders[month]
@@ -128,6 +128,10 @@ module BxBlockAdmin
         orders_count: orders_count,
         range: range
       }
+    end
+
+    def sign_up_count(range)
+      accounts_count = AccountBlock::Account.where('guest IS NULL OR guest =?',false).where(created_at: range).count
     end
   end
 end

@@ -19,6 +19,10 @@ module BxBlockCart
         BxBlockCouponCodeGenerator::CouponCodeSerializer.new(object.coupon_code).serializable_hash[:data]
       end
     end
+    
+    attribute :items_total do |object|
+      object.items_total
+    end
 
     attribute :account do |object|
       if object.present?
