@@ -24,6 +24,12 @@ appExtConfig:
   SMTP_USERNAME: "WE4CX23WXDSU33WDOAAEWAK6JU"
   SMTP_PORT: "587"
   SMTP_ADDRESS: "smtp.develmail.com"
+  SHIPROCKET_ACCOUNT_ID: eb9b277d-040c-45b0-bd2e-93cf38f7f69f
+  SHIPROCKET_API_EMAIL: ecommerceappampampampwebsite_744679+api@store.builder.cafe
+  SHIPROCKET_API_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI5NzQ0MTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjYzMjkwMDI2LCJleHAiOjE2NjQxNTQwMjYsIm5iZiI6MTY2MzI5MDAyNiwianRpIjoib1VpRjNEZDFPMmxGbHl3RiJ9.uE0PWWxrEoDVraX2OU3-srLy-a--XlK4jHcQOg0JpYs
+  SHIPROCKET_EMAIL: ecommerceappampampampwebsite_744679@store.builder.cafe
+  SHIPROCKET_PASSWORD: ZD@45q6moRT9l
+
   BUILD_CARD_ID: "744394"
 
 image:
