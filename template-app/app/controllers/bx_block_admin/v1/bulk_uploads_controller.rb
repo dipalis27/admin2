@@ -6,7 +6,7 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        bulk_images = BxBlockCatalogue::BulkImage.order(updated_at: :desc).page(current_page).per(per_page)
+        bulk_images = BxBlockCatalogue::BulkImage.order(created_at: :desc).page(current_page).per(per_page)
         render json: BxBlockAdmin::BulkImageSerializer.new(bulk_images, pagination_data(bulk_images, per_page)).serializable_hash, status: :ok
       end
 

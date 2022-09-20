@@ -9,9 +9,9 @@ module BxBlockAdmin
         if params[:search_term].present?
           BxBlockInstructorData::Instructor.where("instructor_name ILIKE (?) or email ILIKE (?)", "%#{params[:search_term]}%", "%#{params[:search_term]}%")
         else
-          BxBlockInstructorData::Instructor.all.order(updated_at: :desc).page(current_page).per(per_page)
+          BxBlockInstructorData::Instructor.all.order(created_at: :desc).page(current_page).per(per_page)
         end
-        instructors = BxBlockInstructorData::Instructor.order(updated_at: :desc).page(current_page).per(per_page)
+        instructors = BxBlockInstructorData::Instructor.order(created_at: :desc).page(current_page).per(per_page)
         options = pagination_data(instructors, per_page)
         options[:params] = { host: request.protocol + request.host_with_port }
         render json: BxBlockInstructorsData::InstructorSerializer.new(instructors, options).serializable_hash, status: :ok

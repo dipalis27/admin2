@@ -10,7 +10,7 @@ module BxBlockAdmin
           else
             BxBlockCategoriesSubCategories::Category.left_joins(:sub_categories).where("LOWER(categories.name) LIKE LOWER(:search) OR LOWER(sub_categories.name) LIKE LOWER(:search)", search: "%#{params[:search]}%").distinct
           end
-        categories = categories.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
+        categories = categories.order(created_at: :desc).page(params[:page]).per(params[:per_page])
         render json: BxBlockAdmin::CategorySerializer.new(categories, pagination_data(categories, params[:per_page])).serializable_hash, status: :ok
       end
 

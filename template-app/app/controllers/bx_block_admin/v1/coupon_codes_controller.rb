@@ -6,7 +6,7 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        coupons = BxBlockCouponCodeGenerator::CouponCode.order(updated_at: :desc).page(current_page).per(per_page)
+        coupons = BxBlockCouponCodeGenerator::CouponCode.order(created_at: :desc).page(current_page).per(per_page)
         render json: CouponCodeSerializer.new(coupons, pagination_data(coupons, per_page)).serializable_hash, status: :ok
       end
 

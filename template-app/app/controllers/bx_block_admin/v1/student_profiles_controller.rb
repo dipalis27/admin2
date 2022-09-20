@@ -12,7 +12,7 @@ module BxBlockAdmin
           else
             BxBlockStudentsData::StudentProfile.all
           end
-        students = students.order(updated_at: :desc).page(current_page).per(per_page)
+        students = students.order(created_at: :desc).page(current_page).per(per_page)
         render json: BxBlockStudentsData::StudentSerializer.new(students, pagination_data(students, per_page)).serializable_hash, status: :ok
       end
 

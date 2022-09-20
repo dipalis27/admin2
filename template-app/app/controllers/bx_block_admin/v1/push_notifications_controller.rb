@@ -8,7 +8,7 @@ module BxBlockAdmin
       def index
         per_page = params[:per_page].present? ? params[:per_page].to_i : 10
         current_page = params[:page].present? ? params[:page].to_i : 1
-        notifications = BxBlockNotification::PushNotification.order(updated_at: :desc).page(current_page).per(per_page)
+        notifications = BxBlockNotification::PushNotification.order(created_at: :desc).page(current_page).per(per_page)
 
         if notifications.present?
           render json: PushNotificationSerializer.new(notifications, pagination_data(notifications, per_page)).serializable_hash, status: :ok
