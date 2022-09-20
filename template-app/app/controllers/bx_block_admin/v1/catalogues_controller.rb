@@ -10,7 +10,7 @@ module BxBlockAdmin
           catalogue_array = BxBlockCatalogue::Catalogue.search(params)
           catalogues = Kaminari.paginate_array(catalogue_array).page(current_page).per(per_page)
         else
-          catalogues = BxBlockCatalogue::Catalogue.order(updated_at: :desc).page(current_page).per(per_page)  
+          catalogues = BxBlockCatalogue::Catalogue.order(created_at: :desc).page(current_page).per(per_page)  
         end
         render json: serialized_hash(catalogues, options: pagination_data(catalogues, per_page)), status: :ok
       end
