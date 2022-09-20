@@ -4,23 +4,36 @@ RSpec.describe BxBlockAdmin::V1::PaymentsController, type: :controller do
   before :context do
     @admin_user = FactoryBot.create(:admin_user, email: 'admin292@example.com', role: 'super_admin')
     @token = BuilderJsonWebToken::AdminJsonWebToken.encode(@admin_user.id)
-    @request_params = { token: @token, format: :json }    
+    @request_params = { token: @token, format: :json }
+    @razorpay_variables_present = ENV['RAZORPAY_KEY'].present? && ENV['RAZORPAY_SECRET'].present?
+    @razorpay_variables_not_present = !(ENV['RAZORPAY_KEY'].present? && ENV['RAZORPAY_SECRET'].present?)
   end
 
   describe 'Payment configurations Test' do
 
     context '/index' do
-      it 'API is present' do
-        FactoryBot.create(:api_configuration)
+      it 'If country is india and razorpay variables are present' do
+        @brand = FactoryBot.create(:brand_settings)
+        @brand.country == "india" && @razorpay_variables_present
         get :index, params: @request_params
+        expectation = HashWithIndifferentAccess.new({"api_key" => ENV['RAZORPAY_KEY'], "api_secret_key"=> "-", "user_name"=> ENV['USER_NAME'], "razorpay_account_id"=> ENV['RAZORPAY_ACCOUNT_ID'], "razorpay_variables"=> @razorpay_variables_present})
+        response_attributes = JSON.parse(response.body)['data']['attributes']
+        expect(response_attributes).to eq(expectation)
         expect(response.status).to eq(200)
       end
 
-      it 'API is not present' do
-        get :index, params: @request_params
-        expectation = HashWithIndifferentAccess.new({"error" => "No API configurations found"})
-        expect(JSON.parse(response.body)).to eq(expectation)
-        expect(response).to have_http_status(:not_found)
+      it 'If country is india and razorpay variables are not present' do
+        @brand = FactoryBot.create(:brand_settings)
+        @brand.country == "india" && !@razorpay_variables_not_present
+        get :index, params: @request_params.merge(configuration_type: 'razorpay')
+        expect(response.status).to eq(200)
+      end
+
+      it 'If country is uk' do
+        @brand = FactoryBot.create(:brand_settings, country: "uk")
+        @brand.country == "uk"
+        get :index, params: @request_params.merge(configuration_type: 'stripe')
+        expect(response.status).to eq(200)
       end
     end
 
