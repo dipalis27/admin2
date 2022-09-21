@@ -268,4 +268,12 @@ BxBlockSettings::EmailSetting.event_names.keys.each do |event_name|
   end
   email_setting.event_name = event_name
   email_setting.save
+
+  # Brandsetting sections
+  sections = YAML.load_file("#{Rails.root}/config/sections.yml")
+  sections.each do |section_hash|
+    section = BxBlockStoreProfile::Section.find_or_initialize_by(component_name: section_hash['component_name'])
+    section.assign_attributes(section_hash)
+    section.save
+  end
 end

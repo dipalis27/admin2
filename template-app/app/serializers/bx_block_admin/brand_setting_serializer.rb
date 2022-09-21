@@ -30,5 +30,9 @@ module BxBlockAdmin
       banners = BxBlockBanner::Banner.where(web_banner: true).order('banner_position ASC')
       BxBlockAdmin::BannerSerializer.new(banners)
     end
+    attribute :sections do |object|
+      sections = BxBlockStoreProfile::Section.order('position ASC')
+      BxBlockAdmin::SectionSerializer.new(sections)
+    end
   end
 end

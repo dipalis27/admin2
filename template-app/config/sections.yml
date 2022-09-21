@@ -1,0 +1,38 @@
+[
+  {
+    position: 1,
+    name: 'Banner/Carousel - 1',
+    component_name: 'BannerCarousel1',
+    is_active: true,
+  },
+  {
+    position: 2,
+    name: 'Categories',
+    component_name: 'CategorySection',
+    is_active: true,
+  },
+  {
+    position: 3,
+    name: 'New Arrivals',
+    component_name: 'NewArrivalsSection',
+    is_active: true,
+  },
+  {
+    position: 4,
+    name: 'Banner - 2',
+    component_name: 'BannerCarousel2',
+    is_active: true,
+  },
+  {
+    position: 5,
+    name: 'Tranding Products',
+    component_name: 'TrendingProductsSection',
+    is_active: true,
+  },
+  {
+    position: 6,
+    name: 'Banner - 3',
+    component_name: 'BannerCarousel3',
+    is_active: true,
+  }
+]
