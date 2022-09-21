@@ -42,6 +42,12 @@ module BxBlockAdmin
           if @brand_setting.update(brand_settings_params)
             @brand_setting.logo.attach(data: params[:logo]) if params[:logo].present?
             @brand_setting.favicon_logo.attach(data: params[:favicon_logo]) if params[:favicon_logo].present?
+            if params[:sections].present?
+              params[:sections].each do |section_hash|
+                section = BxBlockStoreProfile::Section.find_by_id(section_hash[:id])
+                section.update(position: section_hash[:position])
+              end
+            end
             response = BxBlockBanner::Banner.validate_and_save(params[:banners]) if params[:banners].present?
             if response[:success]
               return render json: BrandSettingSerializer.new(@brand_setting), status: :ok

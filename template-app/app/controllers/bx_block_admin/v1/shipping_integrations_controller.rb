@@ -64,14 +64,14 @@ module BxBlockAdmin
         end
 
         def shiprocket_default_credentials_available?
-          ENV['SHIPROCKET_USER_EMAIL'].present? && ENV['SHIPROCKET_USER_PASSWORD'].present?
+          ENV['SHIPROCKET_EMAIL'].present? && ENV['SHIPROCKET_PASSWORD'].present?
         end
 
         def shiprocket_variable_response
           {data:{
               attributes:{
-                ship_rocket_user_email: ENV['SHIPROCKET_USER_EMAIL'],
-                ship_rocket_user_password: ENV['SHIPROCKET_USER_PASSWORD'],
+                ship_rocket_user_email: ENV['SHIPROCKET_EMAIL'],
+                ship_rocket_user_password: ENV['SHIPROCKET_PASSWORD'],
                 shiprocket_variables: shiprocket_default_credentials_available?
               }
             }
