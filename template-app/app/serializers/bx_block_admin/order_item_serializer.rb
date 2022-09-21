@@ -1,5 +1,6 @@
 module BxBlockAdmin
   class OrderItemSerializer < BuilderBase::BaseSerializer
+    extend AttachmentHelper
     attributes :id, :quantity, :unit_price, :total_price
 
     attribute :catalogue do |object|
@@ -16,6 +17,12 @@ module BxBlockAdmin
         end
       end
       variants
+    end
+
+    attribute :catalogue_variant_attachment do |object|
+      if object.catalogue_variant.present?
+        object.catalogue_variant.attachments.select{ |attachment| attachment.image.attached? }.map { |attachment| attachment_hash(attachment, $hostname) }
+      end
     end
   end
 end
