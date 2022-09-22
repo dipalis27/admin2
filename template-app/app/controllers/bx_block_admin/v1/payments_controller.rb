@@ -68,6 +68,7 @@ module BxBlockAdmin
               user_name: ENV['USER_NAME'],
               api_secret_key: '-',
               razorpay_account_id: ENV['RAZORPAY_ACCOUNT_ID'],
+              configuration_type: "razorpay",
               razorpay_variables: razorpay_default_credentials_available?
             }
           }

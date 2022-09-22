@@ -72,6 +72,7 @@ module BxBlockAdmin
               attributes:{
                 ship_rocket_user_email: ENV['SHIPROCKET_EMAIL'],
                 ship_rocket_user_password: ENV['SHIPROCKET_PASSWORD'],
+                configuration_type: "shiprocket",
                 shiprocket_variables: shiprocket_default_credentials_available?
               }
             }
