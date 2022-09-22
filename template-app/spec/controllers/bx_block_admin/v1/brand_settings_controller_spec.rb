@@ -63,12 +63,13 @@ RSpec.describe BxBlockAdmin::V1::BrandSettingsController, type: :controller do
     context '/update' do
       before do
         @brand = FactoryBot.create(:brand_settings)
+        Rails.application.load_seed
       end
       it 'when admin_user provide all the fields' do
         request.headers['token'] = @token
-        put :update, params: {"id": @brand.id,"heading": Faker::Lorem.word, "country": "uk", "phone_number": "98765432101", "logo": Rack::Test::UploadedFile.new(Rails.root.join('app/assets/images/Logo.png'))}
-        expect(JSON.parse(response.body)["message"]).to eq("Brand Settings updated successfully")
+        put :update, params: {"id": @brand.id,"heading": Faker::Lorem.word, "country": "uk", "phone_number": "98765432101", "logo": Rack::Test::UploadedFile.new(Rails.root.join('app/assets/images/Logo.png')), sections: [{id: 1,position: 6}]}
         expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)["data"]["attributes"]["sections"].present?).to eq(true)
       end
       
       it 'when admin_user does not valid id' do
