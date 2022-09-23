@@ -62,6 +62,13 @@ module BxBlockAdmin
         attachment_hash(attachment, $hostname)
       end
     end
+
+    attribute :meta_fields do |object|
+      {
+        meta_title: object.meta_title,
+        meta_description: object.meta_description
+      }
+    end
     
     attribute :catalogue_variants_attributes do |object|
       if object.catalogue_variants.exists?  

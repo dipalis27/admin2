@@ -68,7 +68,9 @@ module BxBlockAdmin
         end
 
         def shiprocket_variable_response
-          {data:{
+          {
+            data:[
+            {
               attributes:{
                 ship_rocket_user_email: ENV['SHIPROCKET_EMAIL'],
                 ship_rocket_user_password: ENV['SHIPROCKET_PASSWORD'],
@@ -76,6 +78,7 @@ module BxBlockAdmin
                 shiprocket_variables: shiprocket_default_credentials_available?
               }
             }
+          ]
           }
         end
     end
