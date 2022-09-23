@@ -40,20 +40,23 @@ module BxBlockAdmin
         @brand_setting = BxBlockStoreProfile::BrandSetting.find_by_id(params[:id])
         if @brand_setting
           if @brand_setting.update(brand_settings_params)
-            @brand_setting.logo.attach(data: params[:logo]) if params[:logo].present?
+            @brand_setting.logo.attach(io: params[:logo], filename: "logo_#{@brand_setting}") if params[:logo].present?
             @brand_setting.favicon_logo.attach(data: params[:favicon_logo]) if params[:favicon_logo].present?
             if params[:sections].present?
               params[:sections].each do |section_hash|
                 section = BxBlockStoreProfile::Section.find_by_id(section_hash[:id])
-                section.update(position: section_hash[:position])
+                section.update(section_hash.permit(:position, :name, :component_name, :is_active)) if section.present?
               end
             end
-            response = BxBlockBanner::Banner.validate_and_save(params[:banners]) if params[:banners].present?
-            if response[:success]
-              return render json: BrandSettingSerializer.new(@brand_setting), status: :ok
-            else
-              return render json: { errors: [response[:message]] }, status: :unprocessable_entity
+            if params[:banners].present?
+              response = BxBlockBanner::Banner.validate_and_save(params[:banners])
+              if response[:success]
+                return render json: BrandSettingSerializer.new(@brand_setting), status: :ok
+              else
+                return render json: { errors: [response[:message]] }, status: :unprocessable_entity
+              end
             end
+            return render json: BrandSettingSerializer.new(@brand_setting), status: :ok
           else
             return render json: { errors: [@brand_setting.errors.full_messages.to_sentence] }, status: :unprocessable_entity
           end
@@ -113,6 +116,7 @@ module BxBlockAdmin
       def update_store_detail
        @brand_setting = BxBlockStoreProfile::BrandSetting.find(params[:brand_setting_id])
         if @brand_setting
+          @brand_setting.is_whatsapp_number_required = true
           if @brand_setting.update(update_store_detail_params)
             render json: BxBlockAdmin::StoreDetailSerializer.new(@brand_setting).serializable_hash, status: :ok
           else

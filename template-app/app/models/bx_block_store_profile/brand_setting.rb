@@ -3,7 +3,7 @@ module BxBlockStoreProfile
     self.table_name = :brand_settings
     include BxBlockStoreProfile::Country
     include UrlUtilities
-    attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image
+    attr_accessor :web_json_attached, :mobile_json_attached, :cropped_image, :is_whatsapp_number_required
 
     COLOR_PALET = [
       "{themeName: 'Sky',primaryColor:'#364F6B',secondaryColor:'#3FC1CB'}", 
@@ -324,6 +324,7 @@ module BxBlockStoreProfile
 
     def validate_whatsapp_number
       return if whatsapp_number.blank?
+      return if self.is_whatsapp_number_required.blank?
       if country == 'india'
         errors.add(:whatsapp_number, 'must be a 10 digit phone number') unless whatsapp_number =~ /\A\d{10}\z/
       elsif country == 'uk'
