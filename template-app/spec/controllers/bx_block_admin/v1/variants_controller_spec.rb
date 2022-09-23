@@ -132,6 +132,52 @@ RSpec.describe BxBlockAdmin::V1::VariantsController, type: :controller do
         end  
       end
     end
+
+    context "POST /bulk_data" do
+      context 'with a valid authorization token' do
+        before(:example) do
+          request_body = {
+            data: [
+              {
+                name: "Variant-1",
+                variant_properties_attributes: [
+                  {
+                    name: "Variant-Property-1"
+                  } 
+                ] 
+              }
+            ]
+          }
+          post :bulk_data, params: request_body.merge({token: @token})
+        end
+
+        let(:not_acceptable_body) do
+          {
+            data: [
+              {
+                name: "Error-variant" 
+              }
+            ]
+          }
+        end
+        
+        it "should have success status code" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'should return unprocessable entity status' do
+          post :bulk_data, params: not_acceptable_body.merge({token: @token})
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "with a invalid authorization token" do
+        it 'returns a bad request' do
+          post :bulk_data
+          expect(response).to have_http_status(:bad_request)
+        end  
+      end
+    end
     
   end
 end
