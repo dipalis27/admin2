@@ -65,35 +65,6 @@ module BxBlockAdmin
         end
       end
 
-      def add_banner
-        @banner = BxBlockBanner::Banner.create(banner_params)
-        if @banner.save
-          render json: BxBlockAdmin::BannerSerializer.new(@banner), status: :ok
-        else
-          render json: { errors: @banner.errors.full_messages }, status: 400
-        end
-      end
-
-      def update_banner
-        @banner = BxBlockBanner::Banner.find(params[:id])
-
-        if @banner.update(banner_params)
-          render(json: @banner,status: :ok, message: "Banner updated successfully")
-        else
-          render(json:{ error: "No banner found"}, status:404)
-        end
-      end
-
-      def destroy_banner
-        @banner = BxBlockBanner::Banner.find(params[:id])
-
-        if @banner.destroy
-          render json: { message: "Banner destroyed successfully", success: true}
-        else
-          render(json:{ error: "No banner found"}, status:404)
-        end
-      end
-
       def show
         begin
           @brand_setting = BxBlockStoreProfile::BrandSetting.find(params[:id])
