@@ -50,7 +50,8 @@ module BxBlockAdmin
         range = time_range(filters)
         monthly_order(filters,range)
       elsif filters[:duration].to_s.downcase == 'lifetime'
-        start_date = BxBlockStoreProfile::BrandSetting.first.created_at.to_date
+        brand_setting = BxBlockStoreProfile::BrandSetting.first
+        start_date = brand_setting.present? ? brand_setting.created_at.to_date : (Date.today - 1.days)
         end_date = Date.today.end_of_day
         range = start_date..end_date
         monthly_order(filters,range)
