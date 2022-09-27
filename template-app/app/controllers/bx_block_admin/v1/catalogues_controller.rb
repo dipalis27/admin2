@@ -81,6 +81,36 @@ module BxBlockAdmin
           render json: { errors: "Please select a file" }, status: :unprocessable_entity
         end
       end
+
+      def one_click_upload
+        if params[:data].present?
+          catalogues = []
+          params[:data].each do |each_hash|
+            catalogue = BxBlockCatalogue::Catalogue.new(each_hash.permit(:name, :description, :price))
+            category = BxBlockCategoriesSubCategories::Category.find_or_create_by(name: each_hash[:category])
+            unless category.image.attached?
+              file, filename = attach_image(each_hash[:category_image_url])
+              if file.present? && filename.present?
+                category.image.attach(io: file, filename: filename)
+              end
+              category.save
+            end
+            sub_category = category.sub_categories.find_or_create_by(name: each_hash[:sub_category])
+            catalogue.sub_category_ids = [sub_category.id]
+            catalogue.status = "draft"
+            attachment = catalogue.attachments.new
+            file, filename = attach_image(each_hash[:catalogue_image_url])
+            if file.present? && filename.present?
+              attachment.image.attach(io: file, filename: filename)  
+            end
+            catalogues << catalogue
+          end
+          catalogues.map{|catalogue| catalogue.save(validate: false) }
+          render json: { message: "Created successfully." }, status: :ok
+        else
+          render json: { errors: "Data is not present." }, status: :unprocessable_entity 
+        end
+      end
       
       private
 
@@ -110,6 +140,15 @@ module BxBlockAdmin
         # Calls base class method serialized_hash in application_controller
         def serialized_hash(obj, options: {}, serializer_class: BxBlockAdmin::CatalogueSerializer)
           super(serializer_class, obj, options)
+        end
+
+        # Used to store an image from url
+        def attach_image(image_url)
+          return nil, nil if image_url.nil?
+          url = URI.parse(URI.encode(image_url.strip))
+          filename = File.basename(url.path)
+          file = URI.open url
+          return file, filename
         end
 
     end
