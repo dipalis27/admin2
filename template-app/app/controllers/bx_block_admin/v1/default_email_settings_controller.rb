@@ -37,10 +37,6 @@ module BxBlockAdmin
         end
       end
 
-      def show
-        render json: serialized_hash(@default_email_setting), status: :ok
-      end
-
       def destroy
         if @default_email_setting.destroy
           render json: { message: "Default email setting deleted successfully.", success: true }, status: :ok
