@@ -169,7 +169,7 @@ RSpec.describe BxBlockAdmin::V1::CataloguesController, type: :controller do
           it { is_expected.to have_key(:price_including_tax) }
           it { is_expected.to have_key(:catalogue_variants_attributes) }
           it { is_expected.to have_key(:tags) }
-          it { is_expected.to have_key(:brand) }
+          it { is_expected.to have_key(:brand_id) }
           it { is_expected.to have_key(:category) }
           # it { is_expected.to have_key(:subscriptions) }
           it { is_expected.to have_key(:catalogue_attachments) }        
@@ -211,6 +211,33 @@ RSpec.describe BxBlockAdmin::V1::CataloguesController, type: :controller do
           delete :destroy, params: {id: 1}
           expect(response).to have_http_status(:bad_request)
         end  
+      end
+    end
+
+    context 'POST /one_click_upload' do
+      context 'with a valid authorization token' do
+        let(:request_body) do
+          {
+            data:
+              [
+                {
+                  category: "Baby Care",
+                  category_image_url: "https://drive.google.com/uc?export=view&id=1QefNn-V2lzbKXfVMb_Jbr0dONjRRHT3r",
+                  sub_category: "Baby Food",
+                  name: "Nestle Cerelac With Milk, Multigrain Dal Veg Baby Cereal (From 12 to 24 Months)",
+                  description: "First prod",
+                  price: 10,
+                  catalogue_image_url: "https://drive.google.com/uc?export=view&id=1jhxsSGIVjaI35qCpAYbaMz_zqY5gSTPq"
+                }
+              ]
+          }
+        end
+
+        subject do
+          post :one_click_upload, params: request_body.merge({token: @token})
+        end
+
+        it { is_expected.to have_http_status(:success) }  
       end
     end
     
